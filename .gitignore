@@ -1,4 +1,6 @@
 # Android Ignores
+**/google-services.json
+# Android Ignores
 *.iml
 .gradle
 /local.properties

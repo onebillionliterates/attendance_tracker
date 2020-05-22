@@ -14,7 +14,7 @@ class AppDataTest{
     @Test
     fun get_admin_info() {
         val mobileNumber = "8884410287"
-        val passcode = 330337
+        val passcode = 337703
 
         appData.getAdminInfo(mobileNumber, passcode)
     }
