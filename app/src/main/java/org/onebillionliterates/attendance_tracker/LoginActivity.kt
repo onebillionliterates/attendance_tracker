@@ -14,8 +14,6 @@ import org.onebillionliterates.attendance_tracker.data.AppData
 
 class LoginActivity : AppCompatActivity() {
 
-    private val appData = AppData()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
@@ -25,8 +23,6 @@ class LoginActivity : AppCompatActivity() {
             val mobileNumber = "8884410287"
             val passcode = 337703
 
-            appData.allAdmins()
-            appData.getAdminInfo(mobileNumber, passcode)
             val userName = username.text.toString()
             val password = password.text.toString()
             if( userName == "admin" && password == "12345"){

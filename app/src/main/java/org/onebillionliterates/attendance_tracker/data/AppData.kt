@@ -1,38 +1,31 @@
 package org.onebillionliterates.attendance_tracker.data
 
-import android.util.Log
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AppData {
-    private val db = FirebaseFirestore.getInstance()
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
+
+class AppData() {
+    private val db = Firebase.firestore
     private val TAG: String = "APP_DATA"
 
-    fun getAdminInfo(mobileNumber: String, passcode: Int) {
-        db.collection("admin")
+    suspend fun getAdminInfo(mobileNumber: String, passcode: Int): MutableList<DocumentSnapshot> {
+        val data = db.collection("admin")
             .whereEqualTo("mobile_number", mobileNumber)
             .whereEqualTo("passcode", passcode)
             .get()
-            .addOnSuccessListener { result ->
-                Log.w(TAG, "FOR PARTICULAR INFO " + result.size())
-                for (document in result) {
-                    Log.d(TAG, "PARTICULAR_ADMIN ${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents.", exception)
-            }
+            .await();
+
+        return data.documents
     }
 
-    fun allAdmins() {
-        db.collection("admin")
+    suspend fun allAdmins(): MutableList<DocumentSnapshot> {
+        val data = db.collection("admin")
             .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    Log.d(TAG, "ALL_ADMINS ${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents.", exception)
-            }
+            .await();
+
+        return data.documents
     }
 }
