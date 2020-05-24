@@ -21,7 +21,8 @@ class LoginActivity : AppCompatActivity() {
 
         loginButton.setOnClickListener { view ->
             val mobileNumber = "8884410287"
-            val passcode = 337703
+            val passCode = "337703"
+            val appData = AppData();
 
             val userName = username.text.toString()
             val password = password.text.toString()

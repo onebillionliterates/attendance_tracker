@@ -3,13 +3,12 @@ package org.onebillionliterates
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.collection.IsCollectionWithSize
+import org.hamcrest.core.Is
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -25,16 +24,22 @@ class AppDataTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         Firebase.initialize(appContext)
         /**
-         // FiReBasE locally -
-         // https://firebase.google.com/docs/emulator-suite
-         // https://firebase.google.com/docs/emulator-suite/connect_and_prototype
-         val db = Firebase.firestore
-         db.firestoreSettings = firestoreSettings {
-            host = "10.0.2.2:8080"
-            isSslEnabled = false
-            isPersistenceEnabled = false
-         }
+        // FiReBasE locally -
+        // https://firebase.google.com/docs/emulator-suite
+        // https://firebase.google.com/docs/emulator-suite/connect_and_prototype
+        val db = Firebase.firestore
+        db.firestoreSettings = firestoreSettings {
+        host = "10.0.2.2:8080"
+        isSslEnabled = false
+        isPersistenceEnabled = false
+        }
          **/
+    }
+
+    @Test
+    fun instrumentation_test() {
+        val TAG = "INSTRUMENTATION TESTS"
+        Log.d(TAG, "THIS IS SAMPLE TEST")
     }
 
     @Test
@@ -48,28 +53,11 @@ class AppDataTest {
         val TAG = "TESTING APP COROUTINE"
         val appData = AppData();
         val mobileNumber = "8884410287"
-        val passcode = 337703
+        val passcode = "337703"
+        var admin = appData.getAdminInfo(mobileNumber, passcode)
 
-        val data = appData.getAdminInfo(mobileNumber, passcode)
-
-        assertThat(data, IsCollectionWithSize.hasSize(1))
-        for (document in data) {
-            Log.d(TAG, "PARTICULAR ${document.id} => ${document.data}")
-        }
-        println(data)
+        assertThat(admin, Is(notNullValue()))
+        Log.d(TAG, "PARTICULAR => $admin")
     }
 
-    @Test
-    fun get_all_admins() = runBlocking {
-        val TAG = "TESTING APP COROUTINE"
-        val appData = AppData();
-
-        val data = appData.allAdmins()
-
-        assertNotNull(data)
-        for (document in data) {
-            Log.d(TAG, "ALL_ADMINS ${document.id} => ${document.data}")
-        }
-        println(data)
-    }
 }
