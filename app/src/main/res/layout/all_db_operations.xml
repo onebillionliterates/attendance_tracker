@@ -38,6 +38,22 @@
             android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveTeacher"
             android:layout_marginTop="5dp"/>
 
+
+    <Button
+            android:text="SAVE SCHOOL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/saveSchool"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/getTeacher"
+            android:layout_marginTop="5dp"/>
+
+    <Button
+            android:text="GET SCHOOL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/getSchool"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveSchool"
+            android:layout_marginTop="5dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
