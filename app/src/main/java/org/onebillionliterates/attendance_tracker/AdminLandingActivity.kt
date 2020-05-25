@@ -14,5 +14,9 @@ class AdminLandingActivity : AppCompatActivity() {
             val intent = Intent(this, SchoolListingActivity::class.java)
             startActivity(intent)
         }
+        all_teachers.setOnClickListener { view ->
+            val intent = Intent(this, TeachersActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

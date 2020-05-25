@@ -10,8 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.login.*
+import org.onebillionliterates.attendance_tracker.data.AppData
 
 class LoginActivity : AppCompatActivity() {
+
+    private val appData = AppData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +22,11 @@ class LoginActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         loginButton.setOnClickListener { view ->
+            val mobileNumber = "8884410287"
+            val passcode = 337703
+
+            appData.allAdmins()
+            appData.getAdminInfo(mobileNumber, passcode)
             val userName = username.text.toString()
             val password = password.text.toString()
             if( userName == "admin" && password == "12345"){
