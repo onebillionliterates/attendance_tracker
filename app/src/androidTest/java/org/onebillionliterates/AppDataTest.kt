@@ -1,7 +1,7 @@
 package org.onebillionliterates
 
 import android.util.Log
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
@@ -12,11 +12,10 @@ import org.hamcrest.core.Is
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.onebillionliterates.attendance_tracker.data.AppData
 
 
-@RunWith(AndroidJUnit4::class)
+@MediumTest
 class AppDataTest {
     @Before
     fun setupClass() {
@@ -49,15 +48,17 @@ class AppDataTest {
     }
 
     @Test
-    fun get_admin_info() = runBlocking {
-        val TAG = "TESTING APP COROUTINE"
-        val appData = AppData();
-        val mobileNumber = "8884410287"
-        val passcode = "337703"
-        var admin = appData.getAdminInfo(mobileNumber, passcode)
+    fun get_admin_info() {
+        runBlocking {
+            val TAG = "TESTING APP COROUTINE"
+            val appData = AppData();
+            val mobileNumber = "8884410287"
+            val passcode = "337703"
+            var admin = appData.getAdminInfo(mobileNumber, passcode)
 
-        assertThat(admin, Is(notNullValue()))
-        Log.d(TAG, "PARTICULAR => $admin")
+            assertThat(admin, Is(notNullValue()))
+            Log.d(TAG, "PARTICULAR => $admin")
+        }
     }
 
 }
