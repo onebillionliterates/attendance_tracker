@@ -8,11 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.all_db_operations.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.onebillionliterates.attendance_tracker.data.AppData
-import org.onebillionliterates.attendance_tracker.data.School
-import org.onebillionliterates.attendance_tracker.data.Teacher
+import kotlinx.coroutines.withContext
+import org.onebillionliterates.attendance_tracker.data.*
 import org.threeten.bp.LocalDateTime
 
 class DBOperations : AppCompatActivity() {
@@ -40,7 +40,12 @@ class DBOperations : AppCompatActivity() {
 
         saveTeacher.setOnClickListener { view ->
             GlobalScope.launch {
-                val teacher = Teacher(adminRef = "fw7aJ1dVDpQndyHFhDsv", mobileNumber = "1231231231", name = "Gordon", passCode = "3344123123")
+                val teacher = Teacher(
+                    adminRef = "fw7aJ1dVDpQndyHFhDsv",
+                    mobileNumber = "1231231231",
+                    name = "Gordon",
+                    passCode = "3344123123"
+                )
                 val savedTeacher = appData.saveTeacher(teacher)
 
                 Log.d(TAG, Thread.currentThread().name)
@@ -62,10 +67,16 @@ class DBOperations : AppCompatActivity() {
         saveSchool.setOnClickListener { view ->
             GlobalScope.launch {
                 val location = Location(LocationManager.GPS_PROVIDER)
-                location.latitude =12.9048363
-                location.longitude =77.7007194
+                location.latitude = 12.9048363
+                location.longitude = 77.7007194
 
-                val school = School(adminRef = "fw7aJ1dVDpQndyHFhDsv", mobileNumber = "1231231231", name = "Gordon Ramsay School", uniqueCode = "3344123123", location = location)
+                val school = School(
+                    adminRef = "fw7aJ1dVDpQndyHFhDsv",
+                    mobileNumber = "1231231231",
+                    name = "Gordon Ramsay School",
+                    uniqueCode = "3344123123",
+                    location = location
+                )
                 val savedTeacher = appData.saveSchool(school)
 
                 Log.d(TAG, Thread.currentThread().name)
@@ -76,7 +87,11 @@ class DBOperations : AppCompatActivity() {
 
         getSchool.setOnClickListener { view ->
             GlobalScope.launch {
-                val school = appData.getSchoolInfo(adminRef = "fw7aJ1dVDpQndyHFhDsv", name = "Gordon Ramsay School", uniqueCode = "3344123123")
+                val school = appData.getSchoolInfo(
+                    adminRef = "fw7aJ1dVDpQndyHFhDsv",
+                    name = "Gordon Ramsay School",
+                    uniqueCode = "3344123123"
+                )
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => ${school.id}")
@@ -84,7 +99,50 @@ class DBOperations : AppCompatActivity() {
             Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
         }
 
+        saveSession.setOnClickListener { view ->
+            GlobalScope.launch {
+                val session = Session(
+                    adminRef = "fw7aJ1dVDpQndyHFhDsv",
+                    teacherRef = "s9FoQNUw8cVuJn5JkIxn",
+                    schoolRef = "KI32lNxCTENtUk1z4XDv",
+                    startDate = LocalDateTime.now().minusDays(10),
+                    endDate = LocalDateTime.now().plusDays(40),
+                    durationInSecs = 1*60*60,
+                    mondayWorking = true,
+                    wednesdayWorking = true,
+                    fridayWorking = true
+                )
 
+                val savedSession = appData.saveSession(session);
+
+                Log.d(TAG, Thread.currentThread().name)
+                Log.d(TAG, "PARTICULAR => $savedSession")
+            }
+            Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
+        }
+
+        saveAttendance.setOnClickListener { view ->
+            GlobalScope.launch {
+                val attendance = Attendance(
+                    adminRef = "fw7aJ1dVDpQndyHFhDsv",
+                    teacherRef = "s9FoQNUw8cVuJn5JkIxn",
+                    schoolRef = "KI32lNxCTENtUk1z4XDv",
+                    sessionRef = "EqQMRPApwAiB5NaxGQdC",
+                    inTime = LocalDateTime.now().minusHours(1),
+                    outTime = LocalDateTime.now()
+                )
+
+                val attendanceSaved = appData.saveAttendance(attendance)
+
+                Log.d(TAG, Thread.currentThread().name)
+                Log.d(TAG, "PARTICULAR => $attendanceSaved")
+                Thread.sleep(4000)
+                withContext (Dispatchers.Main) {
+                    Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
+                }
+            }
+
+        }
     }
 
 }
