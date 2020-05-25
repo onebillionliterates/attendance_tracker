@@ -4,29 +4,30 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.login.*
+import kotlinx.coroutines.*
 import org.onebillionliterates.attendance_tracker.data.AppData
 
 class LoginActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidThreeTen.init(this);
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
         setSupportActionBar(toolbar)
 
         loginButton.setOnClickListener { view ->
-            val mobileNumber = "8884410287"
-            val passCode = "337703"
-            val appData = AppData();
 
             val userName = username.text.toString()
             val password = password.text.toString()
-            if( userName == "admin" && password == "12345"){
+            if (userName == "admin" && password == "12345") {
                 Snackbar.make(view, "Login SuccessFul", Snackbar.LENGTH_LONG).show()
                 val intent = Intent(this, AdminLandingActivity::class.java)
                 startActivity(intent)
