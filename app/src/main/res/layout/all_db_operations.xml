@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent">
+
+
+    <TextView
+            android:text="DB Operations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/dbops_title"
+            android:textSize="36sp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="36dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="150dp" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="150dp" android:textStyle="bold" app:layout_constraintHorizontal_bias="0.461"/>
+    <Button
+            android:text="GET ADMIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/getAdmin"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/dbops_title"
+            android:layout_marginTop="5dp"/>
+
+    <Button
+            android:text="SAVE TEACHER"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/saveTeacher"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/getAdmin"
+            android:layout_marginTop="5dp"/>
+
+    <Button
+            android:text="GET TEACHER"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/getTeacher"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveTeacher"
+            android:layout_marginTop="5dp"/>
+
+
+    <Button
+            android:text="SAVE SCHOOL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/saveSchool"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/getTeacher"
+            android:layout_marginTop="5dp"/>
+
+    <Button
+            android:text="GET SCHOOL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/getSchool"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveSchool"
+            android:layout_marginTop="5dp"/>
+
+    <Button
+            android:text="CREATE A SESSION"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/saveSession"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/getSchool"
+            android:layout_marginTop="5dp"/>
+
+    <Button
+            android:text="SAVE ATTENDANCE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/saveAttendance"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveSession"
+            android:layout_marginTop="5dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
