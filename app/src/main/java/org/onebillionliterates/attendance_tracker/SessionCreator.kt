@@ -34,7 +34,7 @@ class SessionCreator : AppCompatActivity() {
                     iconImageView.setImageDrawable(TimeDrawable(this))
                 }
             }
-        listOf(R.id.selectSchool, R.id.startDate, R.id.endTime, R.id.startTime, R.id.endTime, R.id.days, R.id.teachers)
+        listOf(R.id.selectSchool, R.id.startDate, R.id.endDate, R.id.startTime, R.id.endTime, R.id.days, R.id.teachers)
             .forEach { mainViewId->
                 run {
                     val view = findViewById<View>(mainViewId).findViewById<View>(R.id.includedRightIcon)
