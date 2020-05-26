@@ -67,7 +67,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.7'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
-
+    implementation 'info.androidhive:fontawesome:0.0.5'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'org.threeten:threetenbp:1.3.5'
