@@ -1,12 +1,16 @@
 package org.onebillionliterates.attendance_tracker.adapter
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.onebillionliterates.attendance_tracker.R
 import org.onebillionliterates.attendance_tracker.model.Teacher
+import java.io.IOException
 
 
 class CustomAdapter(var teacherList : ArrayList<Teacher>) :
@@ -19,6 +23,19 @@ class CustomAdapter(var teacherList : ArrayList<Teacher>) :
             val textViewAddress  = itemView.findViewById(R.id.textViewAddress) as TextView
             textViewName.text = teacher.name
             textViewAddress.text = teacher.address
+
+            val imageViewAddress  = itemView.findViewById(R.id.image_view_arrow) as ImageView
+            val assetsBitmap:Bitmap? = getBitmapFromAssets("arrow_background.jpg")
+            imageViewAddress.setImageBitmap(assetsBitmap)
+        }
+
+        fun getBitmapFromAssets(fileName: String): Bitmap? {
+            return try {
+                BitmapFactory.decodeFile(fileName)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                null
+            }
         }
 
     }
@@ -35,5 +52,7 @@ class CustomAdapter(var teacherList : ArrayList<Teacher>) :
     override fun onBindViewHolder(holder: CustomAdapter.ViewHolder, position: Int) {
         holder.bindItems(teacherList[position])
     }
+
+
 
 }
