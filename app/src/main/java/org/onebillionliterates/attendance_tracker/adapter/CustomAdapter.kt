@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.onebillionliterates.attendance_tracker.R
+import org.onebillionliterates.attendance_tracker.drawables.ArrowDrawable
 import org.onebillionliterates.attendance_tracker.model.Teacher
 import java.io.IOException
 
@@ -20,13 +21,13 @@ class CustomAdapter(var teacherList : ArrayList<Teacher>) :
 
         fun bindItems(teacher: Teacher) {
             val textViewName = itemView.findViewById(R.id.textViewUsername) as TextView
-            val textViewAddress  = itemView.findViewById(R.id.textViewAddress) as TextView
+//            val textViewAddress  = itemView.findViewById(R.id.textViewAddress) as TextView
             textViewName.text = teacher.name
-            textViewAddress.text = teacher.address
+//            textViewAddress.text = teacher.address
 
-            val imageViewAddress  = itemView.findViewById(R.id.image_view_arrow) as ImageView
-            val assetsBitmap:Bitmap? = getBitmapFromAssets("arrow_background.jpg")
-            imageViewAddress.setImageBitmap(assetsBitmap)
+//            val imageViewArrow  = itemView.findViewById(R.id.imageViewArrow) as ImageView
+//            imageViewArrow.setImageDrawable(R.drawable.arrow_drawable)
+
         }
 
         fun getBitmapFromAssets(fileName: String): Bitmap? {

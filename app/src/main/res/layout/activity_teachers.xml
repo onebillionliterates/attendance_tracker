@@ -31,7 +31,7 @@
             android:layout_marginRight="5dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="0.05"
-            android:backgroundTint="#2180F3"
+            android:backgroundTint="@color/colorPrimary"
             android:text="+ Add new"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="#FFFFFF"

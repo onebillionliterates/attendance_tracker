@@ -31,9 +31,9 @@ class TeachersAdapter(val userList: ArrayList<Teacher>) : RecyclerView.Adapter<C
 
         fun bindItems(teacher: Teacher) {
             val textViewName = itemView.findViewById(R.id.textViewUsername) as TextView
-            val textViewAddress  = itemView.findViewById(R.id.textViewAddress) as TextView
+//            val textViewAddress  = itemView.findViewById(R.id.textViewAddress) as TextView
             textViewName.text = teacher.name
-            textViewAddress.text = teacher.address
+//            textViewAddress.text = teacher.address
         }
     }
 }

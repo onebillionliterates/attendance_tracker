@@ -29,11 +29,11 @@ class TeachersActivity : AppCompatActivity() {
         val teachers = ArrayList<Teacher>()
 
         //adding some dummy data to the list
-        teachers.add(Teacher("Belal Khan", "Ranchi Jharkhand"))
-        teachers.add(Teacher("Ramiz Khan", "Ranchi Jharkhand"))
-        teachers.add(Teacher("Faiz Khan", "Ranchi Jharkhand"))
-        teachers.add(Teacher("Yashar Khan", "Ranchi Jharkhand"))
-        teachers.add(Teacher("Teacher 5", "Ranchi Jharkhand"))
+        teachers.add(Teacher("Teacher 01", "Ranchi Jharkhand"))
+        teachers.add(Teacher("Teacher 02", "Ranchi Jharkhand"))
+        teachers.add(Teacher("Teacher 03", "Ranchi Jharkhand"))
+        teachers.add(Teacher("Teacher 04", "Ranchi Jharkhand"))
+        teachers.add(Teacher("Teacher 05", "Ranchi Jharkhand"))
         teachers.add(Teacher("Teacher 6", "Ranchi Jharkhand"))
         teachers.add(Teacher("Teacher 7", "Ranchi Jharkhand"))
         teachers.add(Teacher("Teacher 8", "Ranchi Jharkhand"))

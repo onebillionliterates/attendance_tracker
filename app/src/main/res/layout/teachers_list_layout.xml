@@ -18,27 +18,35 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/textViewUsername"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+                        android:layout_weight="0.8"
+                        android:padding="15dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/colorLightBlack" />
                     <ImageView
-                        android:id="@+id/image_view_arrow"
-                        android:layout_width="20dp"
-                        android:layout_height="30dp" />
+                        android:id="@+id/imageViewArrow"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.2"
+                        android:paddingRight="5dp"
+                        android:src="@drawable/arrow"/>
                 </LinearLayout>
-                <TextView
-                    android:id="@+id/textViewAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+<!--                <TextView-->
+<!--                    android:id="@+id/textViewAddress"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:padding="5dp"-->
+<!--                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />-->
                 <FrameLayout
                     android:background="@drawable/dotted_boarder"
                     android:layout_width="match_parent"
-                    android:layout_height="4dp"/>
+                    android:layout_height="4dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"/>
             </LinearLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>
