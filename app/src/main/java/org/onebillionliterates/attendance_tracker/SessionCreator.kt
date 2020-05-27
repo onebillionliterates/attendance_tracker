@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.session_create.*
 import org.onebillionliterates.attendance_tracker.drawables.*
 
-class SessionCreator : AppCompatActivity() {
+class SessionCreator : AppCompatActivity(), View.OnClickListener {
     val TAG = "SessionCreator_Activity"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.session_create)
+        initView()
+    }
 
+    private fun initView() {
         schoolIcon.setImageDrawable(SchoolSolidDrawable(this))
         dayIcon.setImageDrawable(CalendarDaySolidDrawable(this))
         teacherIcon.setImageDrawable(UserDrawable(this))
@@ -43,5 +46,21 @@ class SessionCreator : AppCompatActivity() {
                 }
             }
 
+        days.setOnClickListener(this)
+    }
+
+    override fun onClick(clickView: View?) {
+        when (clickView) {
+            days -> {
+                daysUpDownBottomSheet()
+            }
+        }
+    }
+
+    private fun daysUpDownBottomSheet() {
+        val bottomSheet = layoutInflater.inflate(R.layout.days_drawer, null)
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(bottomSheet)
+        dialog.show()
     }
 }

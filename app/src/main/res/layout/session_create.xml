@@ -166,7 +166,7 @@
             android:layout_marginTop="25dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="150dp"
+                android:layout_width="175dp"
                 android:layout_height="60dp"
                 android:background="@drawable/button_view"
                 android:id="@+id/startTime"
@@ -192,10 +192,12 @@
                     android:hint="Start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:id="@+id/startTimeSelectTextView"
-                    app:layout_constraintStart_toEndOf="@+id/includedTimeIcon"
-                    android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+                    android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
                     android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.50"
+                    app:layout_constraintEnd_toStartOf="@+id/includedRightIcon"
+                    app:layout_constraintStart_toEndOf="@+id/includedTimeIcon" android:textAlignment="center"/>
 
             <include
                     android:id="@+id/includedRightIcon"
@@ -207,11 +209,11 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
                     android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-            />
+                    android:layout_marginEnd="15dp"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="150dp"
+                android:layout_width="175dp"
                 android:layout_height="60dp"
                 android:background="@drawable/button_view"
                 android:id="@+id/endTime"
@@ -234,12 +236,13 @@
                     app:layout_constraintBottom_toBottomOf="parent"/>
             <TextView
                     android:hint="End"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content" android:id="@+id/endTimeSelectTextView"
-                    app:layout_constraintStart_toEndOf="@+id/includedTimeIcon"
-                    android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+                    android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
                     android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/includedTimeIcon"
+                    app:layout_constraintEnd_toStartOf="@+id/includedRightIcon" android:textAlignment="center"/>
 
             <include
                     android:id="@+id/includedRightIcon"
@@ -251,7 +254,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
                     android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-            />
+                    android:layout_marginEnd="15dp"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
