@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:text="Select Days"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:id="@+id/daysHeaderText"
+            android:gravity="center_vertical"
+    />
+
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="left|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/dayMonday"
+            android:text="Monday"
+            android:textSize="20sp"
+
+    />
+
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/dayTuesday"
+            android:text="Tuesday"
+            android:textSize="20sp"/>
+
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/dayWednesday"
+            android:text="Wednesday"
+            android:textSize="20sp"/>
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/dayThursday"
+            android:text="Thursday"
+            android:textSize="20sp"/>
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/dayFriday"
+            android:text="Friday"
+            android:textSize="20sp"/>
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/daySaturday"
+            android:text="Saturday"
+            android:textSize="20sp"/>
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:srcCompat="@drawable/dotted_line"/>
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:buttonTint="@color/colorPrimary"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/daySunday"
+            android:text="Sunday"
+            android:textSize="20sp"/>
+
+</TableLayout>
