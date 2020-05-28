@@ -6,4 +6,6 @@
     <color name="colorDimGray">#696969</color>
     <color name="colorVeryDarkGray">#0a0a0a</color>
     <color name="colorLightBlack">#404040</color>
+    <color name="colorRedDark">#ffcc0000</color>
+    <color name="colorRedClickable">#990000</color>
 </resources>

@@ -1,15 +1,19 @@
 package org.onebillionliterates.attendance_tracker;
 
-import android.os.Bundle;
+import android.graphics.Color
+import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.onebillionliterates.attendance_tracker.adapter.CustomAdapter
-import org.onebillionliterates.attendance_tracker.drawables.*
+import org.onebillionliterates.attendance_tracker.drawables.EmailDrawable
+import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
+import org.onebillionliterates.attendance_tracker.drawables.TrashDrawable
+import org.onebillionliterates.attendance_tracker.drawables.UserDrawable
 import org.onebillionliterates.attendance_tracker.model.Teacher
 
 class TeachersActivity : AppCompatActivity() {
@@ -58,6 +62,11 @@ class TeachersActivity : AppCompatActivity() {
 
         val emailIdIcon = view.findViewById<ImageView>(R.id.emailIcon)
         emailIdIcon.setImageDrawable(EmailDrawable(this))
+
+        val trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
+        val color: Int = Color.parseColor("#ffcc0000") //The color u want
+        trashIcon.setColorFilter(color)
+        trashIcon.setImageDrawable(TrashDrawable(this))
     }
 
     private fun daysUpDownBottomSheet() {
