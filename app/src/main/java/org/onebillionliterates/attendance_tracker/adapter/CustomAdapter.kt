@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import org.onebillionliterates.attendance_tracker.R
+import org.onebillionliterates.attendance_tracker.MainActivity
 import org.onebillionliterates.attendance_tracker.drawables.ArrowDrawable
 import org.onebillionliterates.attendance_tracker.model.Teacher
 import java.io.IOException
@@ -21,24 +23,22 @@ class CustomAdapter(var teacherList : ArrayList<Teacher>) :
 
         fun bindItems(teacher: Teacher) {
             val textViewName = itemView.findViewById(R.id.textViewUsername) as TextView
-//            val textViewAddress  = itemView.findViewById(R.id.textViewAddress) as TextView
             textViewName.text = teacher.name
-//            textViewAddress.text = teacher.address
 
-//            val imageViewArrow  = itemView.findViewById(R.id.imageViewArrow) as ImageView
-//            imageViewArrow.setImageDrawable(R.drawable.arrow_drawable)
-
-        }
-
-        fun getBitmapFromAssets(fileName: String): Bitmap? {
-            return try {
-                BitmapFactory.decodeFile(fileName)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
+            val arrowImageView = itemView.findViewById(R.id.imageViewArrow) as ImageView
+            var click=true
+            arrowImageView.setOnClickListener {
+                if (click) {
+                    arrowImageView.setImageResource (R.drawable.arrow_gray);
+                    click = false;
+                } else {
+                    arrowImageView.setImageResource (R.drawable.arrow_blue);
+                    click = true;
+                }
+                println("clicked")
             }
-        }
 
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomAdapter.ViewHolder {
@@ -53,7 +53,4 @@ class CustomAdapter(var teacherList : ArrayList<Teacher>) :
     override fun onBindViewHolder(holder: CustomAdapter.ViewHolder, position: Int) {
         holder.bindItems(teacherList[position])
     }
-
-
-
 }

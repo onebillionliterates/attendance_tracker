@@ -38,9 +38,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
-
         </activity>
         <activity android:name=".SchoolListingActivity" android:label="Schools Listing" >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".TeachersActivity">

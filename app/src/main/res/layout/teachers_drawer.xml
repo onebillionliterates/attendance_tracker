@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:text="Add a new teacher"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:id="@+id/addNewTeacher"
+            android:gravity="center_vertical"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginLeft="15dp"
+            android:text="Remove"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_red_dark"
+            android:id="@+id/remove"
+            android:gravity="right"
+            />
+    </LinearLayout>
+    <!-- Teacher Name -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/button_view"
+        android:id="@+id/teachers"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@+id/days"
+        android:layout_marginTop="25dp">
+        <ImageView
+            android:id="@+id/teacherIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="TODO"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <TextView
+            android:hint="Teacher Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/teacherSelectTextView"
+            app:layout_constraintStart_toEndOf="@+id/teacherIcon"
+            android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Phone number -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/button_view"
+        android:id="@+id/phone"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@+id/days"
+        android:layout_marginTop="25dp">
+        <ImageView
+            android:id="@+id/phoneIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="TODO"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <TextView
+            android:hint="MobileNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mobileNumberTextView"
+            app:layout_constraintStart_toEndOf="@+id/phoneIcon"
+            android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Email Id -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/button_view"
+        android:id="@+id/email"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@+id/days"
+        android:layout_marginTop="25dp">
+        <ImageView
+            android:id="@+id/emailIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="TODO"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <TextView
+            android:hint="Email Id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/emailTextView"
+            app:layout_constraintStart_toEndOf="@+id/emailIcon"
+            android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/buttonAddNew"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_weight="0.05"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Add"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="#FFFFFF"
+        app:color="#FFFFFF" />
+</TableLayout>

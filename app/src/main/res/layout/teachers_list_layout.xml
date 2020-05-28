@@ -29,11 +29,11 @@
                         android:textColor="@color/colorLightBlack" />
                     <ImageView
                         android:id="@+id/imageViewArrow"
-                        android:layout_width="30dp"
+                        android:layout_width="40dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.2"
                         android:paddingRight="5dp"
-                        android:src="@drawable/arrow"/>
+                        android:src="@drawable/arrow_blue"/>
                 </LinearLayout>
 <!--                <TextView-->
 <!--                    android:id="@+id/textViewAddress"-->

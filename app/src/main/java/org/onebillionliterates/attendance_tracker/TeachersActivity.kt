@@ -1,33 +1,38 @@
 package org.onebillionliterates.attendance_tracker;
 
 import android.os.Bundle;
-import android.widget.LinearLayout
+import android.view.View
+import android.widget.Button
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.onebillionliterates.attendance_tracker.adapter.CustomAdapter
+import org.onebillionliterates.attendance_tracker.drawables.*
 import org.onebillionliterates.attendance_tracker.model.Teacher
 
 class TeachersActivity : AppCompatActivity() {
 
-    private lateinit var linearLayoutManager: LinearLayoutManager
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_teachers)
+        setContentView(R.layout.teachers_activity)
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        initRecyclerView(recyclerView)
 
 
-        //getting recyclerview from xml
-        val recyclerView = findViewById(R.id.recyclerview) as RecyclerView
+        val buttonAddNew = findViewById<Button>(R.id.buttonAddNew)
+        buttonAddNew.setOnClickListener {
+            daysUpDownBottomSheet()
+            println("add new clicked")
+        }
+    }
 
-        //adding a layoutmanager
+    private fun initRecyclerView(recyclerView : RecyclerView){
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-
-        //crating an arraylist to store users using the data class user
         val teachers = ArrayList<Teacher>()
-
         //adding some dummy data to the list
         teachers.add(Teacher("Teacher 01", "Ranchi Jharkhand"))
         teachers.add(Teacher("Teacher 02", "Ranchi Jharkhand"))
@@ -40,11 +45,27 @@ class TeachersActivity : AppCompatActivity() {
         teachers.add(Teacher("Teacher 9", "Ranchi Jharkhand"))
         teachers.add(Teacher("Teacher 10", "Ranchi Jharkhand"))
 
-        //creating our adapter
         val adapter = CustomAdapter(teachers)
-
-        //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
+    }
+
+    private fun initView(view : View) {
+        val teacherIcon = view.findViewById<ImageView>(R.id.teacherIcon)
+        teacherIcon.setImageDrawable(UserDrawable(this))
+
+        val phoneIcon = view.findViewById<ImageView>(R.id.phoneIcon)
+        phoneIcon.setImageDrawable(MobileDrawable(this))
+
+        val emailIdIcon = view.findViewById<ImageView>(R.id.emailIcon)
+        emailIdIcon.setImageDrawable(EmailDrawable(this))
+    }
+
+    private fun daysUpDownBottomSheet() {
+        val bottomSheet = layoutInflater.inflate(R.layout.teachers_drawer, null)
+        initView(bottomSheet)
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(bottomSheet)
+        dialog.show()
     }
 }
 
