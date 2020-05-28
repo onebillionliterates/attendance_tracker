@@ -1,11 +1,13 @@
 package org.onebillionliterates.attendance_tracker
 
+import android.app.DatePickerDialog
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
+import android.webkit.DateSorter
+import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -56,6 +58,10 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         days.setOnClickListener(this)
         teachers.setOnClickListener(this)
         school.setOnClickListener(this)
+        startDate.setOnClickListener(this)
+        endDate.setOnClickListener(this)
+        startTime.setOnClickListener(this)
+        endTime.setOnClickListener(this)
     }
 
     override fun onClick(clickView: View?) {
@@ -70,6 +76,20 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
 
             school -> {
                 openSchoolBottomSheet()
+            }
+
+            startDate, endDate->
+            {
+                val dialog = BottomSheetDialog(this)
+                dialog.setContentView(DatePicker(this))
+                dialog.show()
+            }
+
+            startTime, endTime->
+            {
+                val dialog = BottomSheetDialog(this)
+                dialog.setContentView(TimePicker(this))
+                dialog.show()
             }
         }
     }
