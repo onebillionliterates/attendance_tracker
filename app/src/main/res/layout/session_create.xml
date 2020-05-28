@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/button_view"
-            android:id="@+id/selectSchool"
+            android:id="@+id/school"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="20dp"
             app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="20dp">
@@ -68,7 +68,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="20dp"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/selectSchool"
+            app:layout_constraintTop_toBottomOf="@+id/school"
             android:layout_marginTop="25dp">
 
         <include
