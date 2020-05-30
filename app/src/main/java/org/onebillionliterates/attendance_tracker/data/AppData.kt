@@ -12,7 +12,7 @@ import kotlinx.coroutines.tasks.await
 import org.threeten.bp.*
 
 
-class AppData() {
+class AppData {
     private val db = Firebase.firestore
     private val TAG: String = "APP_DATA"
     private val adminCollection = db.collection("admin")
@@ -175,22 +175,18 @@ class AppData() {
         )
     }
 
-    suspend fun getSession(
+    suspend fun fetchSessions(
         adminRef: String,
         schoolRef: String,
-        teacherRef: String,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
-    ): Session {
-        Log.d(
-            TAG, "START DATE : ${startDate.toEpochSecond(ZoneOffset.UTC)} END DATE : ${endDate.toEpochSecond(
-                ZoneOffset.UTC
-            )}"
-        )
+        teacherRefs: List<String>,
+        startDate: LocalDateTime
 
+    ): List<Session> {
         // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
         val data = sessionsCollection
             .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereEqualTo("schoolRef", schoolCollection.document(schoolRef))
+            .whereArrayContainsAny("teachersTef", teacherRefs.map { teacherCollection.document() })
             .whereGreaterThanOrEqualTo("endDate", startDate.toTimestamp())
             .get()
             .await()
@@ -206,7 +202,22 @@ class AppData() {
                 durationInSecs = document.get("durationInSecs") as Long,
                 weekDaysInfo = listOfWeekDays(document)
             )
-        }.first()
+        }
+    }
+
+    suspend fun verifySession(session: Session): Boolean {
+
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(session.adminRef))
+            .whereEqualTo("schoolRef", schoolCollection.document(session.schoolRef))
+            .whereArrayContainsAny("teachersTef", session.teacherRefs.map { teacherCollection.document() })
+            .whereEqualTo("startDate", session.startDate.toTimestamp())
+            .whereEqualTo("endDate", session.endDate.toTimestamp())
+            .whereEqualTo("durationInSec", session.durationInSecs)
+            .get()
+            .await()
+
+        return data.documents.size > 0
     }
 
     private fun listOfWeekDays(document: DocumentSnapshot): List<Boolean> =

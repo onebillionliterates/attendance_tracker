@@ -122,13 +122,12 @@ class DBOperations : AppCompatActivity() {
         getSession.setOnClickListener { view ->
             GlobalScope.launch {
 
-                val fetchedSession = appData.getSession(
+                val fetchedSession = appData.fetchSessions(
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
                     schoolRef = "KI32lNxCTENtUk1z4XDv",
-                    teacherRef = "s9FoQNUw8cVuJn5JkIxn",
-                    startDate = LocalDateTime.now(),
-                    endDate = LocalDateTime.now()
-                );
+                    teacherRefs = listOf("s9FoQNUw8cVuJn5JkIxn"),
+                    startDate = LocalDateTime.now()
+                )
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $fetchedSession")
