@@ -6,15 +6,9 @@ data class Session(
     val id: String? = null,
     val adminRef: String,
     val schoolRef: String,
-    val teacherRef: String,
     val startDate: LocalDateTime,
     val endDate: LocalDateTime,
-    val durationInSecs: Int = 1 * 60 * 60,
-    val mondayWorking: Boolean = false,
-    val tuesdayWorking: Boolean = false,
-    val wednesdayWorking: Boolean = false,
-    val thursdayWorking: Boolean = false,
-    val fridayWorking: Boolean = false,
-    val saturdayWorking: Boolean = false,
-    val sundayWorking: Boolean = false
+    val durationInSecs: Long = 1 * 60 * 60,
+    val weekDaysInfo:List<Boolean> = (1..7).map { false },
+    val teacherRefs: List<String> = emptyList()
 )

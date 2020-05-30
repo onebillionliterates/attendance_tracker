@@ -103,20 +103,35 @@ class DBOperations : AppCompatActivity() {
             GlobalScope.launch {
                 val session = Session(
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
-                    teacherRef = "s9FoQNUw8cVuJn5JkIxn",
+                    teacherRefs = listOf("s9FoQNUw8cVuJn5JkIxn"),
                     schoolRef = "KI32lNxCTENtUk1z4XDv",
                     startDate = LocalDateTime.now().minusDays(10),
                     endDate = LocalDateTime.now().plusDays(40),
-                    durationInSecs = 1*60*60,
-                    mondayWorking = true,
-                    wednesdayWorking = true,
-                    fridayWorking = true
+                    durationInSecs = 1 * 60 * 60,
+                    weekDaysInfo = listOf(true, false, true, false, true, false, false)
                 )
 
                 val savedSession = appData.saveSession(session);
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $savedSession")
+            }
+            Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
+        }
+
+        getSession.setOnClickListener { view ->
+            GlobalScope.launch {
+
+                val fetchedSession = appData.getSession(
+                    adminRef = "fw7aJ1dVDpQndyHFhDsv",
+                    schoolRef = "KI32lNxCTENtUk1z4XDv",
+                    teacherRef = "s9FoQNUw8cVuJn5JkIxn",
+                    startDate = LocalDateTime.now(),
+                    endDate = LocalDateTime.now()
+                );
+
+                Log.d(TAG, Thread.currentThread().name)
+                Log.d(TAG, "PARTICULAR => $fetchedSession")
             }
             Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
         }
@@ -137,7 +152,7 @@ class DBOperations : AppCompatActivity() {
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $attendanceSaved")
                 Thread.sleep(4000)
-                withContext (Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
                 }
             }

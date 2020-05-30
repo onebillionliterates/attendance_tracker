@@ -64,11 +64,19 @@
             android:layout_marginTop="5dp"/>
 
     <Button
+            android:text="GET A SESSION"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/getSession"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveSession"
+            android:layout_marginTop="5dp"/>
+
+    <Button
             android:text="SAVE ATTENDANCE"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/saveAttendance"
             tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
-            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveSession"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/getSession"
             android:layout_marginTop="5dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
 

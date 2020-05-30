@@ -1,8 +1,10 @@
 package org.onebillionliterates.attendance_tracker.data
 
 import android.location.Location
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -152,17 +154,11 @@ class AppData() {
                 hashMapOf(
                     "adminRef" to adminCollection.document(sessionToSave.adminRef),
                     "schoolRef" to schoolCollection.document(sessionToSave.schoolRef),
-                    "teacherRef" to teacherCollection.document(sessionToSave.teacherRef),
+                    "teachersRef" to sessionToSave.teacherRefs.map { ref -> teacherCollection.document(ref) },
                     "startDate" to sessionToSave.startDate.toTimestamp(),
                     "endDate" to sessionToSave.endDate.toTimestamp(),
                     "durationInSecs" to sessionToSave.durationInSecs,
-                    "mondayWorking" to sessionToSave.mondayWorking,
-                    "tuesdayWorking" to sessionToSave.tuesdayWorking,
-                    "wednesdayWorking" to sessionToSave.wednesdayWorking,
-                    "thursdayWorking" to sessionToSave.thursdayWorking,
-                    "fridayWorking" to sessionToSave.fridayWorking,
-                    "saturdayWorking" to sessionToSave.saturdayWorking,
-                    "sundayWorking" to sessionToSave.sundayWorking
+                    "weekDaysInfo" to sessionToSave.weekDaysInfo
                 )
             )
             .await()
@@ -171,19 +167,57 @@ class AppData() {
             id = data.id,
             adminRef = sessionToSave.adminRef,
             schoolRef = sessionToSave.schoolRef,
-            teacherRef = sessionToSave.teacherRef,
+            teacherRefs = sessionToSave.teacherRefs,
             startDate = sessionToSave.startDate,
             endDate = sessionToSave.endDate,
             durationInSecs = sessionToSave.durationInSecs,
-            mondayWorking = sessionToSave.mondayWorking,
-            tuesdayWorking = sessionToSave.tuesdayWorking,
-            wednesdayWorking = sessionToSave.wednesdayWorking,
-            thursdayWorking = sessionToSave.thursdayWorking,
-            fridayWorking = sessionToSave.fridayWorking,
-            saturdayWorking = sessionToSave.saturdayWorking,
-            sundayWorking = sessionToSave.sundayWorking
+            weekDaysInfo = sessionToSave.weekDaysInfo
         )
     }
+
+    suspend fun getSession(
+        adminRef: String,
+        schoolRef: String,
+        teacherRef: String,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime
+    ): Session {
+        Log.d(
+            TAG, "START DATE : ${startDate.toEpochSecond(ZoneOffset.UTC)} END DATE : ${endDate.toEpochSecond(
+                ZoneOffset.UTC
+            )}"
+        )
+
+        // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereGreaterThanOrEqualTo("endDate", startDate.toTimestamp())
+            .get()
+            .await()
+
+        return data.documents.map { document ->
+            Session(
+                id = document.id,
+                adminRef = document.getDocumentReference("adminRef")!!.id,
+                schoolRef = document.getDocumentReference("schoolRef")!!.id,
+                teacherRefs = listOfTeacherRefs(document),
+                startDate = document.getTimestamp("startDate")?.toLocalDateTime()!!,
+                endDate = document.getTimestamp("endDate")?.toLocalDateTime()!!,
+                durationInSecs = document.get("durationInSecs") as Long,
+                weekDaysInfo = listOfWeekDays(document)
+            )
+        }.first()
+    }
+
+    private fun listOfWeekDays(document: DocumentSnapshot): List<Boolean> =
+        (document.get("weekDaysInfo") as List<*>).map { value ->
+            value as Boolean
+        }
+
+
+    private fun listOfTeacherRefs(document: DocumentSnapshot) =
+        (document.get("teachersRef") as List<*>).map { doc -> doc as DocumentReference }
+            .map { teacherDoc -> teacherDoc.id }
 
 
     suspend fun saveAttendance(attendanceToSave: Attendance): Attendance {
