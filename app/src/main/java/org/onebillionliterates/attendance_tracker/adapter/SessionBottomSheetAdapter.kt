@@ -22,12 +22,12 @@ class SessionBottomSheetAdapter(private val dataList : List<DataHolder>, private
             val displayCheckboxView = itemView.findViewById(R.id.checkedText) as AppCompatCheckBox
 
             if(showSingleSelect){
-                displayTextView.visibility = 0
+                displayTextView.visibility = View.VISIBLE
                 displayTextView.text = info.displayText
                 return
             }
 
-            displayCheckboxView.visibility = 0
+            displayCheckboxView.visibility = View.VISIBLE
             displayCheckboxView.text = info.displayText
         }
 
