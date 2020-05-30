@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/school"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="412dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/button_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <EditText
+            android:id="@+id/school_name_add"
+            android:layout_width="303dp"
+            android:layout_height="51dp"
+            android:layout_marginStart="63dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="3dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="School Name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/school"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="496dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/button_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <EditText
+            android:id="@+id/school_phone_number_add"
+            android:layout_width="304dp"
+            android:layout_height="47dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="6dp"
+            android:ems="10"
+            android:inputType="phone"
+            android:text="Phone Number"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Select School -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/school"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="576dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="23dp"
+        android:background="@drawable/button_view"
+        app:layout_constraintBottom_toTopOf="@+id/add_new_school"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/school_email_add"
+            android:layout_width="307dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="57dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="5dp"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:text="Email ID"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="409dp"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="392dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="20dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toTopOf="@+id/school"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/add_new_school"
+        android:layout_width="380dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="23dp"
+        android:layout_marginEnd="15dp"
+        android:background="@color/colorPrimary"
+        android:text="Add"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/school" />
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView3"
+        android:layout_width="404dp"
+        android:layout_height="380dp"
+        tools:layout_editor_absoluteX="2dp"
+        tools:layout_editor_absoluteY="6dp" />
+
+    <!-- Select Start Date -->
+
+    <!-- Select End Date -->
+
+    <!-- Select Start And End Time -->
+    <!-- Select Days -->
+    <!-- Select Teacher -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
