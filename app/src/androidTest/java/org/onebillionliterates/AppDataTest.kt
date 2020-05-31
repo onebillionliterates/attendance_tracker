@@ -5,6 +5,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
+import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -21,6 +22,7 @@ class AppDataTest {
     fun setupClass() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        AndroidThreeTen.init(appContext);
         Firebase.initialize(appContext)
         /**
         // FiReBasE locally -

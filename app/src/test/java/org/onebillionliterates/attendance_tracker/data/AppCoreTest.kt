@@ -1,13 +1,13 @@
 package org.onebillionliterates.attendance_tracker.data
 
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
-import org.threeten.bp.*
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE
 
 class AppCoreTest {
@@ -17,9 +17,10 @@ class AppCoreTest {
         adminRef: String = "adminRef",
         schoolRef: String? = "schoolRef",
         teachersRef: List<String> = listOf("teacherRef"),
-        startDate: LocalDateTime = LocalDateTime.now(),
-        endDate: LocalDateTime = LocalDateTime.now(),
-        durationInSecs: Long = 30 * 60,
+        startDate: LocalDate = LocalDate.now(),
+        endDate: LocalDate = LocalDate.now(),
+        startTime: LocalTime = LocalTime.now(),
+        endTime: LocalTime = LocalTime.now().plusMinutes(30),
         weekDaysInfo: List<Boolean> = listOf(true, false, true, false, true, false, false)
     ): Session {
         return Session(
@@ -27,17 +28,18 @@ class AppCoreTest {
             schoolRef = schoolRef!!,
             startDate = startDate,
             endDate = endDate,
-            durationInSecs = durationInSecs,
+            startTime = startTime,
+            endTime = endTime,
             teacherRefs = teachersRef,
             weekDaysInfo = weekDaysInfo
         )
     }
 
-    fun parseISODate(isoDate:String) = LocalDateTime.of(LocalDate.parse(isoDate, ISO_LOCAL_DATE), LocalTime.MIDNIGHT)
+    fun parseISODate(isoDate: String) = LocalDate.parse(isoDate, ISO_LOCAL_DATE)
 
     @Test
     internal fun minimum_30_mins_session() {
-        val session = getSession(durationInSecs = 0)
+        val session = getSession(endTime = LocalTime.now())
 
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
@@ -50,7 +52,7 @@ class AppCoreTest {
 
     @Test
     internal fun end_is_before_start() {
-        val session = getSession(endDate = LocalDateTime.now().minusDays(1))
+        val session = getSession(endDate = LocalDate.now().minusDays(1))
 
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
@@ -105,7 +107,9 @@ class AppCoreTest {
     internal fun session_within_same_date_window_is_found() {
         val session = getSession(
             startDate = parseISODate("2020-01-15"),
-            endDate = parseISODate("2020-01-20")
+            endDate = parseISODate("2020-01-20"),
+            startTime = LocalTime.NOON,
+            endTime = LocalTime.NOON.plusHours(1)
         )
 
         runBlocking {
@@ -125,13 +129,17 @@ class AppCoreTest {
                     getSession(
                         startDate = parseISODate("2020-01-01"),
                         endDate = parseISODate("2020-01-31"),
-                        weekDaysInfo = listOf(true, false, true, false, false, false, false)
+                        weekDaysInfo = listOf(true, false, true, false, false, false, false),
+                        startTime = LocalTime.NOON,
+                        endTime = LocalTime.NOON.plusMinutes(30)
                     ),
 
                     getSession(
                         startDate = parseISODate("2020-01-10"),
                         endDate = parseISODate("2020-01-19"),
-                        weekDaysInfo = listOf(false, false, true, false, false, false, false)
+                        weekDaysInfo = listOf(false, false, true, false, false, false, false),
+                        startTime = LocalTime.NOON.plusMinutes(30),
+                        endTime = LocalTime.NOON.plusHours(1)
                     )
                 )
             )

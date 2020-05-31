@@ -3,9 +3,7 @@ package org.onebillionliterates.attendance_tracker.data
 import android.location.Location
 import android.util.Log
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -13,8 +11,8 @@ import org.threeten.bp.*
 
 
 class AppData {
-    private val db = Firebase.firestore
     private val TAG: String = "APP_DATA"
+    private val db = Firebase.firestore
     private val adminCollection = db.collection("admin")
     private val teacherCollection = db.collection("teachers")
     private val schoolCollection = db.collection("schools")
@@ -24,8 +22,12 @@ class AppData {
     fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()) =
         LocalDateTime.ofInstant(Instant.ofEpochMilli(seconds * 1000 + nanoseconds / 1000000), zone)
 
+    fun Timestamp.toLocalDate(zone: ZoneId = ZoneId.systemDefault()) = this.toLocalDateTime().toLocalDate()
+
     fun LocalDateTime.toTimestamp(zone: ZoneId = ZoneOffset.UTC) =
         Timestamp(toEpochSecond(ZoneOffset.of(zone.id)), nano)
+
+    fun LocalDate.toTimestamp(zone: ZoneId = ZoneOffset.UTC) = this.atStartOfDay().toTimestamp(zone)
 
 
     fun geoPointToLocation(geoPoint: GeoPoint): Location {
@@ -157,7 +159,8 @@ class AppData {
                     "teachersRef" to sessionToSave.teacherRefs.map { ref -> teacherCollection.document(ref) },
                     "startDate" to sessionToSave.startDate.toTimestamp(),
                     "endDate" to sessionToSave.endDate.toTimestamp(),
-                    "durationInSecs" to sessionToSave.durationInSecs,
+                    "startTime" to sessionToSave.startTime.toNanoOfDay(),
+                    "endTime" to sessionToSave.endTime.toNanoOfDay(),
                     "weekDaysInfo" to sessionToSave.weekDaysInfo
                 )
             )
@@ -170,7 +173,8 @@ class AppData {
             teacherRefs = sessionToSave.teacherRefs,
             startDate = sessionToSave.startDate,
             endDate = sessionToSave.endDate,
-            durationInSecs = sessionToSave.durationInSecs,
+            startTime = sessionToSave.startTime,
+            endTime = sessionToSave.endTime,
             weekDaysInfo = sessionToSave.weekDaysInfo
         )
     }
@@ -179,8 +183,7 @@ class AppData {
         adminRef: String,
         schoolRef: String,
         teacherRefs: List<String>,
-        startDate: LocalDateTime
-
+        startDate: LocalDate
     ): List<Session> {
         // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
         val data = sessionsCollection
@@ -197,9 +200,10 @@ class AppData {
                 adminRef = document.getDocumentReference("adminRef")!!.id,
                 schoolRef = document.getDocumentReference("schoolRef")!!.id,
                 teacherRefs = listOfTeacherRefs(document),
-                startDate = document.getTimestamp("startDate")?.toLocalDateTime()!!,
-                endDate = document.getTimestamp("endDate")?.toLocalDateTime()!!,
-                durationInSecs = document.get("durationInSecs") as Long,
+                startDate = document.getTimestamp("startDate")?.toLocalDate()!!,
+                endDate = document.getTimestamp("endDate")?.toLocalDate()!!,
+                startTime = LocalTime.ofNanoOfDay(document.get("startTime") as Long),
+                endTime = LocalTime.ofNanoOfDay(document.get("endTime") as Long),
                 weekDaysInfo = listOfWeekDays(document)
             )
         }
@@ -213,7 +217,8 @@ class AppData {
             .whereArrayContainsAny("teachersTef", session.teacherRefs.map { teacherCollection.document() })
             .whereEqualTo("startDate", session.startDate.toTimestamp())
             .whereEqualTo("endDate", session.endDate.toTimestamp())
-            .whereEqualTo("durationInSec", session.durationInSecs)
+            .whereEqualTo("startTime", session.startTime)
+            .whereEqualTo("endTime", session.endTime)
             .get()
             .await()
 

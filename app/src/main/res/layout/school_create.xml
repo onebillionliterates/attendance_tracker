@@ -6,7 +6,6 @@
                                                    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/school"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginStart="20dp"
@@ -38,39 +37,37 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/school"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="496dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/button_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="496dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/button_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" android:id="@+id/constraintLayout2">
 
         <EditText
-            android:id="@+id/school_phone_number_add"
-            android:layout_width="304dp"
-            android:layout_height="47dp"
-            android:layout_marginStart="60dp"
-            android:layout_marginEnd="7dp"
-            android:layout_marginBottom="6dp"
-            android:ems="10"
-            android:inputType="phone"
-            android:text="Phone Number"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+                android:id="@+id/school_phone_number_add"
+                android:layout_width="304dp"
+                android:layout_height="47dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginEnd="7dp"
+                android:layout_marginBottom="6dp"
+                android:ems="10"
+                android:inputType="phone"
+                android:text="Phone Number"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Select School -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/school"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginStart="20dp"
@@ -118,26 +115,29 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/add_new_school"
-        android:layout_width="380dp"
-        android:layout_height="58dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="23dp"
-        android:layout_marginEnd="15dp"
-        android:background="@color/colorPrimary"
-        android:text="Add"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/school" />
+            android:id="@+id/add_new_school"
+            android:layout_width="380dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="23dp"
+            android:layout_marginEnd="15dp"
+            android:background="@color/colorPrimary"
+            android:text="Add"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/school" app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="25dp"/>
 
     <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView3"
-        android:layout_width="404dp"
-        android:layout_height="380dp"
-        tools:layout_editor_absoluteX="2dp"
-        tools:layout_editor_absoluteY="6dp" />
+            android:id="@+id/mapView3"
+            android:layout_width="404dp"
+            android:layout_height="380dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="10dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="10dp"/>
 
     <!-- Select Start Date -->
 

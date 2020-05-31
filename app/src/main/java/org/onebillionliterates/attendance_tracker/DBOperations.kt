@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.all_db_operations.*
 import kotlinx.coroutines.Dispatchers
@@ -13,16 +15,19 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.onebillionliterates.attendance_tracker.data.*
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalTime
 
 class DBOperations : AppCompatActivity() {
 
-    val appData = AppData()
+
     val TAG = "DBOperations_Activity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Firebase.initialize(this)
         AndroidThreeTen.init(this);
-
+        val appData = AppData()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.all_db_operations)
 
@@ -105,9 +110,10 @@ class DBOperations : AppCompatActivity() {
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
                     teacherRefs = listOf("s9FoQNUw8cVuJn5JkIxn"),
                     schoolRef = "KI32lNxCTENtUk1z4XDv",
-                    startDate = LocalDateTime.now().minusDays(10),
-                    endDate = LocalDateTime.now().plusDays(40),
-                    durationInSecs = 1 * 60 * 60,
+                    startDate = LocalDate.now().minusDays(10),
+                    endDate = LocalDate.now().plusDays(40),
+                    startTime = LocalTime.NOON.minusHours(1),
+                    endTime = LocalTime.NOON,
                     weekDaysInfo = listOf(true, false, true, false, true, false, false)
                 )
 
@@ -126,7 +132,7 @@ class DBOperations : AppCompatActivity() {
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
                     schoolRef = "KI32lNxCTENtUk1z4XDv",
                     teacherRefs = listOf("s9FoQNUw8cVuJn5JkIxn"),
-                    startDate = LocalDateTime.now()
+                    startDate = LocalDate.now()
                 )
 
                 Log.d(TAG, Thread.currentThread().name)
