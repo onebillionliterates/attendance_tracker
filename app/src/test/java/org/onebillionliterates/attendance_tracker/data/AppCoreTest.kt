@@ -127,6 +127,7 @@ class AppCoreTest {
                 )
             ).thenReturn(
                 listOf(
+                    // Date covers - time in between
                     getSession(
                         startDate = parseISODate("2020-01-01"),
                         endDate = parseISODate("2020-01-31"),
@@ -134,6 +135,7 @@ class AppCoreTest {
                         startTime = LocalTime.NOON,
                         endTime = LocalTime.NOON.plusMinutes(30)
                     ),
+                    // Date in between - time in between
                     getSession(
                         startDate = parseISODate("2020-01-10"),
                         endDate = parseISODate("2020-01-19"),
@@ -141,20 +143,23 @@ class AppCoreTest {
                         startTime = LocalTime.NOON.plusMinutes(30),
                         endTime = LocalTime.NOON.plusHours(1)
                     ),
+                    // Date terminal - time overlapping start
                     getSession(
-                        startDate = parseISODate("2020-01-16"),
-                        endDate = parseISODate("2020-01-19"),
-                        weekDaysInfo = listOf(false, false, true, false, false, false, false),
-                        startTime = LocalTime.NOON.plusMinutes(15),
-                        endTime = LocalTime.NOON.minusMinutes(15)
-                    ),
-                    getSession(
-                        startDate = parseISODate("2020-01-20"),
-                        endDate = parseISODate("2020-01-20"),
+                        startDate = session.startDate,
+                        endDate = session.startDate,
                         weekDaysInfo = listOf(false, false, true, false, false, false, false),
                         startTime = LocalTime.NOON.minusMinutes(15),
                         endTime = LocalTime.NOON.plusMinutes(15)
+                    ),
+                    // Date terminal - time encompassing
+                    getSession(
+                        startDate = session.endDate,
+                        endDate = session.endDate,
+                        weekDaysInfo = listOf(false, false, true, false, false, false, false),
+                        startTime = session.startTime.minusHours(1),
+                        endTime = session.endTime.plusHours(1)
                     )
+
                 )
             )
         }
@@ -189,7 +194,32 @@ class AppCoreTest {
                     teacherRefs = listOf("teacherRef"),
                     startDate = session.startDate
                 )
-            ).thenReturn(emptyList())
+            ).thenReturn(
+                listOf(
+                    // Next to Next Session
+                    getSession(
+                        startDate = session.startDate,
+                        endDate = session.endDate,
+                        startTime = session.endTime,
+                        endTime = session.endTime.plusMinutes(30)
+                    ),
+                    // Next to Next Session
+                    getSession(
+                        startDate = session.startDate,
+                        endDate = session.endDate,
+                        startTime = session.startTime.minusMinutes(30),
+                        endTime = session.startTime
+                    ),
+                    // Sessions on the complimenting days
+                    getSession(
+                        startDate = session.startDate,
+                        endDate = session.endDate,
+                        startTime = session.startTime,
+                        endTime = session.endTime,
+                        weekDaysInfo = session.weekDaysInfo.map { valueForDay->!valueForDay }
+                    )
+                )
+            )
         }
         runBlocking {
             instance.saveSession(session = session)

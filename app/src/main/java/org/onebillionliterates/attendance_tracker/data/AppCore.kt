@@ -11,8 +11,7 @@ class AppCore(val appData: AppData) {
                 referenceEnd.isAfter(this) || referenceStart.isEqual(this)
 
     fun LocalTime.inBetween(referenceStart: LocalTime, referenceEnd: LocalTime): Boolean =
-        referenceStart.isBefore(this) || referenceStart.equals(this) &&
-                referenceEnd.isAfter(this) || referenceStart.equals(this)
+        referenceStart.isBefore(this) && referenceEnd.isAfter(this)
 
     suspend fun saveSession(session: Session) {
         if (session.endTime.toNanoOfDay() - session.startTime.toNanoOfDay() < 30 * 60) throw IllegalArgumentException(
@@ -29,15 +28,19 @@ class AppCore(val appData: AppData) {
             teacherRefs = session.teacherRefs,
             startDate = session.startDate
         )
-            .filter {
-                    foundSession -> session.startDate.inBetween(foundSession.startDate, foundSession.endDate) ||
-                    session.endDate.inBetween(foundSession.startDate, foundSession.endDate)
-            }
-            .filter { foundSession -> session.startTime.inBetween(foundSession.startTime, foundSession.endTime) ||
-                    session.endTime.inBetween(foundSession.startTime, foundSession.endTime)
+            .filter { foundSession ->
+                session.startDate.inBetween(foundSession.startDate, foundSession.endDate) ||
+                        session.endDate.inBetween(foundSession.startDate, foundSession.endDate)
             }
             .filter { foundSession ->
-                (1..7).any { idx ->
+                foundSession.startTime.inBetween(session.startTime, session.endTime) ||
+                        foundSession.endTime.inBetween(session.startTime, session.endTime) ||
+                        session.startTime.inBetween(foundSession.startTime, foundSession.endTime) ||
+                        session.endTime.inBetween(foundSession.startTime, foundSession.endTime) ||
+                        ((session.startTime == foundSession.startTime) && (session.endTime == foundSession.endTime))
+            }
+            .filter { foundSession ->
+                (0..6).any { idx ->
                     foundSession.weekDaysInfo[idx] && session.weekDaysInfo[idx]
                 }
             }
