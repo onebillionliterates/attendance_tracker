@@ -194,6 +194,49 @@ class AppData {
             .get()
             .await()
 
+        return mapSessions(data)
+    }
+
+    suspend fun fetchActiveSessions(
+        adminRef: String
+    ): List<Session> {
+        // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereGreaterThanOrEqualTo("endDate", LocalDate.now().toTimestamp())
+            .get()
+            .await()
+
+        return mapSessions(data)
+    }
+
+    suspend fun fetchPastSessions(
+        adminRef: String
+    ): List<Session> {
+        // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereLessThan("endDate", LocalDate.now().toTimestamp())
+            .get()
+            .await()
+
+        return mapSessions(data)
+    }
+
+    suspend fun fetchFutureSessions(
+        adminRef: String
+    ): List<Session> {
+        // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereGreaterThan("startDate", LocalDate.now().toTimestamp())
+            .get()
+            .await()
+
+        return mapSessions(data)
+    }
+
+    private fun mapSessions(data: QuerySnapshot): List<Session> {
         return data.documents.map { document ->
             Session(
                 id = document.id,

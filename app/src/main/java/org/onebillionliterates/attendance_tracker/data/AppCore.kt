@@ -18,6 +18,7 @@ class AppCore(val appData: AppData) {
             INVALID_DURATION.message
         )
         if (session.endDate.isBefore(session.startDate)) throw IllegalArgumentException(INVALID_END.message)
+        if (session.weekDaysInfo.none { value -> value }) throw IllegalArgumentException(DAYS_NOT_ASSOCIATED.message)
         if (session.schoolRef.isBlank()) throw IllegalArgumentException(SCHOOL_NOT_ASSOCIATED.message)
         if (session.teacherRefs.isNullOrEmpty()) throw IllegalArgumentException(TEACHERS_NOT_ASSOCIATED.message)
         if (appData.verifySession(session)) throw IllegalArgumentException(SESSION_ALREADY_EXISTS.message)
@@ -48,6 +49,17 @@ class AppCore(val appData: AppData) {
         if (overlappingSessionsFound.isNotEmpty()) throw IllegalArgumentException(SESSIONS_CONFLICTS_EXISTS.message)
 
         appData.saveSession(session)
+    }
+
+    suspend fun allSessions(adminRef: String): Map<String, List<Session>> {
+        return mapOf(
+            "today" to appData.fetchActiveSessions(adminRef).filter { session ->
+                val dayVal = LocalDate.now().dayOfWeek.value - 1
+                session.weekDaysInfo[dayVal]
+            },
+            "past" to appData.fetchPastSessions(adminRef),
+            "future" to appData.fetchFutureSessions(adminRef)
+        )
     }
 
 }

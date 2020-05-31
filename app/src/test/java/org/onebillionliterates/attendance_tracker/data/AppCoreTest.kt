@@ -3,10 +3,10 @@ package org.onebillionliterates.attendance_tracker.data
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE
@@ -64,6 +64,18 @@ class AppCoreTest {
     }
 
     @Test
+    internal fun when_no_days_attached() {
+        val session = getSession(weekDaysInfo = (0..6).map { false })
+
+        val thrown = assertThrows(IllegalArgumentException::class.java) {
+            runBlocking {
+                instance.saveSession(session)
+            }
+        }
+        assertThat(thrown.message, `is`(ERRORS.DAYS_NOT_ASSOCIATED.message))
+    }
+
+    @Test
     internal fun when_no_school_attached() {
         val session = getSession(schoolRef = "")
 
@@ -92,7 +104,7 @@ class AppCoreTest {
         val session = getSession()
 
         runBlocking {
-            Mockito.`when`(mockedAppData.verifySession(session)).thenReturn(true)
+            `when`(mockedAppData.verifySession(session)).thenReturn(true)
         }
 
         val thrown = assertThrows(IllegalArgumentException::class.java) {
@@ -118,7 +130,7 @@ class AppCoreTest {
         }
 
         runBlocking {
-            Mockito.`when`(
+            `when`(
                 mockedAppData.fetchSessions(
                     adminRef = "adminRef",
                     schoolRef = "schoolRef",
@@ -187,7 +199,7 @@ class AppCoreTest {
         }
 
         runBlocking {
-            Mockito.`when`(
+            `when`(
                 mockedAppData.fetchSessions(
                     adminRef = "adminRef",
                     schoolRef = "schoolRef",
@@ -216,7 +228,7 @@ class AppCoreTest {
                         endDate = session.endDate,
                         startTime = session.startTime,
                         endTime = session.endTime,
-                        weekDaysInfo = session.weekDaysInfo.map { valueForDay->!valueForDay }
+                        weekDaysInfo = session.weekDaysInfo.map { valueForDay -> !valueForDay }
                     )
                 )
             )
@@ -226,4 +238,45 @@ class AppCoreTest {
             Mockito.verify(mockedAppData).saveSession(session)
         }
     }
+
+    @Test
+    internal fun session_groups_having_active_session_for_today() {
+        runBlocking {
+            `when`(
+                mockedAppData.fetchActiveSessions(
+                    adminRef = "adminRef"
+                )
+            ).thenReturn(
+                listOf(
+                    // Active on all days
+                    getSession(weekDaysInfo = (0..6).map { true }),
+                    // Not active on any day -- Why are you here ??
+                    getSession(weekDaysInfo = (0..6).map { false })
+                )
+            )
+            `when`(
+                mockedAppData.fetchFutureSessions(
+                    adminRef = "adminRef"
+                )
+            ).thenReturn(
+                listOf(getSession())
+            )
+            `when`(
+                mockedAppData.fetchPastSessions(
+                    adminRef = "adminRef"
+                )
+            ).thenReturn(
+                listOf(getSession())
+            )
+
+            val sessionsMap: Map<String, List<Session>> = instance.allSessions(adminRef = "adminRef")
+            val todaySessions = sessionsMap.get("today")
+            val pastSessions = sessionsMap.get("past")
+            val futureSessions = sessionsMap.get("future")
+            val totalSize = todaySessions!!.size + pastSessions!!.size + futureSessions!!.size
+            assertThat(totalSize, `is`(3))
+        }
+    }
+
+
 }
