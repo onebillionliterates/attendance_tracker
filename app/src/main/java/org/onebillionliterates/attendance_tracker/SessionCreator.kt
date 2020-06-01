@@ -3,7 +3,6 @@ package org.onebillionliterates.attendance_tracker
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
-import android.webkit.DateSorter
 import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,14 +11,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.session_create.*
+import kotlinx.android.synthetic.main.session_create.view.*
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
 import org.onebillionliterates.attendance_tracker.drawables.*
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
 
 class SessionCreator : AppCompatActivity(), View.OnClickListener {
     val TAG = "SessionCreator_Activity"
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.session_create)
         initView()
@@ -78,17 +82,37 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 openSchoolBottomSheet()
             }
 
-            startDate, endDate->
-            {
+            startDate, endDate -> {
                 val dialog = BottomSheetDialog(this)
-                dialog.setContentView(DatePicker(this))
+                val datePicker = DatePicker(this)
+                val today = LocalDate.now();
+                datePicker.init(today.year, today.monthValue.minus(1), today.dayOfMonth) { view, year, monthOfYear, dayOfMonth ->
+                    when(clickView){
+                        startDate->{
+                            startDateSelectTextView.text = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
+                        }
+                        endDate->{
+                            endDateSelectTextView.text = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
+                        }
+                    }
+                }
+                dialog.setContentView(datePicker)
                 dialog.show()
             }
-
-            startTime, endTime->
-            {
+            startTime, endTime -> {
                 val dialog = BottomSheetDialog(this)
-                dialog.setContentView(TimePicker(this))
+                val timePicker = TimePicker(this)
+                timePicker.setOnTimeChangedListener { view, hourOfDay, minute ->
+                    when(clickView){
+                        startTime->{
+                            startTimeSelectTextView.text = LocalTime.of(hourOfDay, minute).toString()
+                        }
+                        endTime->{
+                            endTimeSelectTextView.text = LocalTime.of(hourOfDay, minute).toString()
+                        }
+                    }
+                }
+                dialog.setContentView(timePicker)
                 dialog.show()
             }
         }
@@ -121,6 +145,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(sheetView)
         dialog.show()
+        dialog.setOnDismissListener{
+            print(adapter)
+        }
     }
 
 
@@ -146,6 +173,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(sheetView)
         dialog.show()
+        dialog.setOnDismissListener{
+            print(adapter)
+        }
     }
 
     private fun openSchoolBottomSheet() {
@@ -160,15 +190,18 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
             DataHolder("1", "Text 1"),
             DataHolder("2", "Text 2")
         )
-
+        val dialog = BottomSheetDialog(this)
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(dataHolder, singleSelect = true)
+        val adapter = SessionBottomSheetAdapter(dataHolder, singleSelect = true, bottomDialog = dialog)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
 
-        val dialog = BottomSheetDialog(this)
         dialog.setContentView(sheetView)
         dialog.show()
+        dialog.setOnDismissListener{
+            print(adapter)
+        }
     }
+
 }
