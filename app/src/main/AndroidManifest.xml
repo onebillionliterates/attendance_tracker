@@ -11,13 +11,13 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
 
-        <activity android:name=".SessionCreator">
+        <!--<activity android:name=".SessionCreator">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
+        </activity>-->
 
         <activity android:name=".DBOperations">
             <intent-filter>
@@ -43,6 +43,8 @@
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".AddSchoolActivity">
         </activity>
         <activity
             android:name=".TeachersActivity">

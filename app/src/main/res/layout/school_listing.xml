@@ -4,68 +4,32 @@
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent">
-    <TableLayout
-            android:layout_width="409dp"
-            android:layout_height="239dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="10dp"
-            app:layout_constraintVertical_bias="0.002" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent">
 
-        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:layout_marginTop="10dp" android:layout_marginBottom="10dp">
-            <TextView
-                    android:text="School 1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/school_1"
-                    android:textSize="26sp" app:layout_constraintTop_toTopOf="parent"
-                    android:background="#FFFFFF"/>
-        </TableRow>
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent"
-                  android:layout_marginTop="10dp" android:layout_marginBottom="10dp">
-            <TextView
-                    android:text="School 2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/school_2"
-                    android:textSize="26sp" app:layout_constraintTop_toTopOf="parent"
-            />
-        </TableRow>
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent"
-                  android:layout_marginTop="10dp" android:layout_marginBottom="10dp">
-            <TextView
-                    android:text="School 3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/school_3"
-                    android:textSize="26sp" app:layout_constraintTop_toTopOf="parent"
-            />
-        </TableRow>
-    </TableLayout>
-    <FrameLayout
-            android:layout_width="406dp"
-            android:layout_height="93dp"
-            android:layout_gravity="bottom|right"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0" android:id="@+id/add_school_section"
-            app:layout_constraintBottom_toBottomOf="parent">
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="729dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true" app:srcCompat="@android:drawable/ic_input_add"
-                android:id="@+id/add_school_button" app:backgroundTint="#BD3232"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="16dp"
-        />
-        <TextView
-                android:layout_width="348dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Add New School"
-                android:elevation="16dp"
-                android:textColor="@android:color/background_dark"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="36sp"/>
-    </FrameLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/school_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="657dp" />
 
-
+        <Button
+            android:id="@+id/add_school_button"
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:background="@color/colorPrimary"
+            android:text="+ Add New"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
