@@ -287,8 +287,9 @@ class AppData {
                     "sessionRef" to sessionsCollection.document(attendanceToSave.sessionRef),
                     "teacherRef" to teacherCollection.document(attendanceToSave.teacherRef),
                     "schoolRef" to schoolCollection.document(attendanceToSave.schoolRef),
-                    "inTime" to attendanceToSave.inTime.toTimestamp(),
-                    "outTime" to attendanceToSave.outTime.toTimestamp(),
+                    "inTime" to attendanceToSave.inTime.toNanoOfDay(),
+                    "outTime" to attendanceToSave.outTime.toNanoOfDay(),
+                    "createdAt" to attendanceToSave.createdAt.toTimestamp(),
                     "remarks" to attendanceToSave.remarks
                 )
             )
@@ -302,7 +303,41 @@ class AppData {
             sessionRef = attendanceToSave.sessionRef,
             inTime = attendanceToSave.inTime,
             outTime = attendanceToSave.outTime,
+            createdAt = attendanceToSave.createdAt,
             remarks = attendanceToSave.remarks
         )
+    }
+
+    suspend fun fetchSessionsTill(adminRef: String, tillDate: LocalDate): List<Session> {
+        // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereLessThanOrEqualTo("startDate", tillDate.toTimestamp())
+            .get()
+            .await()
+
+        return mapSessions(data)
+    }
+
+    suspend fun fetchAttendanceFor(adminRef: String, tillDate: LocalDate): List<Attendance> {
+        // Range Queries Are Not Allowed in FireStore - https://firebase.google.com/docs/firestore/query-data/queries
+        val data = attendanceCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereEqualTo("createdAt", tillDate.toTimestamp())
+            .get()
+            .await()
+
+        return return data.documents.map { document ->
+            Attendance(
+                id = document.id,
+                adminRef = document.getDocumentReference("adminRef")!!.id,
+                sessionRef = document.getDocumentReference("sessionRef")!!.id,
+                schoolRef = document.getDocumentReference("schoolRef")!!.id,
+                teacherRef = document.getDocumentReference("teacherRef")!!.id,
+                createdAt = document.getTimestamp("createdAt")?.toLocalDate()!!,
+                inTime = LocalTime.ofNanoOfDay(document.get("inTime") as Long),
+                outTime = LocalTime.ofNanoOfDay(document.get("outTime") as Long)
+            )
+        }
     }
 }

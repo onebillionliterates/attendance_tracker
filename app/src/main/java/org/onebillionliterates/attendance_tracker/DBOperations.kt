@@ -148,8 +148,9 @@ class DBOperations : AppCompatActivity() {
                     teacherRef = "s9FoQNUw8cVuJn5JkIxn",
                     schoolRef = "KI32lNxCTENtUk1z4XDv",
                     sessionRef = "EqQMRPApwAiB5NaxGQdC",
-                    inTime = LocalDateTime.now().minusHours(1),
-                    outTime = LocalDateTime.now()
+                    inTime = LocalTime.now().minusHours(1),
+                    outTime = LocalTime.now(),
+                    createdAt = LocalDate.now()
                 )
 
                 val attendanceSaved = appData.saveAttendance(attendance)

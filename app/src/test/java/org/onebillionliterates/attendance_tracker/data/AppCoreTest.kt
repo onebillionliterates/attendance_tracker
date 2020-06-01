@@ -5,8 +5,10 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.any
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE
@@ -15,6 +17,7 @@ class AppCoreTest {
     private val mockedAppData: AppData = Mockito.mock(AppData::class.java)
     private val instance = AppCore(mockedAppData)
     private fun getSession(
+        id: String? = null,
         adminRef: String = "adminRef",
         schoolRef: String? = "schoolRef",
         teachersRef: List<String> = listOf("teacherRef"),
@@ -25,6 +28,7 @@ class AppCoreTest {
         weekDaysInfo: List<Boolean> = listOf(true, false, true, false, true, false, false)
     ): Session {
         return Session(
+            id = id,
             adminRef = adminRef,
             schoolRef = schoolRef!!,
             startDate = startDate,
@@ -275,6 +279,134 @@ class AppCoreTest {
             val futureSessions = sessionsMap.get("future")
             val totalSize = todaySessions!!.size + pastSessions!!.size + futureSessions!!.size
             assertThat(totalSize, `is`(3))
+        }
+    }
+
+    @Test
+    internal fun attendance_generation_for_duration() {
+        val today = parseISODate("2020-05-15");
+        runBlocking {
+            val allSession = listOf(
+                // Active on all days
+                getSession(
+                    id = "session1Ref",
+                    startDate = today.minusDays(15),
+                    endDate = today.plusDays(15),
+                    startTime = LocalTime.NOON.minusHours(1),
+                    endTime = LocalTime.NOON,
+                    weekDaysInfo = (0..6).map { true },
+                    teachersRef = listOf("teacher1", "teacher2")
+                ),
+                // Active on all days
+                getSession(
+                    id = "session2Ref",
+                    startDate = today.minusDays(5),
+                    endDate = today.plusDays(15),
+                    startTime = LocalTime.NOON,
+                    endTime = LocalTime.NOON.plusHours(1),
+                    weekDaysInfo = (0..6).map { true },
+                    teachersRef = listOf("teacher1", "teacher2", "teacher3")
+                ),
+                // Not active on any day -- Why are you here ??
+                getSession(
+                    id = "session3Ref",
+                    weekDaysInfo = (0..6).map { false },
+                    teachersRef = listOf("teacher1", "teacher2")
+                )
+            )
+            `when`(
+                mockedAppData.fetchSessionsTill(
+                    adminRef = "adminRef",
+                    tillDate = today
+                )
+            ).thenReturn(
+                allSession
+            )
+            val allAttendance = listOf(
+                Attendance(
+                    adminRef = allSession[0].adminRef,
+                    schoolRef = allSession[0].schoolRef,
+                    sessionRef = allSession[0].id!!,
+                    teacherRef = "teacher1",
+                    createdAt = today,
+                    inTime = allSession[0].startTime,
+                    outTime = allSession[0].endTime
+                ),
+                Attendance(
+                    adminRef = allSession[0].adminRef,
+                    schoolRef = allSession[0].schoolRef,
+                    sessionRef = allSession[0].id!!,
+                    teacherRef = "teacher2",
+                    createdAt = today,
+                    inTime = allSession[0].startTime,
+                    outTime = allSession[0].endTime
+                ),
+                Attendance(
+                    adminRef = allSession[1].adminRef,
+                    schoolRef = allSession[1].schoolRef,
+                    sessionRef = allSession[1].id!!,
+                    teacherRef = "teacher3",
+                    createdAt = today,
+                    inTime = allSession[1].startTime,
+                    outTime = allSession[1].endTime
+                ),
+                // Not Expecting because Session 3 is not having weekOfDays expected
+                Attendance(
+                    adminRef = allSession[2].adminRef,
+                    schoolRef = allSession[2].schoolRef,
+                    sessionRef = allSession[2].id!!,
+                    teacherRef = "teacher3",
+                    createdAt = today,
+                    inTime = allSession[2].startTime,
+                    outTime = allSession[2].endTime
+                )
+
+                )
+
+            `when`(
+                mockedAppData.fetchAttendanceFor(
+                    adminRef = "adminRef",
+                    tillDate = today
+                )
+            ).thenReturn(
+                allAttendance
+            )
+
+            `when`(
+                mockedAppData.fetchAttendanceFor(
+                    adminRef = "adminRef",
+                    tillDate = today.minusDays(2)
+                )
+            ).thenReturn(
+                listOf(
+                    Attendance(
+                        adminRef = allSession[0].adminRef,
+                        schoolRef = allSession[0].schoolRef,
+                        sessionRef = allSession[0].id!!,
+                        teacherRef = "teacher1",
+                        createdAt = today.minusDays(2),
+                        inTime = allSession[0].startTime,
+                        outTime = allSession[0].endTime
+                    )
+                )
+            )
+
+            `when`(
+                mockedAppData.fetchAttendanceFor(
+                    adminRef = "adminRef",
+                    tillDate = today.minusDays(1)
+                )
+            ).thenReturn(
+                emptyList()
+            )
+
+
+            val fetchAttendanceForADay =
+                instance.fetchAttendance(adminRef = "adminRef", fromDate = today, toDate = today)
+            fetchAttendanceForADay
+            val fetchAttendanceForADuration =
+                instance.fetchAttendance(adminRef = "adminRef", fromDate = today.minusDays(2), toDate = today)
+            fetchAttendanceForADuration
         }
     }
 
