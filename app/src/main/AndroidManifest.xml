@@ -17,7 +17,7 @@
         <activity android:name=".DBOperations">
         </activity>
 
-        <!--<activity
+        <activity
                 android:name=".LoginActivity"
                 android:label="OBLF Attendance Tracker"
                 android:theme="@style/AppTheme.NoActionBar">
@@ -26,7 +26,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>-->
+        </activity>
         <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
