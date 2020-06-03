@@ -1,6 +1,5 @@
 package org.onebillionliterates.attendance_tracker
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.DatePicker
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.session_create.*
-import kotlinx.android.synthetic.main.session_create.view.*
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
 import org.onebillionliterates.attendance_tracker.drawables.*
