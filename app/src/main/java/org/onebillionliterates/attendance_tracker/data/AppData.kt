@@ -2,6 +2,7 @@ package org.onebillionliterates.attendance_tracker.data
 
 import android.location.Location
 import android.util.Log
+import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
@@ -19,7 +20,14 @@ class AppData {
     private val sessionsCollection = db.collection("sessions")
     private val attendanceCollection = db.collection("attendance")
 
-    fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()) =
+    private object HOLDER {
+        val INSTANCE = AppData()
+    }
+    companion object {
+        val instance: AppData by lazy { HOLDER.INSTANCE }
+    }
+
+    fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneOffset.UTC) =
         LocalDateTime.ofInstant(Instant.ofEpochMilli(seconds * 1000 + nanoseconds / 1000000), zone)
 
     fun Timestamp.toLocalDate(zone: ZoneId = ZoneId.systemDefault()) = this.toLocalDateTime().toLocalDate()
@@ -57,7 +65,7 @@ class AppData {
     }
 
     suspend fun saveTeacher(teacherToSave: Teacher): Teacher {
-        val createdAt = LocalDateTime.now()
+        val createdAt = LocalDateTime.now(ZoneOffset.UTC)
         val data: DocumentReference = teacherCollection
             .add(
                 hashMapOf(
@@ -66,7 +74,8 @@ class AppData {
                     "name" to teacherToSave.name,
                     "passCode" to teacherToSave.passCode,
                     "remarks" to teacherToSave.remarks,
-                    "createdAt" to createdAt.toTimestamp()
+                    "createdAt" to createdAt.toTimestamp(),
+                    "emailId" to teacherToSave.emailId
                 )
             )
             .await()
@@ -78,8 +87,26 @@ class AppData {
             name = teacherToSave.name,
             passCode = teacherToSave.passCode,
             remarks = teacherToSave.remarks,
-            createdAt = createdAt
+            createdAt = createdAt,
+            emailId = teacherToSave.emailId
         )
+    }
+
+    fun updateTeacher(teacherToSave: Teacher): Teacher {
+        val createdAt = LocalDateTime.now(ZoneOffset.UTC)
+        if(teacherToSave.id!=null) {
+            teacherCollection.document(teacherToSave.id)
+                .set(hashMapOf(
+                    "adminRef" to adminCollection.document(teacherToSave.adminRef),
+                    "mobileNumber" to teacherToSave.mobileNumber,
+                    "name" to teacherToSave.name,
+                    "passCode" to teacherToSave.passCode,
+                    "remarks" to teacherToSave.remarks,
+                    "createdAt" to createdAt.toTimestamp(),
+                    "emailId" to teacherToSave.emailId
+                ))
+        }
+        return teacherToSave
     }
 
     suspend fun getTeacherInfo(mobileNumber: String, passCode: String): Teacher {
@@ -101,6 +128,35 @@ class AppData {
             )
         }.first()
     }
+
+    suspend fun getTeachersCollection():MutableList<Teacher>{
+
+        val teachersList: MutableList<Teacher> = ArrayList()
+
+        teacherCollection
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    teachersList.add(Teacher(
+                        document.id,
+                        document.getDocumentReference("adminRef")!!.id,
+                        document.getString("mobileNumber"),
+                        document.getString("name"),
+                        document.getString("passCode"),
+                        document.getString("remarks"),
+                        document.getTimestamp("createdAt")?.toLocalDateTime(),
+                        document.getString("emailId"),
+                        document.getString("verificationId")
+                    ))
+                    Log.d(TAG, "${document.id} => ${document.data}")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents: ", exception)
+            }.await()
+        return teachersList
+    }
+
 
     suspend fun saveSchool(schoolToSave: School): School {
 

@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.onebillionliterates.attendance_tracker.R
-import org.onebillionliterates.attendance_tracker.model.Teacher
+import org.onebillionliterates.attendance_tracker.data.Teacher
 
 
 class CustomAdapter(var teacherList: ArrayList<Teacher>) :

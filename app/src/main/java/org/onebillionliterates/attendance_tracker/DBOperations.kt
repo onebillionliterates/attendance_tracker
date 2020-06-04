@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.onebillionliterates.attendance_tracker.data.*
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 
 class DBOperations : AppCompatActivity() {
@@ -46,6 +45,7 @@ class DBOperations : AppCompatActivity() {
         saveTeacher.setOnClickListener { view ->
             GlobalScope.launch {
                 val teacher = Teacher(
+                    id = "id",
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
                     mobileNumber = "1231231231",
                     name = "Gordon",

@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,15 +8,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.onebillionliterates.attendance_tracker.R
-import org.onebillionliterates.attendance_tracker.model.Teacher
+import org.onebillionliterates.attendance_tracker.data.Teacher
+import org.onebillionliterates.attendance_tracker.util.TeachersViewUtils
 
 
-class TeachersAdapter(private var teachersList : ArrayList<Teacher>) :
+class TeachersAdapter(private var teachersList : MutableList<Teacher>) :
     RecyclerView.Adapter<TeachersAdapter.ViewHolder>() {
 
-    open class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+    open class ViewHolder(con: Context, itemView: View) : RecyclerView.ViewHolder(itemView){
+
+        val context: Context = con
 
         open fun bindItems(teacher: Teacher) {
+
             val textViewName = itemView.findViewById(R.id.textViewUsername) as TextView
             textViewName.text = teacher.name
 
@@ -29,6 +34,7 @@ class TeachersAdapter(private var teachersList : ArrayList<Teacher>) :
                     arrowImageView.setImageResource (R.drawable.arrow_blue);
                     click = true;
                 }
+                TeachersViewUtils.populateBottomSheet(context, R.layout.teachers_drawer, teacher)
                 println("clicked")
             }
         }
@@ -36,7 +42,7 @@ class TeachersAdapter(private var teachersList : ArrayList<Teacher>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.teachers_list_layout, parent, false)
-        return ViewHolder(v)
+        return ViewHolder(parent.context, v)
     }
 
     override fun getItemCount(): Int {
