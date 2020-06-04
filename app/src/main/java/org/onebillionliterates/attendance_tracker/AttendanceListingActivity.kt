@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package org.onebillionliterates.attendance_tracker
 
 import android.content.Context
@@ -24,11 +22,11 @@ import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 
-class SessionsListingActivity : AppCompatActivity() {
+class AttendanceListingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.sessions_listing)
+        setContentView(R.layout.attendance_listing)
         initView()
     }
 
@@ -37,14 +35,14 @@ class SessionsListingActivity : AppCompatActivity() {
         val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
         viewPager.adapter = AttendanceListingPager(supportFragmentManager, tabLayout.tabCount)
 
-        findViewById<View>(R.id.addNewSession).setOnClickListener {
+        findViewById<View>(R.id.durationSelect).setOnClickListener {
             val intent = Intent(this, SessionCreator::class.java)
             startActivity(intent)
         }
     }
 }
 
-class SessionListingPager(
+class AttendanceListingPager(
     fragmentManger: FragmentManager,
     private val tabCount: Int,
     private val data: Map<String, List<*>>? = null
@@ -64,7 +62,7 @@ class SessionListingPager(
     }
 }
 
-class SessionsListFragment : Fragment() {
+class AttendanceListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = RecyclerView(requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -100,19 +98,19 @@ class SessionsListFragment : Fragment() {
     }
 }
 
-class SchoolDetails(itemView: View) : GroupViewHolder(itemView) {
+class AttendanceSchoolDetails(itemView: View) : GroupViewHolder(itemView) {
     fun setSchoolDetails(group: ExpandableGroup<DataHolder>) {
         itemView.findViewById<TextView?>(R.id.sessionName)!!.text = group.title
     }
 }
 
-class SessionDetails(itemView: View) : ChildViewHolder(itemView) {
+class AttendanceSessionDetails(itemView: View) : ChildViewHolder(itemView) {
     fun setSessionDetails(session: DataHolder) {
         itemView.findViewById<TextView?>(R.id.displayText)!!.text = session.displayText
     }
 }
 
-class SessionExpandableListAdapter(
+class AttendanceSessionExpandableListAdapter(
     private val context: Context,
     groupedData: List<ExpandableGroup<DataHolder>>
 ) : ExpandableRecyclerViewAdapter<AttendanceSchoolDetails, AttendanceSessionDetails>(groupedData) {
