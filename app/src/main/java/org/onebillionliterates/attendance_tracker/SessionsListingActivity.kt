@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -23,8 +22,6 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
-import org.onebillionliterates.attendance_tracker.drawables.ArrowDrawable
-import org.onebillionliterates.attendance_tracker.drawables.DownArrowDrawable
 
 class SessionsListingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,14 +109,12 @@ class SessionsListFragment : Fragment() {
 class SchoolDetails(itemView: View) : GroupViewHolder(itemView) {
     fun setSchoolDetails(group: ExpandableGroup<DataHolder>) {
         itemView.findViewById<TextView?>(R.id.sessionName)!!.text = group.title
-        itemView.findViewById<ImageView?>(R.id.sessionDrawable)!!.setImageDrawable(DownArrowDrawable(itemView.context))
     }
 }
 
 class SessionDetails(itemView: View) : ChildViewHolder(itemView) {
     fun setSessionDetails(session: DataHolder) {
         itemView.findViewById<TextView?>(R.id.displayText)!!.text = session.displayText
-        itemView.findViewById<ImageView?>(R.id.arrowDrawable)!!.setImageDrawable(ArrowDrawable(itemView.context))
     }
 }
 

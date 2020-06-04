@@ -3,7 +3,8 @@
                                                    xmlns:app="http://schemas.android.com/apk/res-auto"
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:layout_width="match_parent"
-                                                   android:layout_height="match_parent">
+                                                   android:layout_height="match_parent"
+android:background="#ffffff">
 
     <com.google.android.material.tabs.TabLayout
             android:layout_width="0dp"
@@ -12,7 +13,7 @@
             android:layout_marginEnd="1dp" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="1dp"
             app:layout_constraintHorizontal_bias="0.0" app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="40dp" android:id="@+id/sessionsTabs">
+            android:layout_marginTop="1dp" android:id="@+id/sessionsTabs">
 
         <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
@@ -36,7 +37,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sessionsTabs">
+            app:layout_constraintTop_toBottomOf="@+id/sessionsTabs"
+            android:background="#ffffff" android:layout_marginTop="1dp">
     </androidx.viewpager.widget.ViewPager>
     <Button
             android:id="@+id/addNewSession"
