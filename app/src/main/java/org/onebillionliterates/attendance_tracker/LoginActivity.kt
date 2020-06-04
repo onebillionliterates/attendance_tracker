@@ -3,17 +3,20 @@ package org.onebillionliterates.attendance_tracker
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.snackbar.Snackbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.login.*
-import kotlinx.coroutines.*
-import org.onebillionliterates.attendance_tracker.data.AppData
+import org.onebillionliterates.attendance_tracker.drawables.*
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,20 +26,22 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.login)
         setSupportActionBar(toolbar)
 
-        loginButton.setOnClickListener { view ->
-
-            val userName = username.text.toString()
-            val password = password.text.toString()
-            if (userName == "admin" && password == "12345") {
-                Snackbar.make(view, "Login SuccessFul", Snackbar.LENGTH_LONG).show()
-                val intent = Intent(this, AdminLandingActivity::class.java)
-                startActivity(intent)
-            }
-
-            showLoginFailedDailog()
+        login.setOnClickListener { view ->
+            val intent = Intent(this, AdminLandingActivity::class.java)
+            startActivity(intent)
         }
-    }
 
+        initView()
+    }
+    private fun initView() {
+
+        val passCodeIcon = findViewById<View>(R.id.passCodeInfo).findViewById<ImageView>(R.id.passCodeIcon)
+        passCodeIcon.setImageDrawable(PasswordDrawable(this))
+
+        val phoneIcon = findViewById<View>(R.id.phoneInfo).findViewById<ImageView>(R.id.phoneIcon)
+        phoneIcon.setImageDrawable(MobileDrawable(this))
+
+    }
     private fun showLoginFailedDailog() {
         val dialog = this?.let {
             // Use the Builder class for convenient dialog construction

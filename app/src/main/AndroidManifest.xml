@@ -10,21 +10,14 @@
             android:hardwareAccelerated="false"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-
-        <!--<activity android:name=".SessionCreator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>-->
+        <activity android:name=".AttendanceListingActivity">
+        </activity>
+        <activity android:name=".SessionsListingActivity">
+        </activity>
+        <activity android:name=".SessionCreator">
+        </activity>
 
         <activity android:name=".DBOperations">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity
@@ -38,19 +31,17 @@
             </intent-filter>
         </activity>
         <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
-        </activity>
-        <activity android:name=".SchoolListingActivity" android:label="Schools Listing" >
             <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".SchoolListingActivity" android:label="Schools Listing">
         </activity>
         <activity android:name=".AddSchoolActivity">
         </activity>
-        <activity
-            android:name=".TeachersActivity">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".TeachersActivity">
         </activity>
     </application>
 
