@@ -75,7 +75,8 @@ class AppData {
                     "passCode" to teacherToSave.passCode,
                     "remarks" to teacherToSave.remarks,
                     "createdAt" to createdAt.toTimestamp(),
-                    "emailId" to teacherToSave.emailId
+                    "emailId" to teacherToSave.emailId,
+                    "verificationId" to teacherToSave.verificationId
                 )
             )
             .await()
@@ -88,14 +89,16 @@ class AppData {
             passCode = teacherToSave.passCode,
             remarks = teacherToSave.remarks,
             createdAt = createdAt,
-            emailId = teacherToSave.emailId
+            emailId = teacherToSave.emailId,
+            verificationId = teacherToSave.verificationId
+
         )
     }
 
     fun updateTeacher(teacherToSave: Teacher): Teacher {
         val createdAt = LocalDateTime.now(ZoneOffset.UTC)
         if(teacherToSave.id!=null) {
-            teacherCollection.document(teacherToSave.id)
+            teacherCollection.document(teacherToSave.id!!)
                 .set(hashMapOf(
                     "adminRef" to adminCollection.document(teacherToSave.adminRef),
                     "mobileNumber" to teacherToSave.mobileNumber,
@@ -103,7 +106,8 @@ class AppData {
                     "passCode" to teacherToSave.passCode,
                     "remarks" to teacherToSave.remarks,
                     "createdAt" to createdAt.toTimestamp(),
-                    "emailId" to teacherToSave.emailId
+                    "emailId" to teacherToSave.emailId,
+                    "verificationId" to teacherToSave.verificationId
                 ))
         }
         return teacherToSave

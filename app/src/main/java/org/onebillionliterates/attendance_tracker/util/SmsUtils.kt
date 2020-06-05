@@ -51,7 +51,6 @@ class SmsUtils {
                 override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
                     //Getting the code sent by SMS
                     val code = phoneAuthCredential.smsCode
-                    println("verification code -------- $code")
                     //sometime the code is not detected automatically
                     //in this case the code will be null
                     //so user has to manually enter the code
@@ -63,19 +62,31 @@ class SmsUtils {
                 }
 
                 override fun onVerificationFailed(e: FirebaseException) {
-                    //Toast.makeText(context , e.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context , e.message, Toast.LENGTH_LONG).show()
+//                    GlobalScope.launch {
+//                        if(teacherBoolean.isUpdate) {
+//                            println("update")
+//                            AppData.instance.updateTeacher(teacher)
+//                        }else{
+//                            println("save")
+//                            var t = AppData.instance.saveTeacher(teacher)
+//                            teacher.id=t.id
+//                        }
+//                    }
                 }
 
                 override fun onCodeSent(s: String, forceResendingToken: ForceResendingToken) {
                     super.onCodeSent(s, forceResendingToken)
-                    println("verification Id -------- sms utils ------- $s")
-                    //Toast.makeText(context , "$s sent to $mobile successfully", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context , "verification code sent to "+teacher.mobileNumber+" successfully", Toast.LENGTH_LONG).show()
                     GlobalScope.launch {
                         teacher.verificationId=s
                         if(teacherBoolean.isUpdate) {
+                            println("update")
                             AppData.instance.updateTeacher(teacher)
                         }else{
-                            AppData.instance.saveTeacher(teacher)
+                            println("save")
+                            var t = AppData.instance.saveTeacher(teacher)
+                            teacher.id=t.id
                         }
                     }
                 }

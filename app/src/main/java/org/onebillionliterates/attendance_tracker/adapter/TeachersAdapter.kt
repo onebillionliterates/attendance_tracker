@@ -12,14 +12,15 @@ import org.onebillionliterates.attendance_tracker.data.Teacher
 import org.onebillionliterates.attendance_tracker.util.TeachersViewUtils
 
 
-class TeachersAdapter(private var teachersList : MutableList<Teacher>) :
+class TeachersAdapter(var teachersList : MutableList<Teacher>) :
     RecyclerView.Adapter<TeachersAdapter.ViewHolder>() {
 
     open class ViewHolder(con: Context, itemView: View) : RecyclerView.ViewHolder(itemView){
 
         val context: Context = con
 
-        open fun bindItems(teacher: Teacher) {
+        open fun bindItems(teachersList : MutableList<Teacher>, index : Int) {
+            val teacher= teachersList[index]
 
             val textViewName = itemView.findViewById(R.id.textViewUsername) as TextView
             textViewName.text = teacher.name
@@ -34,7 +35,7 @@ class TeachersAdapter(private var teachersList : MutableList<Teacher>) :
                     arrowImageView.setImageResource (R.drawable.arrow_blue);
                     click = true;
                 }
-                TeachersViewUtils.populateBottomSheet(context, R.layout.teachers_drawer, teacher)
+                TeachersViewUtils.populateBottomSheet(context, R.layout.teachers_drawer, teachersList, index)
                 println("clicked")
             }
         }
@@ -50,6 +51,6 @@ class TeachersAdapter(private var teachersList : MutableList<Teacher>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindItems(teachersList[position])
+        holder.bindItems(teachersList, position)
     }
 }
