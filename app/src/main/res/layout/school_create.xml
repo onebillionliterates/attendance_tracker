@@ -62,10 +62,26 @@
             android:text="Phone Number"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toTopOf="parent" android:id="@+id/constraintLayout2">
+
+        <EditText
+                android:id="@+id/school_phone_number_add"
+                android:layout_width="304dp"
+                android:layout_height="47dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginEnd="7dp"
+                android:layout_marginBottom="6dp"
+                android:ems="10"
+                android:inputType="phone"
+                android:text="Phone Number"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Select School -->
@@ -118,11 +134,13 @@
         app:layout_constraintTop_toBottomOf="@+id/school" />
 
     <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView3"
-        android:layout_width="404dp"
-        android:layout_height="380dp"
-        tools:layout_editor_absoluteX="2dp"
-        tools:layout_editor_absoluteY="6dp" />
+            android:id="@+id/mapView3"
+            android:layout_width="404dp"
+            android:layout_height="380dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="10dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="10dp"/>
 
     <!-- Select Start Date -->
 

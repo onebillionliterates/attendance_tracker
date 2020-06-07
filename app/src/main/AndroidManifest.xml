@@ -17,20 +17,14 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_key"/>
 
+        <activity android:name=".AttendanceListingActivity">
+        </activity>
+        <activity android:name=".SessionsListingActivity">
+        </activity>
         <activity android:name=".SessionCreator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity android:name=".DBOperations">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity
@@ -44,19 +38,17 @@
             </intent-filter>
         </activity>
         <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
-        </activity>
-        <activity android:name=".SchoolListingActivity" android:label="Schools Listing" >
             <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".SchoolListingActivity" android:label="Schools Listing">
         </activity>
         <activity android:name=".AddSchoolActivity">
         </activity>
-        <activity
-            android:name=".TeachersActivity">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".TeachersActivity">
         </activity>
         <activity android:name=".TeacherSessions" android:label="Session list in teacher login" >
             <intent-filter>

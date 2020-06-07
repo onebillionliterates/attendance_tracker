@@ -1,4 +1,4 @@
 package org.onebillionliterates.attendance_tracker.model
 
-data class Teacher(val name: String, val address: String)
+data class TeacherBoolean(var isUpdate: Boolean)
 

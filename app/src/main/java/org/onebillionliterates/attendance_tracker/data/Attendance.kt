@@ -1,6 +1,7 @@
 package org.onebillionliterates.attendance_tracker.data
 
-import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalTime
 
 data class Attendance(
     val id: String? = null,
@@ -8,7 +9,8 @@ data class Attendance(
     val sessionRef: String,
     val teacherRef: String,
     val schoolRef: String,
-    val inTime: LocalDateTime,
-    val outTime: LocalDateTime,
+    val createdAt: LocalDate,
+    val inTime: LocalTime,
+    val outTime: LocalTime,
     val remarks: String? = null
 )
