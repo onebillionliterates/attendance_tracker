@@ -113,12 +113,15 @@ class AppData {
         return teacherToSave
     }
 
-    suspend fun getTeacherInfo(mobileNumber: String, passCode: String): Teacher {
+    suspend fun getTeacherInfo(mobileNumber: String): Teacher? {
         val data = teacherCollection
             .whereEqualTo("mobileNumber", mobileNumber)
-            .whereEqualTo("passCode", passCode)
             .get()
-            .await();
+            .await()
+
+        if(data.documents.isEmpty()){
+            return null
+        }
 
         return data.documents.map { document ->
             Teacher(
@@ -128,7 +131,9 @@ class AppData {
                 document.getString("name"),
                 document.getString("passCode"),
                 document.getString("remarks"),
-                document.getTimestamp("createdAt")?.toLocalDateTime()
+                document.getTimestamp("createdAt")?.toLocalDateTime() ,
+                document.getString("emailId"),
+                document.getString("verificationId")
             )
         }.first()
     }

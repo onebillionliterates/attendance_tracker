@@ -36,7 +36,7 @@ class SmsUtils {
             setClassVariables(con, teacher, teacherBoolean)
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 "+91"+teacher?.mobileNumber,
-                60,
+                120,
                 TimeUnit.SECONDS,
                 TaskExecutors.MAIN_THREAD,
                 mCallbacks

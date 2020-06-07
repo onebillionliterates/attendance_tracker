@@ -2,13 +2,11 @@ package org.onebillionliterates.attendance_tracker.util
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.onebillionliterates.attendance_tracker.R
@@ -25,11 +23,14 @@ import org.threeten.bp.ZoneOffset
 
 class TeachersViewUtils {
 
+
     interface CustomListListener {
         fun onListChanged(myList: List<Teacher>)
     }
 
     companion object {
+        var TAG = this::class.qualifiedName
+
         lateinit var editTextTeacher: EditText
         lateinit var editTextMobile: EditText
         lateinit var editTextEmail: EditText
@@ -40,17 +41,22 @@ class TeachersViewUtils {
         private lateinit var teachers: MutableList<Teacher>
         private lateinit var pos: Position
 
+        private lateinit var trashIcon: ImageView
+        private lateinit var removeText: TextView
+
+
         fun populateBottomSheet(
             con: Context,
             resource: Int,
-            teachersList : MutableList<Teacher>,
+            teachersList: MutableList<Teacher>,
             index: Int
         ) {
             teachers = teachersList
-            pos =  Position(index)
+            pos = Position(index)
             val bottomSheet: View = LayoutInflater.from(con).inflate(resource, null)
 
             initImageIcons(con, bottomSheet)
+            initRemoveLayout(con, bottomSheet)
             initView(con, bottomSheet)
 
             dialog = BottomSheetDialog(con)
@@ -58,11 +64,28 @@ class TeachersViewUtils {
             dialog.show()
         }
 
-        private fun initView(
-            con: Context,
-            view: View
-        ) {
+        private fun initRemoveLayout(con: Context, view: View) {
+            trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
+            removeText = view.findViewById(R.id.delete) as TextView
+            trashIcon.setOnClickListener {
+                removeTeacher(con)
+            }
+            removeText.setOnClickListener {
+                removeTeacher(con)
+            }
+        }
 
+        private fun removeTeacher(con: Context){
+            trashIcon.setImageResource (R.drawable.trash_black);
+            removeText.setTextColor(Color.parseColor("#0a0a0a"))
+            //teachers.removeAt(pos.index)
+//                mListener.onListChanged(teachers)
+//                Toast.makeText(con, "deleted the teacher successfully", Toast.LENGTH_LONG).show()
+//                Log.d(TAG,"deleted the teacher successfully at position " + pos.index)
+//            dialog.dismiss()
+        }
+
+        private fun initView(con: Context, view: View) {
             editTextTeacher = view.findViewById(R.id.editTextTeacher) as EditText
             editTextMobile = view.findViewById(R.id.editTextMobile) as EditText
             editTextEmail = view.findViewById(R.id.editTextEmail) as EditText
@@ -72,7 +95,7 @@ class TeachersViewUtils {
 
             buttonAdd.setOnClickListener {
 
-                if (!isValidMobile(editTextMobile.text.toString())) {
+                if (!ValidationUtils.isValidMobile(editTextMobile.text.toString())) {
                     var constraintLayout = view.findViewById(R.id.phoneLayout) as ConstraintLayout
                     var phoneAlertLayout =
                         view.findViewById(R.id.phoneAlertLayout) as ConstraintLayout
@@ -86,7 +109,7 @@ class TeachersViewUtils {
                         phoneAlertIcon
                     )
                 }
-                if (!isValidEMail(editTextEmail.text.toString())) {
+                if (!ValidationUtils.isValidEMail(editTextEmail.text.toString())) {
                     var constraintLayout = view.findViewById(R.id.emailLayout) as ConstraintLayout
                     var emailAlertLayout =
                         view.findViewById(R.id.emailAlertLayout) as ConstraintLayout
@@ -112,7 +135,9 @@ class TeachersViewUtils {
             val email = editTextEmail.text.toString()
 
             var teacherBoolean = TeacherBoolean(false)
-            println("position.index ***********"+pos.index)
+
+            Log.d(TAG, "teachers position.index" + pos.index)
+
             if (pos.index == -1) {
                 val teacher = Teacher(
                     "dummy_id",
@@ -125,11 +150,14 @@ class TeachersViewUtils {
                     email,
                     "verificationId"
                 )
-                SmsUtils.sendVerificationCode(con, teacher, teacherBoolean)
-                println("adding to adapter ************* teachers size= "+teachers.size)
+                Log.d(TAG,"adding to teacher to teachers list. now size is " + teachers.size)
                 teachers.add(teacher)
+                SmsUtils.sendVerificationCode(con, teacher, teacherBoolean)
             } else {
+
                 teacherBoolean.isUpdate = true
+
+                Log.d(TAG,"updating to teacher at position " + pos.index)
                 teachers[pos.index].emailId = email
                 teachers[pos.index].mobileNumber = mobile
                 teachers[pos.index].name = name
@@ -160,21 +188,7 @@ class TeachersViewUtils {
 
             val emailIdIcon = view.findViewById<ImageView>(R.id.emailIcon)
             emailIdIcon.setImageDrawable(EmailDrawable(con))
-
-            val trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
-            val color: Int = Color.parseColor("#ffcc0000") //The color u want
-            trashIcon.setColorFilter(color)
-            trashIcon.setImageDrawable(TrashDrawable(con))
         }
-
-        private fun isValidEMail(email: String): Boolean {
-            return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        }
-
-        private fun isValidMobile(phone: String): Boolean {
-            return Patterns.PHONE.matcher(phone).matches()
-        }
-
 
         fun setOnListChangeListener(listener: CustomListListener) {
             mListener = listener

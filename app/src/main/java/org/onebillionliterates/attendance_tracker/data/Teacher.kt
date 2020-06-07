@@ -8,7 +8,7 @@ data class Teacher(
     val adminRef: String,
     var mobileNumber: String? = null,
     var name: String? = null,
-    val passCode: String? = null,
+    var passCode: String? = null,
     val remarks: String? = null,
     var createdAt: LocalDateTime? = null,
     var emailId: String? = null,

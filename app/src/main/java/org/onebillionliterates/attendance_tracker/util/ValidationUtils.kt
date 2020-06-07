@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Patterns
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +15,15 @@ import org.onebillionliterates.attendance_tracker.drawables.AlertDrawable
 class ValidationUtils {
 
     companion object {
+
+        fun isValidEMail(email: String): Boolean {
+            return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        }
+
+        fun isValidMobile(phone: String): Boolean {
+            return Patterns.PHONE.matcher(phone).matches()
+        }
+
 
         fun setTextValidations(
             context: Context,
