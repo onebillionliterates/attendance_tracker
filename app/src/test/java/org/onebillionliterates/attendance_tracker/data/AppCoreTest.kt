@@ -279,6 +279,10 @@ class AppCoreTest {
             val futureSessions = sessionsMap.get("future")
             val totalSize = todaySessions!!.size + pastSessions!!.size + futureSessions!!.size
             assertThat(totalSize, `is`(3))
+
+            val grouping = listOf<Session>(getSession(schoolRef = "School 1"), getSession(schoolRef = "School 1"), getSession(schoolRef = "School 2")).groupBy { session->session.schoolRef }
+            assertThat((grouping["School 1"] ?: error("")).size, `is`(2))
+            assertThat((grouping["School 2"] ?: error("")).size, `is`(1))
         }
     }
 
