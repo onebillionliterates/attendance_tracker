@@ -18,6 +18,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.drawables.*
 import org.onebillionliterates.attendance_tracker.util.LoginViewUtils
+import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
+import org.onebillionliterates.attendance_tracker.drawables.PasswordDrawable
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

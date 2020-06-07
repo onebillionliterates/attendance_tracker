@@ -2,7 +2,6 @@ package org.onebillionliterates.attendance_tracker.data
 
 import android.location.Location
 import android.util.Log
-import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
@@ -23,6 +22,7 @@ class AppData {
     private object HOLDER {
         val INSTANCE = AppData()
     }
+
     companion object {
         val instance: AppData by lazy { HOLDER.INSTANCE }
     }
@@ -97,18 +97,20 @@ class AppData {
 
     fun updateTeacher(teacherToSave: Teacher): Teacher {
         val createdAt = LocalDateTime.now(ZoneOffset.UTC)
-        if(teacherToSave.id!=null) {
+        if (teacherToSave.id != null) {
             teacherCollection.document(teacherToSave.id!!)
-                .set(hashMapOf(
-                    "adminRef" to adminCollection.document(teacherToSave.adminRef),
-                    "mobileNumber" to teacherToSave.mobileNumber,
-                    "name" to teacherToSave.name,
-                    "passCode" to teacherToSave.passCode,
-                    "remarks" to teacherToSave.remarks,
-                    "createdAt" to createdAt.toTimestamp(),
-                    "emailId" to teacherToSave.emailId,
-                    "verificationId" to teacherToSave.verificationId
-                ))
+                .set(
+                    hashMapOf(
+                        "adminRef" to adminCollection.document(teacherToSave.adminRef),
+                        "mobileNumber" to teacherToSave.mobileNumber,
+                        "name" to teacherToSave.name,
+                        "passCode" to teacherToSave.passCode,
+                        "remarks" to teacherToSave.remarks,
+                        "createdAt" to createdAt.toTimestamp(),
+                        "emailId" to teacherToSave.emailId,
+                        "verificationId" to teacherToSave.verificationId
+                    )
+                )
         }
         return teacherToSave
     }
@@ -138,7 +140,7 @@ class AppData {
         }.first()
     }
 
-    suspend fun getTeachersCollection():MutableList<Teacher>{
+    suspend fun getTeachersCollection(): MutableList<Teacher> {
 
         val teachersList: MutableList<Teacher> = ArrayList()
 
@@ -146,17 +148,19 @@ class AppData {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    teachersList.add(Teacher(
-                        document.id,
-                        document.getDocumentReference("adminRef")!!.id,
-                        document.getString("mobileNumber"),
-                        document.getString("name"),
-                        document.getString("passCode"),
-                        document.getString("remarks"),
-                        document.getTimestamp("createdAt")?.toLocalDateTime(),
-                        document.getString("emailId"),
-                        document.getString("verificationId")
-                    ))
+                    teachersList.add(
+                        Teacher(
+                            document.id,
+                            document.getDocumentReference("adminRef")!!.id,
+                            document.getString("mobileNumber"),
+                            document.getString("name"),
+                            document.getString("passCode"),
+                            document.getString("remarks"),
+                            document.getTimestamp("createdAt")?.toLocalDateTime(),
+                            document.getString("emailId"),
+                            document.getString("verificationId")
+                        )
+                    )
                     Log.d(TAG, "${document.id} => ${document.data}")
                 }
             }
@@ -404,5 +408,28 @@ class AppData {
                 outTime = LocalTime.ofNanoOfDay(document.get("outTime") as Long)
             )
         }
+    }
+
+    suspend fun fetchAllTeachers(adminRef: String, teacherRefs: List<String>): List<Teacher> {
+        val cleanedUpRefs = teacherRefs
+            .map { ref -> ref.split("/")[2] }
+        val data =
+            cleanedUpRefs
+                .map { ref -> teacherCollection.document(ref).get().await() }
+
+        return data.map { document ->
+            Teacher(
+                document.id,
+                document.getDocumentReference("adminRef")!!.id,
+                document.getString("mobileNumber"),
+                document.getString("name"),
+                document.getString("passCode"),
+                document.getString("remarks"),
+                document.getTimestamp("createdAt")?.toLocalDateTime()
+            )
+        }
+            .filter { teacher ->
+                teacher.adminRef == adminRef
+            }
     }
 }

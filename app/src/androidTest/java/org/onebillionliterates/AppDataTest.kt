@@ -63,4 +63,20 @@ class AppDataTest {
         }
     }
 
+    @Test
+    fun get_teachers_in() {
+        runBlocking {
+            val TAG = "TESTING APP COROUTINE"
+            val appData = AppData();
+                var teachersForIds = appData.fetchAllTeachers(adminRef = "fw7aJ1dVDpQndyHFhDsv", teacherRefs = listOf<String>(
+                "/teachers/2QK5TdCmsHWNJA28XsIT",
+                "/teachers/PA4P7RzvAmJTrJpGqgaw",
+                "/teachers/nruRCGjagHP2UrNBP8PX"
+            ))
+
+            assertThat(teachersForIds, Is(notNullValue()))
+            Log.d(TAG, "PARTICULAR => $teachersForIds")
+        }
+    }
+
 }
