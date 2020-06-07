@@ -31,6 +31,10 @@ class LoginActivity : AppCompatActivity() {
                 Snackbar.make(view, "Login SuccessFul", Snackbar.LENGTH_LONG).show()
                 val intent = Intent(this, AdminLandingActivity::class.java)
                 startActivity(intent)
+            } else if (userName == "teacher" && password == "98765") {
+                Snackbar.make(view, "Teacher Login SuccessFul", Snackbar.LENGTH_LONG).show()
+                val intent = Intent(this, TeacherSessions::class.java)
+                startActivity(intent)
             }
 
             showLoginFailedDailog()
