@@ -51,22 +51,6 @@
         app:layout_constraintTop_toTopOf="parent" >
 
         <EditText
-            android:id="@+id/school_phone_number_add"
-            android:layout_width="304dp"
-            android:layout_height="47dp"
-            android:layout_marginStart="60dp"
-            android:layout_marginEnd="7dp"
-            android:layout_marginBottom="6dp"
-            android:ems="10"
-            android:inputType="phone"
-            android:text="Phone Number"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" android:id="@+id/constraintLayout2">
-
-        <EditText
                 android:id="@+id/school_phone_number_add"
                 android:layout_width="304dp"
                 android:layout_height="47dp"
