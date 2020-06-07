@@ -3,20 +3,17 @@ package org.onebillionliterates.attendance_tracker
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.login.*
-import org.onebillionliterates.attendance_tracker.drawables.*
+import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
+import org.onebillionliterates.attendance_tracker.drawables.PasswordDrawable
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,21 +23,9 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.login)
         setSupportActionBar(toolbar)
 
-        loginButton.setOnClickListener { view ->
-
-            val userName = username.text.toString()
-            val password = password.text.toString()
-            if (userName == "admin" && password == "12345") {
-                Snackbar.make(view, "Login SuccessFul", Snackbar.LENGTH_LONG).show()
-                val intent = Intent(this, AdminLandingActivity::class.java)
-                startActivity(intent)
-            } else if (userName == "teacher" && password == "98765") {
-                Snackbar.make(view, "Teacher Login SuccessFul", Snackbar.LENGTH_LONG).show()
-                val intent = Intent(this, TeacherSessions::class.java)
-                startActivity(intent)
-            }
-
-            showLoginFailedDailog()
+        login.setOnClickListener { view ->
+            val intent = Intent(this, AdminLandingActivity::class.java)
+            startActivity(intent)
         }
 
         initView()
