@@ -54,8 +54,8 @@ class AppDataTest {
         runBlocking {
             val TAG = "TESTING APP COROUTINE"
             val appData = AppData();
-            val mobileNumber = "+15555215554"
-            val passcode = "e10adc3949ba59abbe56e057f20f883e"
+            val mobileNumber = "8884410287"
+            val passcode = "337703"
             var admin = appData.getAdminInfo(mobileNumber, passcode)
 
             assertThat(admin, Is(notNullValue()))
@@ -69,8 +69,9 @@ class AppDataTest {
             val TAG = "TESTING APP COROUTINE"
             val appData = AppData();
                 var teachersForIds = appData.fetchAllTeachers(adminRef = "fw7aJ1dVDpQndyHFhDsv", teacherRefs = listOf<String>(
-                "/teachers/MPw0TDVnXFmX64vEHZAJ",
-                "/teachers/RxnO8ST2ndX19VNcVsFp"
+                "/teachers/2QK5TdCmsHWNJA28XsIT",
+                "/teachers/PA4P7RzvAmJTrJpGqgaw",
+                "/teachers/nruRCGjagHP2UrNBP8PX"
             ))
 
             assertThat(teachersForIds, Is(notNullValue()))

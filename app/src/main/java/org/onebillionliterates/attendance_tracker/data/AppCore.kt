@@ -2,20 +2,10 @@ package org.onebillionliterates.attendance_tracker.data
 
 import org.onebillionliterates.attendance_tracker.data.ERRORS.*
 import org.threeten.bp.*
-import java.math.BigInteger
-import java.security.MessageDigest
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class AppCore {
-    private val appData: AppData = AppData.instance;
-    private object HOLDER {
-        val INSTANCE = AppCore()
-    }
-
-    companion object {
-        val instance: AppCore by lazy { HOLDER.INSTANCE }
-    }
+class AppCore(val appData: AppData) {
 
     fun LocalDate.inBetween(referenceStart: LocalDate, referenceEnd: LocalDate): Boolean =
         referenceStart.isBefore(this) || referenceStart.isEqual(this) &&
@@ -119,28 +109,13 @@ class AppCore {
                 val teachersAbsent =
                     session.teacherRefs.filter { teacherRef -> !lookUpTable.containsKey("${session.id}_${teacherRef}_${currentDate}") }
 
-                if (teachersPresent.isNotEmpty()) presentSessionList[currentDate]!!.add(session.clone(teachersPresent))
-                if (teachersAbsent.isNotEmpty()) absentSessionList[currentDate]!!.add(session.clone(teachersAbsent))
+                if(teachersPresent.isNotEmpty()) presentSessionList[currentDate]!!.add(session.clone(teachersPresent))
+                if(teachersAbsent.isNotEmpty()) absentSessionList[currentDate]!!.add(session.clone(teachersAbsent))
             }
 
 
         }
         return mapOf("present" to presentSessionList, "absent" to absentSessionList)
-    }
-
-    suspend fun login(mobileNumber: String, sixDigitPassCode: String): LoggedInUser {
-
-        val md5Hashing = MessageDigest.getInstance("MD5")
-        md5Hashing.update(sixDigitPassCode.toByteArray())
-        val hashedPassCode = BigInteger(1, md5Hashing.digest()).toString(16)
-
-        val loggedInUser = LoggedInUser();
-        loggedInUser.adminInfo = appData.getAdminInfo(mobileNumber, hashedPassCode)
-        if (loggedInUser.adminInfo != null)
-            return loggedInUser
-
-        loggedInUser.teacherInfo = Teacher(adminRef = "")// appData.getTeacherInfo(mobileNumber, hashedPassCode)
-        return loggedInUser
     }
 
 }
