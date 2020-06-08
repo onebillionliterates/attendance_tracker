@@ -3,10 +3,7 @@ package org.onebillionliterates.attendance_tracker.data
 import android.location.Location
 import android.util.Log
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -48,7 +45,7 @@ class AppData {
         return location
     }
 
-    suspend fun getAdminInfo(mobileNumber: String, passCode: String): Admin? {
+    suspend fun getAdminInfo(mobileNumber: String, passCode: String): Admin {
         val data = adminCollection
             .whereEqualTo("mobileNumber", mobileNumber)
             .whereEqualTo("passCode", passCode)
@@ -64,7 +61,7 @@ class AppData {
                 document.getString("remarks"),
                 document.getTimestamp("createdAt")?.toLocalDateTime()
             )
-        }.firstOrNull()
+        }.first()
     }
 
     suspend fun saveTeacher(teacherToSave: Teacher): Teacher {
@@ -118,12 +115,15 @@ class AppData {
         return teacherToSave
     }
 
-    suspend fun getTeacherInfo(mobileNumber: String, passCode: String): Teacher? {
+    suspend fun getTeacherInfo(mobileNumber: String): Teacher? {
         val data = teacherCollection
             .whereEqualTo("mobileNumber", mobileNumber)
-            .whereEqualTo("passCode", passCode)
             .get()
-            .await();
+            .await()
+
+        if(data.documents.isEmpty()){
+            return null
+        }
 
         return data.documents.map { document ->
             Teacher(
@@ -137,7 +137,7 @@ class AppData {
                 document.getString("emailId"),
                 document.getString("verificationId")
             )
-        }.firstOrNull()
+        }.first()
     }
 
     suspend fun getTeachersCollection(): MutableList<Teacher> {

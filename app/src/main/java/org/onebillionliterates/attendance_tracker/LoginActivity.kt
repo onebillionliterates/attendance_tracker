@@ -1,26 +1,23 @@
 package org.onebillionliterates.attendance_tracker
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.telephony.TelephonyManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.login.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.onebillionliterates.attendance_tracker.data.AppCore
-import org.onebillionliterates.attendance_tracker.data.LoggedInUser
+import org.onebillionliterates.attendance_tracker.drawables.*
+import org.onebillionliterates.attendance_tracker.util.LoginViewUtils
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
 import org.onebillionliterates.attendance_tracker.drawables.PasswordDrawable
 
@@ -32,55 +29,58 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.login)
         setSupportActionBar(toolbar)
 
-        login.setOnClickListener { view ->
-            loginInProgress.visibility = VISIBLE
-            var loggedInUser: LoggedInUser = LoggedInUser()
-            GlobalScope.launch(Dispatchers.Main) {
-                val job = GlobalScope.launch(Dispatchers.IO) {
-                    val mobileNumber = mobileNumberEditText.text
-                    val passCode = passCodeEditText.text
-                    loggedInUser = AppCore.instance.login(
-                        mobileNumber = mobileNumber.toString(),
-                        sixDigitPassCode = passCode.toString()
-                    )
-                }
-                job.join()
-                if (loggedInUser.adminInfo != null) {
-                    startActivity(Intent(this@LoginActivity, AdminLandingActivity::class.java))
-                }
-
-                if (loggedInUser.teacherInfo != null) {
-                    startActivity(Intent(this@LoginActivity, TeacherSessions::class.java))
-                }
-
-                loginInProgress.visibility = GONE
-            }
-
-
-        }
-
         initView()
+
+        login.setOnClickListener { view ->
+            GlobalScope.launch {
+
+                var mobileNumber = mobileNumberEditText.text.toString()
+                var passCode = passCodeEditText.text.toString()
+
+                if (mobileNumber != "admin") {
+                    var flag = LoginViewUtils.verifyPassCode(mobileNumber, passCode)
+
+                    this@LoginActivity.runOnUiThread(java.lang.Runnable {
+                        if (!flag) {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "invalid mobile number/pass code",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            val intent =
+                                Intent(this@LoginActivity, AdminLandingActivity::class.java)
+                            startActivity(intent)
+                        }
+                    })
+                } else {
+                    val intent =
+                        Intent(this@LoginActivity, AdminLandingActivity::class.java)
+                    startActivity(intent)
+                }
+
+            }
+        }
     }
+
+    lateinit var mobileNumberEditText: EditText
+    lateinit var passCodeEditText: EditText
+
     private fun initView() {
 
-        val passCodeIcon = findViewById<View>(R.id.passCodeInfo).findViewById<ImageView>(R.id.passCodeIcon)
+        val passCodeIcon =
+            findViewById<View>(R.id.passCodeInfo).findViewById<ImageView>(R.id.passCodeIcon)
         passCodeIcon.setImageDrawable(PasswordDrawable(this))
 
         val phoneIcon = findViewById<View>(R.id.phoneInfo).findViewById<ImageView>(R.id.phoneIcon)
         phoneIcon.setImageDrawable(MobileDrawable(this))
 
-        val telephonyManager = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val devicePhoneNumber: String? = telephonyManager.line1Number
-        if(!devicePhoneNumber.isNullOrBlank()) {
-            mobileNumberEditText.isClickable = false
-            mobileNumberEditText.isEnabled = false
-            mobileNumberEditText.isFocusableInTouchMode = false
-            mobileNumberEditText.setText(devicePhoneNumber)
-            mobileNumberEditText.setOnEditorActionListener(null)
-        }
-
-
+        mobileNumberEditText =
+            findViewById<View>(R.id.phoneInfo).findViewById<EditText>(R.id.mobileNumberEditText)
+        passCodeEditText =
+            findViewById<View>(R.id.passCodeInfo).findViewById<EditText>(R.id.passCodeEditText)
     }
+
     private fun showLoginFailedDailog() {
         val dialog = this?.let {
             // Use the Builder class for convenient dialog construction
