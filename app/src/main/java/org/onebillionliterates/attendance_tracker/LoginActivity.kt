@@ -38,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
                 var passCode = passCodeEditText.text.toString()
 
                 if (mobileNumber != "admin") {
-                    var flag = LoginViewUtils.verifyAndSavePassCode(mobileNumber, passCode)
+                    var flag = LoginViewUtils.verifyPassCode(mobileNumber, passCode)
 
                     this@LoginActivity.runOnUiThread(java.lang.Runnable {
                         if (!flag) {

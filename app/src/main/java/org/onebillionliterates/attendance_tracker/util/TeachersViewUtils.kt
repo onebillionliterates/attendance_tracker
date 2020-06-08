@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker.util
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.util.Log
@@ -44,13 +45,17 @@ class TeachersViewUtils {
         private lateinit var trashIcon: ImageView
         private lateinit var removeText: TextView
 
+        private lateinit var activity: Activity
+
 
         fun populateBottomSheet(
+            act: Activity,
             con: Context,
             resource: Int,
             teachersList: MutableList<Teacher>,
             index: Int
         ) {
+            activity=act
             teachers = teachersList
             pos = Position(index)
             val bottomSheet: View = LayoutInflater.from(con).inflate(resource, null)
@@ -152,7 +157,7 @@ class TeachersViewUtils {
                 )
                 Log.d(TAG,"adding to teacher to teachers list. now size is " + teachers.size)
                 teachers.add(teacher)
-                SmsUtils.sendVerificationCode(con, teacher, teacherBoolean)
+                SmsUtils.sendVerificationCode2(activity, con, teacher, teacherBoolean)
             } else {
 
                 teacherBoolean.isUpdate = true
@@ -161,7 +166,7 @@ class TeachersViewUtils {
                 teachers[pos.index].emailId = email
                 teachers[pos.index].mobileNumber = mobile
                 teachers[pos.index].name = name
-                SmsUtils.sendVerificationCode(con, teachers[pos.index], teacherBoolean)
+                SmsUtils.sendVerificationCode2(activity, con, teachers[pos.index], teacherBoolean)
             }
             mListener.onListChanged(teachers)
         }

@@ -3,6 +3,7 @@
           package="org.onebillionliterates.attendance_tracker">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application

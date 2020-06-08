@@ -35,6 +35,7 @@ class TeachersActivity : AppCompatActivity(), TeachersViewUtils.CustomListListen
             buttonAddNew.setOnClickListener {
                 TeachersViewUtils.populateBottomSheet(
                     this@TeachersActivity,
+                    this@TeachersActivity,
                     R.layout.teachers_drawer,
                     teachers,
                     -1
@@ -49,11 +50,11 @@ class TeachersActivity : AppCompatActivity(), TeachersViewUtils.CustomListListen
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
         var teachers: MutableList<Teacher> = mutableListOf<Teacher>()
-        var adapter: TeachersAdapter = TeachersAdapter(teachers)
+        var adapter: TeachersAdapter //= TeachersAdapter(this@TeachersActivity, teachers)
 
         val job = GlobalScope.launch {
             teachers = AppData.instance.getTeachersCollection()
-            adapter = TeachersAdapter(teachers)
+            adapter = TeachersAdapter(this@TeachersActivity, teachers)
 
             this@TeachersActivity.runOnUiThread(java.lang.Runnable {
                 recyclerView.adapter = adapter

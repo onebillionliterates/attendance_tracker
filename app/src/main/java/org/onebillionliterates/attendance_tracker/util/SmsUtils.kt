@@ -1,7 +1,12 @@
 package org.onebillionliterates.attendance_tracker.util
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.telephony.SmsManager
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
@@ -13,7 +18,9 @@ import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.data.AppData
 import org.onebillionliterates.attendance_tracker.data.Teacher
 import org.onebillionliterates.attendance_tracker.model.TeacherBoolean
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 
 class SmsUtils {
@@ -25,9 +32,9 @@ class SmsUtils {
         private lateinit var teacherBoolean: TeacherBoolean
 
         private fun setClassVariables(con: Context, t: Teacher, tb: TeacherBoolean) {
-            context=con
-            teacher=t
-            teacherBoolean=tb
+            context = con
+            teacher = t
+            teacherBoolean = tb
         }
 
         @JvmStatic
@@ -35,7 +42,7 @@ class SmsUtils {
             println("sending verfication code")
             setClassVariables(con, teacher, teacherBoolean)
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                "+91"+teacher?.mobileNumber,
+                "+91" + teacher?.mobileNumber,
                 120,
                 TimeUnit.SECONDS,
                 TaskExecutors.MAIN_THREAD,
@@ -43,50 +50,91 @@ class SmsUtils {
             )
         }
 
+        private var requestSendSms: Int = 2
+
+
+        @JvmStatic
+        fun sendVerificationCode2(
+            activity: Activity,
+            con: Context,
+            teacher: Teacher,
+            teacherBoolean: TeacherBoolean
+        ) {
+            println("sending verification code from phone")
+            setClassVariables(con, teacher, teacherBoolean)
+
+            if (ActivityCompat.checkSelfPermission(
+                    con,
+                    Manifest.permission.SEND_SMS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                println("no permissions")
+
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.SEND_SMS),
+                    requestSendSms
+                )
+            } else {
+                println("we have permissions")
+                var random = Random(System.currentTimeMillis() / 1000L)
+                var text = random.nextInt(100000, 999999).toString()
+                sendSms(con, teacher, teacherBoolean, text)
+                saveData(text)
+            }
+        }
+
+        private fun sendSms(con: Context, teacher: Teacher, teacherBoolean: TeacherBoolean, text: String) {
+            SmsManager.getDefault()
+                .sendTextMessage("+91" + teacher.mobileNumber, null, text, null, null)
+            Toast.makeText(
+                context,
+                "verification code sent to " + teacher.mobileNumber + " successfully",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        private fun saveData(passCode: String) {
+            GlobalScope.launch {
+                teacher.passCode = passCode
+                if (teacherBoolean.isUpdate) {
+                    println("update")
+                    AppData.instance.updateTeacher(teacher)
+                } else {
+                    println("save")
+                    var t = AppData.instance.saveTeacher(teacher)
+                    teacher.id = t.id
+                }
+            }
+        }
+
         @JvmStatic
         private val mCallbacks: OnVerificationStateChangedCallbacks =
             object : OnVerificationStateChangedCallbacks() {
-
-
                 override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
-                    //Getting the code sent by SMS
-                    val code = phoneAuthCredential.smsCode
-                    //sometime the code is not detected automatically
-                    //in this case the code will be null
-                    //so user has to manually enter the code
-        //            if (code != null) {
-        //                editTextCode.setText(code)
-        //                //verifying the code
-        //                verifyVerificationCode(code)
-        //            }
+
                 }
 
                 override fun onVerificationFailed(e: FirebaseException) {
-                    Toast.makeText(context , e.message, Toast.LENGTH_LONG).show()
-//                    GlobalScope.launch {
-//                        if(teacherBoolean.isUpdate) {
-//                            println("update")
-//                            AppData.instance.updateTeacher(teacher)
-//                        }else{
-//                            println("save")
-//                            var t = AppData.instance.saveTeacher(teacher)
-//                            teacher.id=t.id
-//                        }
-//                    }
+                    Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                 }
 
                 override fun onCodeSent(s: String, forceResendingToken: ForceResendingToken) {
                     super.onCodeSent(s, forceResendingToken)
-                    Toast.makeText(context , "verification code sent to "+teacher.mobileNumber+" successfully", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "verification code sent to " + teacher.mobileNumber + " successfully",
+                        Toast.LENGTH_LONG
+                    ).show()
                     GlobalScope.launch {
-                        teacher.verificationId=s
-                        if(teacherBoolean.isUpdate) {
+                        teacher.verificationId = s
+                        if (teacherBoolean.isUpdate) {
                             println("update")
                             AppData.instance.updateTeacher(teacher)
-                        }else{
+                        } else {
                             println("save")
                             var t = AppData.instance.saveTeacher(teacher)
-                            teacher.id=t.id
+                            teacher.id = t.id
                         }
                     }
                 }

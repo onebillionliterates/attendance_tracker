@@ -25,6 +25,24 @@ class LoginViewUtils {
 
         private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
+        suspend fun verifyPassCode(
+            mobileNumber: String,
+            passCode: String
+        ): Boolean {
+            var flag = false
+            var teacher: Teacher? = null
+
+            val job = GlobalScope.launch {
+                teacher = AppData.instance.getTeacherInfo(mobileNumber)
+            }
+            job.join()
+
+            if (teacher != null && teacher!!.passCode==passCode) {
+                flag = true
+            }
+            return flag
+        }
+
         suspend fun verifyAndSavePassCode(
             mobileNumber: String,
             passCode: String
