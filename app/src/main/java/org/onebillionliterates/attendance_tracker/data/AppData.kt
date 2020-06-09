@@ -133,7 +133,7 @@ class AppData {
                 document.getString("name"),
                 document.getString("passCode"),
                 document.getString("remarks"),
-                document.getTimestamp("createdAt")?.toLocalDateTime() ,
+                document.getTimestamp("createdAt")?.toLocalDateTime(),
                 document.getString("emailId"),
                 document.getString("verificationId")
             )
@@ -170,6 +170,43 @@ class AppData {
         return teachersList
     }
 
+    suspend fun fetchTeachers(adminRef: String): List<Teacher> {
+        return teacherCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .get()
+            .await()
+            .map { document ->
+                Teacher(
+                    document.id,
+                    document.getDocumentReference("adminRef")!!.id,
+                    document.getString("mobileNumber"),
+                    document.getString("name"),
+                    document.getString("passCode"),
+                    document.getString("remarks"),
+                    document.getTimestamp("createdAt")?.toLocalDateTime(),
+                    document.getString("emailId"),
+                    document.getString("verificationId")
+                )
+            }
+    }
+
+    suspend fun fetchSchools(adminRef: String): List<School> {
+        return schoolCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .get()
+            .await()
+            .map { document ->
+                School(
+                    id = document.id,
+                    adminRef = document.getDocumentReference("adminRef")!!.id,
+                    name = document.getString("name"),
+                    uniqueCode = document.getString("uniqueCode"),
+                    remarks = document.getString("remarks"),
+                    createdAt = document.getTimestamp("createdAt")?.toLocalDateTime(),
+                    location = geoPointToLocation(document.getGeoPoint("location")!!)
+                )
+            }
+    }
 
     suspend fun saveSchool(schoolToSave: School): School {
 
@@ -410,7 +447,7 @@ class AppData {
         }
     }
 
-    suspend fun fetchAllTeachers(adminRef: String, teacherRefs: List<String>): List<Teacher> {
+    suspend fun fetchTeachersForRefs(adminRef: String, teacherRefs: List<String>): List<Teacher> {
         val cleanedUpRefs = teacherRefs
             .map { ref -> ref.split("/")[2] }
         val data =

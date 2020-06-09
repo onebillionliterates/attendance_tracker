@@ -12,14 +12,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.session_create.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
+import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.drawables.*
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 
 class SessionCreator : AppCompatActivity(), View.OnClickListener {
     val TAG = "SessionCreator_Activity"
+    private lateinit var allSchools: List<DataHolder>
+    private lateinit var allTeachers: List<DataHolder>
+    private lateinit var allWeekDays: List<DataHolder>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
@@ -64,6 +72,32 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         endDate.setOnClickListener(this)
         startTime.setOnClickListener(this)
         endTime.setOnClickListener(this)
+
+        /**
+         * Loading all the data for the drawers
+         */
+        GlobalScope.launch(Dispatchers.Main) {
+            createSessionProgress.visibility = View.VISIBLE
+
+            val job = GlobalScope.launch(Dispatchers.IO) {
+                allTeachers = AppCore.instance.fetchTeachersForAdmin()
+                    .map { teacher -> DataHolder(id = teacher.id, displayText = teacher.name) }
+                allSchools = AppCore.instance.fetchSchoolsForAdmin()
+                    .map { school -> DataHolder(id = school.id, displayText = school.name) }
+                allWeekDays = listOf(
+                    DataHolder("1", "Monday"),
+                    DataHolder("2", "Tuesday"),
+                    DataHolder("3", "Wednesday"),
+                    DataHolder("4", "Thursday"),
+                    DataHolder("5", "Friday"),
+                    DataHolder("6", "Saturday"),
+                    DataHolder("7", "Sunday")
+                )
+            }
+            job.join()
+            createSessionProgress.visibility = View.GONE
+        }
+
     }
 
     override fun onClick(clickView: View?) {
@@ -84,12 +118,16 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 val dialog = BottomSheetDialog(this)
                 val datePicker = DatePicker(this)
                 val today = LocalDate.now();
-                datePicker.init(today.year, today.monthValue.minus(1), today.dayOfMonth) { view, year, monthOfYear, dayOfMonth ->
-                    when(clickView){
-                        startDate->{
+                datePicker.init(
+                    today.year,
+                    today.monthValue.minus(1),
+                    today.dayOfMonth
+                ) { view, year, monthOfYear, dayOfMonth ->
+                    when (clickView) {
+                        startDate -> {
                             startDateSelectTextView.text = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
                         }
-                        endDate->{
+                        endDate -> {
                             endDateSelectTextView.text = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
                         }
                     }
@@ -101,11 +139,11 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 val dialog = BottomSheetDialog(this)
                 val timePicker = TimePicker(this)
                 timePicker.setOnTimeChangedListener { view, hourOfDay, minute ->
-                    when(clickView){
-                        startTime->{
+                    when (clickView) {
+                        startTime -> {
                             startTimeSelectTextView.text = LocalTime.of(hourOfDay, minute).toString()
                         }
-                        endTime->{
+                        endTime -> {
                             endTimeSelectTextView.text = LocalTime.of(hourOfDay, minute).toString()
                         }
                     }
@@ -123,19 +161,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         val recyclerView = sheetView.findViewById<RecyclerView>(R.id.recyclerview)
         //adding a layoutmanager
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        //crating an arraylist to store users using the data class user
-        val dataHolder = listOf(
-            DataHolder("1", "Monday"),
-            DataHolder("2", "Tuesday"),
-            DataHolder("3", "Wednesday"),
-            DataHolder("4", "Thursday"),
-            DataHolder("5", "Friday"),
-            DataHolder("6", "Saturday"),
-            DataHolder("7", "Sunday")
-        )
 
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(dataHolder, singleSelect = false)
+        val adapter = SessionBottomSheetAdapter(allWeekDays, singleSelect = false)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
@@ -143,8 +171,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(sheetView)
         dialog.show()
-        dialog.setOnDismissListener{
-            print(adapter)
+        dialog.setOnDismissListener {
+            val selectedDays = allWeekDays.filter { dataHolder -> dataHolder.selected }
+            if (selectedDays.isNotEmpty()) daySelectTextView.text = "${selectedDays.size} days selected"
         }
     }
 
@@ -156,14 +185,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         val recyclerView = sheetView.findViewById<RecyclerView>(R.id.recyclerview)
         //adding a layoutmanager
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        //crating an arraylist to store users using the data class user
-        val dataHolder = listOf(
-            DataHolder("1", "Text 1"),
-            DataHolder("2", "Text 2")
-        )
 
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(dataHolder, singleSelect = false)
+        val adapter = SessionBottomSheetAdapter(allTeachers, singleSelect = false)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
@@ -171,8 +195,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(sheetView)
         dialog.show()
-        dialog.setOnDismissListener{
-            print(adapter)
+        dialog.setOnDismissListener {
+            val selectedTeachers = allTeachers.filter { dataHolder -> dataHolder.selected }
+            if (selectedTeachers.isNotEmpty()) teacherSelectTextView.text = "${selectedTeachers.size} teachers selected"
         }
     }
 
@@ -184,21 +209,18 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         //adding a layoutmanager
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         //crating an arraylist to store users using the data class user
-        val dataHolder = listOf(
-            DataHolder("1", "Text 1"),
-            DataHolder("2", "Text 2")
-        )
         val dialog = BottomSheetDialog(this)
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(dataHolder, singleSelect = true, bottomDialog = dialog)
+        val adapter = SessionBottomSheetAdapter(allSchools, singleSelect = true, bottomDialog = dialog)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
 
         dialog.setContentView(sheetView)
         dialog.show()
-        dialog.setOnDismissListener{
-            print(adapter)
+        dialog.setOnDismissListener {
+            val selectedSchool = allSchools.filter { dataHolder -> dataHolder.selected }.firstOrNull()
+            schoolSelectTextView.text = selectedSchool?.displayText ?: schoolSelectTextView.text
         }
     }
 

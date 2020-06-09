@@ -33,23 +33,23 @@ class LoginActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         login.setOnClickListener { view ->
-            loginInProgress.visibility = VISIBLE
-            var loggedInUser: LoggedInUser = LoggedInUser()
             GlobalScope.launch(Dispatchers.Main) {
+                loginInProgress.visibility = VISIBLE
+
                 val job = GlobalScope.launch(Dispatchers.IO) {
                     val mobileNumber = mobileNumberEditText.text
                     val passCode = passCodeEditText.text
-                    loggedInUser = AppCore.instance.login(
+                 AppCore.instance.login(
                         mobileNumber = mobileNumber.toString(),
                         sixDigitPassCode = passCode.toString()
                     )
                 }
                 job.join()
-                if (loggedInUser.adminInfo != null) {
+                if (AppCore.loggedInUser.adminInfo != null) {
                     startActivity(Intent(this@LoginActivity, AdminLandingActivity::class.java))
                 }
 
-                if (loggedInUser.teacherInfo != null) {
+                if (AppCore.loggedInUser.teacherInfo != null) {
                     startActivity(Intent(this@LoginActivity, TeacherSessions::class.java))
                 }
 

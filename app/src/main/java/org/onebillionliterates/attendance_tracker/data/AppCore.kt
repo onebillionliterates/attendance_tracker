@@ -9,12 +9,15 @@ import kotlin.collections.HashMap
 
 class AppCore {
     private val appData: AppData = AppData.instance;
+
     private object HOLDER {
         val INSTANCE = AppCore()
+        val LOGGED_IN_USER = LoggedInUser()
     }
 
     companion object {
         val instance: AppCore by lazy { HOLDER.INSTANCE }
+        val loggedInUser: LoggedInUser by lazy { HOLDER.LOGGED_IN_USER }
     }
 
     fun LocalDate.inBetween(referenceStart: LocalDate, referenceEnd: LocalDate): Boolean =
@@ -134,13 +137,20 @@ class AppCore {
         md5Hashing.update(sixDigitPassCode.toByteArray())
         val hashedPassCode = BigInteger(1, md5Hashing.digest()).toString(16)
 
-        val loggedInUser = LoggedInUser();
         loggedInUser.adminInfo = appData.getAdminInfo(mobileNumber, hashedPassCode)
         if (loggedInUser.adminInfo != null)
             return loggedInUser
 
         loggedInUser.teacherInfo = Teacher(adminRef = "")// appData.getTeacherInfo(mobileNumber, hashedPassCode)
         return loggedInUser
+    }
+
+    suspend fun fetchTeachersForAdmin(): List<Teacher> {
+        return AppData.instance.fetchTeachers(loggedInUser.adminInfo!!.id!!)
+    }
+
+    suspend fun fetchSchoolsForAdmin(): List<School> {
+        return AppData.instance.fetchSchools(loggedInUser.adminInfo!!.id!!)
     }
 
 }

@@ -68,7 +68,7 @@ class AppDataTest {
         runBlocking {
             val TAG = "TESTING APP COROUTINE"
             val appData = AppData();
-                var teachersForIds = appData.fetchAllTeachers(adminRef = "fw7aJ1dVDpQndyHFhDsv", teacherRefs = listOf<String>(
+                var teachersForIds = appData.fetchTeachersForRefs(adminRef = "fw7aJ1dVDpQndyHFhDsv", teacherRefs = listOf<String>(
                 "/teachers/MPw0TDVnXFmX64vEHZAJ",
                 "/teachers/RxnO8ST2ndX19VNcVsFp"
             ))

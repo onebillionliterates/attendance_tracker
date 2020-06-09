@@ -350,5 +350,13 @@
                 android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginEnd="15dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/createSessionProgress"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
