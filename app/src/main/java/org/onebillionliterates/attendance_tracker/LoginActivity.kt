@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -61,6 +62,7 @@ class LoginActivity : AppCompatActivity() {
 
         initView()
     }
+    @SuppressLint("MissingPermission")
     private fun initView() {
 
         val passCodeIcon = findViewById<View>(R.id.passCodeInfo).findViewById<ImageView>(R.id.passCodeIcon)
