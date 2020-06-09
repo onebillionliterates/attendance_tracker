@@ -44,7 +44,7 @@
                 android:layout_marginStart="10dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
                 app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="25dp"/>
+                android:layout_marginEnd="25dp" android:inputType="none|phone"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Phone number -->
@@ -85,7 +85,7 @@
                 android:layout_marginStart="10dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
                 app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="25dp"/>
+                android:layout_marginEnd="25dp" android:inputType="numberPassword"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
     <Button
             android:id="@+id/login"
@@ -98,4 +98,13 @@
             android:textColor="#FFFFFF"
             app:color="#FFFFFF" tools:layout_editor_absoluteX="15dp" app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="50dp"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/loginInProgress"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

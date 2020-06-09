@@ -1,21 +1,20 @@
 package org.onebillionliterates.attendance_tracker.data
 
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.any
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE
 
 class AppCoreTest {
-    private val mockedAppData: AppData = Mockito.mock(AppData::class.java)
-    private val instance = AppCore(mockedAppData)
+    private lateinit var mockedAppData: AppData
+    private lateinit var instance: AppCore
+
     private fun getSession(
         id: String? = null,
         adminRef: String = "adminRef",
@@ -41,6 +40,14 @@ class AppCoreTest {
     }
 
     fun parseISODate(isoDate: String) = LocalDate.parse(isoDate, ISO_LOCAL_DATE)
+
+    @BeforeEach
+    internal fun setUp() {
+        mockedAppData = mockk<AppData>()
+        mockkObject(AppData)
+        every { AppData.instance } returns mockedAppData
+        instance = AppCore()
+    }
 
     @Test
     internal fun minimum_30_mins_session() {
@@ -107,9 +114,8 @@ class AppCoreTest {
     internal fun session_already_exits() {
         val session = getSession()
 
-        runBlocking {
-            `when`(mockedAppData.verifySession(session)).thenReturn(true)
-        }
+        coEvery { mockedAppData.verifySession(session) } returns true
+
 
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
@@ -129,56 +135,50 @@ class AppCoreTest {
             endTime = LocalTime.NOON.plusHours(1)
         )
 
-        runBlocking {
-            Mockito.`when`(mockedAppData.verifySession(session)).thenReturn(false)
-        }
+        coEvery { mockedAppData.verifySession(session) } returns false
 
-        runBlocking {
-            `when`(
-                mockedAppData.fetchSessions(
-                    adminRef = "adminRef",
-                    schoolRef = "schoolRef",
-                    teacherRefs = listOf("teacherRef"),
-                    startDate = session.startDate
-                )
-            ).thenReturn(
-                listOf(
-                    // Date covers - time in between
-                    getSession(
-                        startDate = parseISODate("2020-01-01"),
-                        endDate = parseISODate("2020-01-31"),
-                        weekDaysInfo = listOf(true, false, true, false, false, false, false),
-                        startTime = LocalTime.NOON,
-                        endTime = LocalTime.NOON.plusMinutes(30)
-                    ),
-                    // Date in between - time in between
-                    getSession(
-                        startDate = parseISODate("2020-01-10"),
-                        endDate = parseISODate("2020-01-19"),
-                        weekDaysInfo = listOf(false, false, true, false, false, false, false),
-                        startTime = LocalTime.NOON.plusMinutes(30),
-                        endTime = LocalTime.NOON.plusHours(1)
-                    ),
-                    // Date terminal - time overlapping start
-                    getSession(
-                        startDate = session.startDate,
-                        endDate = session.startDate,
-                        weekDaysInfo = listOf(false, false, true, false, false, false, false),
-                        startTime = LocalTime.NOON.minusMinutes(15),
-                        endTime = LocalTime.NOON.plusMinutes(15)
-                    ),
-                    // Date terminal - time encompassing
-                    getSession(
-                        startDate = session.endDate,
-                        endDate = session.endDate,
-                        weekDaysInfo = listOf(false, false, true, false, false, false, false),
-                        startTime = session.startTime.minusHours(1),
-                        endTime = session.endTime.plusHours(1)
-                    )
-
-                )
+        coEvery {
+            mockedAppData.fetchSessions(
+                adminRef = "adminRef",
+                schoolRef = "schoolRef",
+                teacherRefs = listOf("teacherRef"),
+                startDate = session.startDate
             )
-        }
+        } returns listOf(
+            // Date covers - time in between
+            getSession(
+                startDate = parseISODate("2020-01-01"),
+                endDate = parseISODate("2020-01-31"),
+                weekDaysInfo = listOf(true, false, true, false, false, false, false),
+                startTime = LocalTime.NOON,
+                endTime = LocalTime.NOON.plusMinutes(30)
+            ),
+            // Date in between - time in between
+            getSession(
+                startDate = parseISODate("2020-01-10"),
+                endDate = parseISODate("2020-01-19"),
+                weekDaysInfo = listOf(false, false, true, false, false, false, false),
+                startTime = LocalTime.NOON.plusMinutes(30),
+                endTime = LocalTime.NOON.plusHours(1)
+            ),
+            // Date terminal - time overlapping start
+            getSession(
+                startDate = session.startDate,
+                endDate = session.startDate,
+                weekDaysInfo = listOf(false, false, true, false, false, false, false),
+                startTime = LocalTime.NOON.minusMinutes(15),
+                endTime = LocalTime.NOON.plusMinutes(15)
+            ),
+            // Date terminal - time encompassing
+            getSession(
+                startDate = session.endDate,
+                endDate = session.endDate,
+                weekDaysInfo = listOf(false, false, true, false, false, false, false),
+                startTime = session.startTime.minusHours(1),
+                endTime = session.endTime.plusHours(1)
+            )
+
+        )
 
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
@@ -191,87 +191,81 @@ class AppCoreTest {
 
     @Test
     internal fun session_within_same_date_different_window() {
-        val session = getSession(
-            startDate = parseISODate("2020-01-15"),
-            endDate = parseISODate("2020-01-20"),
-            startTime = LocalTime.NOON,
-            endTime = LocalTime.NOON.plusHours(1)
-        )
-
         runBlocking {
-            Mockito.`when`(mockedAppData.verifySession(session)).thenReturn(false)
-        }
+            val session = getSession(
+                startDate = parseISODate("2020-01-15"),
+                endDate = parseISODate("2020-01-20"),
+                startTime = LocalTime.NOON,
+                endTime = LocalTime.NOON.plusHours(1)
+            )
 
-        runBlocking {
-            `when`(
+            coEvery { mockedAppData.verifySession(session) } returns false
+
+            coEvery {
                 mockedAppData.fetchSessions(
                     adminRef = "adminRef",
                     schoolRef = "schoolRef",
                     teacherRefs = listOf("teacherRef"),
                     startDate = session.startDate
                 )
-            ).thenReturn(
-                listOf(
-                    // Next to Next Session
-                    getSession(
-                        startDate = session.startDate,
-                        endDate = session.endDate,
-                        startTime = session.endTime,
-                        endTime = session.endTime.plusMinutes(30)
-                    ),
-                    // Next to Next Session
-                    getSession(
-                        startDate = session.startDate,
-                        endDate = session.endDate,
-                        startTime = session.startTime.minusMinutes(30),
-                        endTime = session.startTime
-                    ),
-                    // Sessions on the complimenting days
-                    getSession(
-                        startDate = session.startDate,
-                        endDate = session.endDate,
-                        startTime = session.startTime,
-                        endTime = session.endTime,
-                        weekDaysInfo = session.weekDaysInfo.map { valueForDay -> !valueForDay }
-                    )
+            } returns listOf(
+                // Next to Next Session
+                getSession(
+                    startDate = session.startDate,
+                    endDate = session.endDate,
+                    startTime = session.endTime,
+                    endTime = session.endTime.plusMinutes(30)
+                ),
+                // Next to Next Session
+                getSession(
+                    startDate = session.startDate,
+                    endDate = session.endDate,
+                    startTime = session.startTime.minusMinutes(30),
+                    endTime = session.startTime
+                ),
+                // Sessions on the complimenting days
+                getSession(
+                    startDate = session.startDate,
+                    endDate = session.endDate,
+                    startTime = session.startTime,
+                    endTime = session.endTime,
+                    weekDaysInfo = session.weekDaysInfo.map { valueForDay -> !valueForDay }
                 )
             )
-        }
-        runBlocking {
+            coEvery { mockedAppData.saveSession(session) } returns session
+
             instance.saveSession(session = session)
-            Mockito.verify(mockedAppData).saveSession(session)
+
+            coVerify {
+                mockedAppData.saveSession(session)
+            }
         }
     }
 
     @Test
     internal fun session_groups_having_active_session_for_today() {
         runBlocking {
-            `when`(
+            coEvery {
                 mockedAppData.fetchActiveSessions(
                     adminRef = "adminRef"
                 )
-            ).thenReturn(
-                listOf(
-                    // Active on all days
-                    getSession(weekDaysInfo = (0..6).map { true }),
-                    // Not active on any day -- Why are you here ??
-                    getSession(weekDaysInfo = (0..6).map { false })
-                )
+            } returns listOf(
+                // Active on all days
+                getSession(weekDaysInfo = (0..6).map { true }),
+                // Not active on any day -- Why are you here ??
+                getSession(weekDaysInfo = (0..6).map { false })
             )
-            `when`(
+            coEvery {
                 mockedAppData.fetchFutureSessions(
                     adminRef = "adminRef"
                 )
-            ).thenReturn(
-                listOf(getSession())
-            )
-            `when`(
+            } returns listOf(getSession())
+
+            coEvery {
                 mockedAppData.fetchPastSessions(
                     adminRef = "adminRef"
                 )
-            ).thenReturn(
-                listOf(getSession())
-            )
+            } returns listOf(getSession())
 
             val sessionsMap: Map<String, List<Session>> = instance.allSessions(adminRef = "adminRef")
             val todaySessions = sessionsMap.get("today")
@@ -280,7 +274,11 @@ class AppCoreTest {
             val totalSize = todaySessions!!.size + pastSessions!!.size + futureSessions!!.size
             assertThat(totalSize, `is`(3))
 
-            val grouping = listOf<Session>(getSession(schoolRef = "School 1"), getSession(schoolRef = "School 1"), getSession(schoolRef = "School 2")).groupBy { session->session.schoolRef }
+            val grouping = listOf<Session>(
+                getSession(schoolRef = "School 1"),
+                getSession(schoolRef = "School 1"),
+                getSession(schoolRef = "School 2")
+            ).groupBy { session -> session.schoolRef }
             assertThat((grouping["School 1"] ?: error("")).size, `is`(2))
             assertThat((grouping["School 2"] ?: error("")).size, `is`(1))
         }
@@ -318,14 +316,13 @@ class AppCoreTest {
                     teachersRef = listOf("teacher1", "teacher2")
                 )
             )
-            `when`(
+            coEvery {
                 mockedAppData.fetchSessionsTill(
                     adminRef = "adminRef",
                     tillDate = today
                 )
-            ).thenReturn(
-                allSession
-            )
+            } returns allSession
+
             val allAttendance = listOf(
                 Attendance(
                     adminRef = allSession[0].adminRef,
@@ -365,54 +362,92 @@ class AppCoreTest {
                     outTime = allSession[2].endTime
                 )
 
-                )
+            )
 
-            `when`(
+            coEvery {
                 mockedAppData.fetchAttendanceFor(
                     adminRef = "adminRef",
                     tillDate = today
                 )
-            ).thenReturn(
-                allAttendance
-            )
+            } returns allAttendance
 
-            `when`(
+
+            coEvery {
                 mockedAppData.fetchAttendanceFor(
                     adminRef = "adminRef",
                     tillDate = today.minusDays(2)
                 )
-            ).thenReturn(
-                listOf(
-                    Attendance(
-                        adminRef = allSession[0].adminRef,
-                        schoolRef = allSession[0].schoolRef,
-                        sessionRef = allSession[0].id!!,
-                        teacherRef = "teacher1",
-                        createdAt = today.minusDays(2),
-                        inTime = allSession[0].startTime,
-                        outTime = allSession[0].endTime
-                    )
+            } returns listOf(
+                Attendance(
+                    adminRef = allSession[0].adminRef,
+                    schoolRef = allSession[0].schoolRef,
+                    sessionRef = allSession[0].id!!,
+                    teacherRef = "teacher1",
+                    createdAt = today.minusDays(2),
+                    inTime = allSession[0].startTime,
+                    outTime = allSession[0].endTime
                 )
             )
 
-            `when`(
+            coEvery {
                 mockedAppData.fetchAttendanceFor(
                     adminRef = "adminRef",
                     tillDate = today.minusDays(1)
                 )
-            ).thenReturn(
-                emptyList()
-            )
-
+            } returns emptyList()
 
             val fetchAttendanceForADay =
                 instance.fetchAttendance(adminRef = "adminRef", fromDate = today, toDate = today)
             fetchAttendanceForADay
+
             val fetchAttendanceForADuration =
                 instance.fetchAttendance(adminRef = "adminRef", fromDate = today.minusDays(2), toDate = today)
             fetchAttendanceForADuration
+
         }
     }
 
+    @Test
+    internal fun admin_login_with_passcode_encryption() {
+        runBlocking {
+            val sixDigitPassCode = "123456"
+            val admin = Admin()
+            coEvery {
+                mockedAppData.getAdminInfo("mobileNumber", "e10adc3949ba59abbe56e057f20f883e")
+            } returns admin
 
+            var loggedInUser: LoggedInUser = instance.login("mobileNumber", sixDigitPassCode)
+
+            coVerify {
+                mockedAppData.getAdminInfo("mobileNumber", "e10adc3949ba59abbe56e057f20f883e")
+            }
+
+            assertThat(loggedInUser.adminInfo, `is`(admin))
+        }
+    }
+
+    @Test
+    internal fun teacher_login_with_passcode_encryption() {
+        return
+        runBlocking {
+            val sixDigitPassCode = "678912"
+            val teacher = Teacher(adminRef = "adminRef")
+
+            coEvery {
+                mockedAppData.getAdminInfo(any(), any())
+            } returns null
+
+            coEvery {
+                mockedAppData.getTeacherInfo("mobileNumber", "73741a8c767a4db2d0ff6c208aa116ad")
+            } returns teacher
+
+            var loggedInUser: LoggedInUser = instance.login("mobileNumber", sixDigitPassCode)
+
+            coVerify {
+                mockedAppData.getTeacherInfo("mobileNumber", "73741a8c767a4db2d0ff6c208aa116ad")
+            }
+
+            assertThat(loggedInUser.teacherInfo, `is`(teacher))
+        }
+    }
 }

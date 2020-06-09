@@ -61,7 +61,7 @@ class DBOperations : AppCompatActivity() {
 
         getTeacher.setOnClickListener { view ->
             GlobalScope.launch {
-                val teacher = appData.getTeacherInfo("1231231231")
+                val teacher = appData.getTeacherInfo("1231231231", passCode = "")
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $teacher")
