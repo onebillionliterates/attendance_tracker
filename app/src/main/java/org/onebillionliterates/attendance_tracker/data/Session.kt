@@ -12,5 +12,6 @@ data class Session(
     val startTime: LocalTime,
     val endTime: LocalTime,
     val weekDaysInfo: List<Boolean> = (0..6).map { false },
-    val teacherRefs: List<String> = emptyList()
+    val teacherRefs: List<String> = emptyList(),
+    val description: String = ""
 )
