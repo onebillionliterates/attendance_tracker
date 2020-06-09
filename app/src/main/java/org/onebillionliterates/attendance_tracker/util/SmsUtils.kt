@@ -18,6 +18,8 @@ import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.data.AppData
 import org.onebillionliterates.attendance_tracker.data.Teacher
 import org.onebillionliterates.attendance_tracker.model.TeacherBoolean
+import java.math.BigInteger
+import java.security.MessageDigest
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -78,9 +80,14 @@ class SmsUtils {
             } else {
                 println("we have permissions")
                 var random = Random(System.currentTimeMillis() / 1000L)
-                var text = random.nextInt(100000, 999999).toString()
-                sendSms(con, teacher, teacherBoolean, text)
-                saveData(text)
+                var sixDigitPassCode = random.nextInt(100000, 999999).toString()
+
+                val md5Hashing = MessageDigest.getInstance("MD5")
+                md5Hashing.update(sixDigitPassCode.toByteArray())
+                val hashedPassCode = BigInteger(1, md5Hashing.digest()).toString(16)
+
+                sendSms(con, teacher, teacherBoolean, sixDigitPassCode)
+                saveData(hashedPassCode)
             }
         }
 
@@ -94,9 +101,9 @@ class SmsUtils {
             ).show()
         }
 
-        private fun saveData(passCode: String) {
+        private fun saveData(hashedPassCode: String) {
             GlobalScope.launch {
-                teacher.passCode = passCode
+                teacher.passCode = hashedPassCode
                 if (teacherBoolean.isUpdate) {
                     println("update")
                     AppData.instance.updateTeacher(teacher)

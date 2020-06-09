@@ -139,7 +139,8 @@ class AppCore {
         if (loggedInUser.adminInfo != null)
             return loggedInUser
 
-        loggedInUser.teacherInfo = Teacher(adminRef = "")// appData.getTeacherInfo(mobileNumber, hashedPassCode)
+        loggedInUser.teacherInfo = appData.getTeacherInfo(mobileNumber, hashedPassCode)//Teacher(adminRef = "")
+        println(loggedInUser)
         return loggedInUser
     }
 
