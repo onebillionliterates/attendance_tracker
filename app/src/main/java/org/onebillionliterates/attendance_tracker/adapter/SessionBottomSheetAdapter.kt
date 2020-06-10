@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import info.androidhive.fontawesome.FontTextView
 import org.onebillionliterates.attendance_tracker.R
 
 
@@ -25,11 +26,14 @@ class SessionBottomSheetAdapter(
 
         fun bindItems(info: DataHolder) {
             val displayTextView = itemView.findViewById(R.id.displayText) as TextView
+            val selectedIcon = itemView.findViewById(R.id.cellSelected) as FontTextView
             val displayCheckboxView = itemView.findViewById(R.id.checkedText) as AppCompatCheckBox
 
             if (showSingleSelect) {
                 displayTextView.visibility = View.VISIBLE
                 displayTextView.text = info.displayText
+                if(info.selected) selectedIcon.visibility = View.VISIBLE
+
                 itemView.setOnClickListener { view ->
                     info.selected = true
                     bottomDialogDismiss!!.dismiss()
@@ -39,7 +43,8 @@ class SessionBottomSheetAdapter(
 
             displayCheckboxView.visibility = View.VISIBLE
             displayCheckboxView.text = info.displayText
-            displayCheckboxView.setOnCheckedChangeListener { buttonView, isChecked ->
+            displayCheckboxView.isChecked = info.selected
+            displayCheckboxView.setOnCheckedChangeListener { _, isChecked ->
                 info.selected = isChecked
             }
         }
