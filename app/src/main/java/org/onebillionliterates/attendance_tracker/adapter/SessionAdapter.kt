@@ -1,25 +1,24 @@
 package org.onebillionliterates.attendance_tracker.adapter
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import org.onebillionliterates.attendance_tracker.R
-import org.onebillionliterates.attendance_tracker.model.Session
+import org.onebillionliterates.attendance_tracker.SessionCheckinClick
+import org.onebillionliterates.attendance_tracker.data.Session
 
 
-class SessionAdapter(var sessionList: ArrayList<Session>) :
+class SessionAdapter(var sessionList: ArrayList<Session>, val sessionClickListener: SessionCheckinClick) :
     RecyclerView.Adapter<SessionAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
-        fun bindItems(session: Session) {
+        fun bindItems(session: Session, sessionClickListener: SessionCheckinClick) {
             val textViewName = itemView.findViewById(R.id.textViewUsername) as TextView
-            textViewName.text = session.name
+            textViewName.text = session.description
 
             val arrowImageView = itemView.findViewById(R.id.imageViewArrow) as ImageView
             var click=true
@@ -33,6 +32,9 @@ class SessionAdapter(var sessionList: ArrayList<Session>) :
                 }
             }
 
+            itemView.setOnClickListener {
+                sessionClickListener.onSessionClicked(session)
+            }
         }
     }
 
@@ -46,10 +48,6 @@ class SessionAdapter(var sessionList: ArrayList<Session>) :
     }
 
     override fun onBindViewHolder(holder: SessionAdapter.ViewHolder, position: Int) {
-        holder.bindItems(sessionList[position])
-        // ADD CLICK LISTENER FOR EACH SESSION
-        //holder.itemView.setOnClickListener {
-
-        //}
+        holder.bindItems(sessionList[position], sessionClickListener = sessionClickListener)
     }
 }
