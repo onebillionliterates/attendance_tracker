@@ -22,9 +22,18 @@ import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
+import kotlinx.android.synthetic.main.sessions_listing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
+import org.onebillionliterates.attendance_tracker.data.AppCore
+import org.onebillionliterates.attendance_tracker.data.Session
 
 class SessionsListingActivity : AppCompatActivity() {
+    private lateinit var todaysSessions: List<Session>
+    private lateinit var futureSessions: List<Session>
+    private lateinit var pastSessions: List<Session>
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
@@ -35,11 +44,32 @@ class SessionsListingActivity : AppCompatActivity() {
     private fun initView() {
         val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
         val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
-        viewPager.adapter = AttendanceListingPager(supportFragmentManager, tabLayout.tabCount)
+
 
         findViewById<View>(R.id.addNewSession).setOnClickListener {
             val intent = Intent(this, SessionCreator::class.java)
             startActivity(intent)
+        }
+
+        /**
+         * Loading all the data for the drawers
+         */
+        GlobalScope.launch(Dispatchers.Main) {
+            sessionsLoader.visibility = View.VISIBLE
+
+            val job = GlobalScope.launch(Dispatchers.IO) {
+                todaysSessions = AppCore.instance.fetchTodaysSessionsForAdmin()
+                futureSessions = AppCore.instance.fetchFutureSessionsForAdmin()
+                pastSessions = AppCore.instance.fetchPastSessionsForAdmin()
+            }
+            job.join()
+            sessionsLoader.visibility = View.GONE
+            viewPager.adapter = SessionListingPager(
+                supportFragmentManager, tabLayout.tabCount,
+                todays = todaysSessions,
+                futures = futureSessions,
+                past = pastSessions
+            )
         }
     }
 }
@@ -47,13 +77,21 @@ class SessionsListingActivity : AppCompatActivity() {
 class SessionListingPager(
     fragmentManger: FragmentManager,
     private val tabCount: Int,
-    private val data: Map<String, List<*>>? = null
+    private val todays: List<Session>,
+    private val futures: List<Session>,
+    private val past: List<Session>
 ) :
     FragmentStatePagerAdapter(fragmentManger, tabCount) {
     override fun getItem(position: Int): Fragment {
         when (position) {
-            0, 1, 2 -> {
-                return AttendanceListFragment()
+            0 -> {
+                return SessionsListFragment(todays)
+            }
+            1 -> {
+                return SessionsListFragment(futures)
+            }
+            2 -> {
+                return SessionsListFragment(past)
             }
         }
         throw IllegalStateException("No Tabs Found")
@@ -64,36 +102,24 @@ class SessionListingPager(
     }
 }
 
-class SessionsListFragment : Fragment() {
+class SessionsListFragment(private val sessions: List<Session>) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = RecyclerView(requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         //crating an arraylist to store users using the data class user
         //creating our adapter
 
-        val adapter = AttendanceSessionExpandableListAdapter(
-            requireContext(),
-            listOf(
-                ExpandableGroup(
-                    "School ", listOf(
-                        DataHolder("1", "Session 1 @ Sometime"),
-                        DataHolder("2", "Session 1 @ Sometime")
-                    )
-                ),
-                ExpandableGroup(
-                    "School 2", listOf(
-                        DataHolder("1", "Session 2 @ Sometime"),
-                        DataHolder("2", "Session 3 @ Sometime")
-                    )
-                ),
-                ExpandableGroup(
-                    "School 3", listOf(
-                        DataHolder("1", "Session 4 @ Sometime"),
-                        DataHolder("2", "Session 5 @ Sometime")
-                    )
-                )
-            )
-        )
+        val groupedSessions = sessions.groupBy { session -> session.schoolRef }
+        val expandableList: List<ExpandableGroup<DataHolder>> = groupedSessions.map { entry ->
+            val schoolName = entry.value.first().description.split("@")[1]
+            val sessions: List<DataHolder> = entry.value.map { session ->
+                val sessionTime = session.description.split("@")[0]
+                DataHolder(id = session.id!!, displayText = "$sessionTime Session")
+            }
+
+            ExpandableGroup(schoolName, sessions)
+        }
+        val adapter = SessionExpandableListAdapter(requireContext(), expandableList)
         recyclerView.adapter = adapter
 
         return recyclerView
@@ -135,7 +161,11 @@ class SessionExpandableListAdapter(
         holder!!.setSessionDetails(group!!.items[childIndex] as DataHolder)
     }
 
-    override fun onBindGroupViewHolder(holder: AttendanceSchoolDetails?, flatPosition: Int, group: ExpandableGroup<*>?) {
+    override fun onBindGroupViewHolder(
+        holder: AttendanceSchoolDetails?,
+        flatPosition: Int,
+        group: ExpandableGroup<*>?
+    ) {
         holder!!.setSchoolDetails(group!! as ExpandableGroup<DataHolder>)
     }
 }

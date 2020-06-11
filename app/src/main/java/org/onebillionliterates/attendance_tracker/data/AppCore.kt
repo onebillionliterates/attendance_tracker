@@ -156,4 +156,16 @@ class AppCore {
         return AppData.instance.fetchSchools(loggedInUser.adminInfo!!.id!!)
     }
 
+    suspend fun fetchTodaysSessionsForAdmin(): List<Session> {
+        return AppData.instance.fetchActiveSessions(loggedInUser.adminInfo!!.id!!)
+    }
+
+    suspend fun fetchFutureSessionsForAdmin(): List<Session> {
+        return AppData.instance.fetchFutureSessions(loggedInUser.adminInfo!!.id!!)
+    }
+
+    suspend fun fetchPastSessionsForAdmin(): List<Session> {
+        return AppData.instance.fetchPastSessions(loggedInUser.adminInfo!!.id!!)
+    }
+
 }
