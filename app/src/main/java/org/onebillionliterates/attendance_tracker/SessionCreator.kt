@@ -1,6 +1,7 @@
 package org.onebillionliterates.attendance_tracker
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.DatePicker
 import android.widget.ImageView
@@ -18,12 +19,15 @@ import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
 import org.onebillionliterates.attendance_tracker.data.AppCore
+import org.onebillionliterates.attendance_tracker.data.Session
 import org.onebillionliterates.attendance_tracker.drawables.*
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
+import org.threeten.bp.format.DateTimeFormatter
 
 class SessionCreator : AppCompatActivity(), View.OnClickListener {
-    val TAG = "SessionCreator_Activity"
+    private val TAG = "SessionCreator_Activity"
+    private val HOUR_12_TIME_FORMAT = DateTimeFormatter.ofPattern("h:mm a")
     private lateinit var allSchools: List<DataHolder>
     private lateinit var allTeachers: List<DataHolder>
     private lateinit var allWeekDays: List<DataHolder>
@@ -72,6 +76,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         endDate.setOnClickListener(this)
         startTime.setOnClickListener(this)
         endTime.setOnClickListener(this)
+        addSession.setOnClickListener(this)
 
         /**
          * Loading all the data for the drawers
@@ -81,9 +86,9 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
 
             val job = GlobalScope.launch(Dispatchers.IO) {
                 allTeachers = AppCore.instance.fetchTeachersForAdmin()
-                    .map { teacher -> DataHolder(id = teacher.id, displayText = teacher.name) }
+                    .map { teacher -> DataHolder(id = teacher.id!!, displayText = teacher.name!!) }
                 allSchools = AppCore.instance.fetchSchoolsForAdmin()
-                    .map { school -> DataHolder(id = school.id, displayText = school.name) }
+                    .map { school -> DataHolder(id = school.id!!, displayText = school.name!!) }
                 allWeekDays = listOf(
                     DataHolder("1", "Monday"),
                     DataHolder("2", "Tuesday"),
@@ -120,15 +125,16 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 val today = LocalDate.now();
                 datePicker.init(
                     today.year,
-                    today.monthValue.minus(1),
+                    today.monthValue,
                     today.dayOfMonth
-                ) { view, year, monthOfYear, dayOfMonth ->
+                ) { _, year, monthOfYear, dayOfMonth ->
+                    val dateString = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
                     when (clickView) {
                         startDate -> {
-                            startDateSelectTextView.text = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
+                            startDateSelectTextView.text = dateString
                         }
                         endDate -> {
-                            endDateSelectTextView.text = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
+                            endDateSelectTextView.text = dateString
                         }
                     }
                 }
@@ -138,18 +144,58 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
             startTime, endTime -> {
                 val dialog = BottomSheetDialog(this)
                 val timePicker = TimePicker(this)
-                timePicker.setOnTimeChangedListener { view, hourOfDay, minute ->
+                timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
+                    val formattedTime = LocalTime.of(hourOfDay, minute).format(HOUR_12_TIME_FORMAT)
                     when (clickView) {
                         startTime -> {
-                            startTimeSelectTextView.text = LocalTime.of(hourOfDay, minute).toString()
+                            startTimeSelectTextView.text = formattedTime
                         }
                         endTime -> {
-                            endTimeSelectTextView.text = LocalTime.of(hourOfDay, minute).toString()
+                            endTimeSelectTextView.text = formattedTime
                         }
                     }
                 }
                 dialog.setContentView(timePicker)
                 dialog.show()
+            }
+            addSession -> {
+                /**
+                 * Saving Session
+                 */
+                GlobalScope.launch(Dispatchers.Main) {
+                    createSessionProgress.visibility = View.VISIBLE
+
+                    val job = GlobalScope.launch(Dispatchers.IO) {
+                        try {
+                            val schoolData: DataHolder = allSchools.firstOrNull { holder -> holder.selected }!!
+                            val teacherRefs: List<String> =
+                                allTeachers.filter { holder -> holder.selected }.map { holder -> holder.id!! }
+                            val daysSelected: List<Boolean> = allWeekDays.map { holder -> holder.selected }
+                            val startTime = LocalTime.parse(startTimeSelectTextView.text, HOUR_12_TIME_FORMAT)!!
+                            val endTime = LocalTime.parse(endTimeSelectTextView.text, HOUR_12_TIME_FORMAT)!!
+                            val startDate = LocalDate.parse(startDateSelectTextView.text)!!
+                            val endDate = LocalDate.parse(endDateSelectTextView.text)!!
+
+                            val savedSession = AppCore.instance.saveSession(
+                                Session(
+                                    schoolRef = schoolData.id,
+                                    teacherRefs = teacherRefs,
+                                    weekDaysInfo = daysSelected,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    startTime = startTime,
+                                    endTime = endTime,
+                                    description = "${startTimeSelectTextView.text} @ ${schoolData.displayText}"
+                                )
+                            )
+                            Log.v(TAG, "Session saved successfully - $savedSession")
+                        } catch (exception: Exception) {
+                            Log.e(TAG, "Error during adding session", exception)
+                        }
+                    }
+                    job.join()
+                    createSessionProgress.visibility = View.GONE
+                }
             }
         }
     }

@@ -4,14 +4,14 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class DataHolder(
-    val id: String?,
-    val displayText: String?,
+    val id: String,
+    val displayText: String,
     var selected: Boolean = false
 ):Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readByte() != 0.toByte()
     ) {
     }

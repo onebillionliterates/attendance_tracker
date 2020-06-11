@@ -267,7 +267,9 @@ class AppData {
                     "endDate" to sessionToSave.endDate.toTimestamp(),
                     "startTime" to sessionToSave.startTime.toNanoOfDay(),
                     "endTime" to sessionToSave.endTime.toNanoOfDay(),
-                    "weekDaysInfo" to sessionToSave.weekDaysInfo
+                    "weekDaysInfo" to sessionToSave.weekDaysInfo,
+                    "createdAt" to sessionToSave.createdAt.toTimestamp(),
+                    "description" to sessionToSave.description
                 )
             )
             .await()
@@ -281,7 +283,8 @@ class AppData {
             endDate = sessionToSave.endDate,
             startTime = sessionToSave.startTime,
             endTime = sessionToSave.endTime,
-            weekDaysInfo = sessionToSave.weekDaysInfo
+            weekDaysInfo = sessionToSave.weekDaysInfo,
+            createdAt = sessionToSave.createdAt
         )
     }
 
@@ -295,7 +298,7 @@ class AppData {
         val data = sessionsCollection
             .whereEqualTo("adminRef", adminCollection.document(adminRef))
             .whereEqualTo("schoolRef", schoolCollection.document(schoolRef))
-            .whereArrayContainsAny("teachersTef", teacherRefs.map { teacherCollection.document() })
+            .whereArrayContainsAny("teachersRef", teacherRefs.map { ref -> teacherCollection.document(ref) })
             .whereGreaterThanOrEqualTo("endDate", startDate.toTimestamp())
             .get()
             .await()
@@ -353,7 +356,9 @@ class AppData {
                 endDate = document.getTimestamp("endDate")?.toLocalDate()!!,
                 startTime = LocalTime.ofNanoOfDay(document.get("startTime") as Long),
                 endTime = LocalTime.ofNanoOfDay(document.get("endTime") as Long),
-                weekDaysInfo = listOfWeekDays(document)
+                weekDaysInfo = listOfWeekDays(document),
+                createdAt = document.getTimestamp("createdAt")?.toLocalDateTime()!!,
+                description = document.getString("description")!!
             )
         }
     }
@@ -363,11 +368,11 @@ class AppData {
         val data = sessionsCollection
             .whereEqualTo("adminRef", adminCollection.document(session.adminRef))
             .whereEqualTo("schoolRef", schoolCollection.document(session.schoolRef))
-            .whereArrayContainsAny("teachersTef", session.teacherRefs.map { teacherCollection.document() })
+            .whereArrayContainsAny("teachersRef", session.teacherRefs.map { ref -> teacherCollection.document(ref) })
             .whereEqualTo("startDate", session.startDate.toTimestamp())
             .whereEqualTo("endDate", session.endDate.toTimestamp())
-            .whereEqualTo("startTime", session.startTime)
-            .whereEqualTo("endTime", session.endTime)
+            .whereEqualTo("startTime", session.startTime.toNanoOfDay())
+            .whereEqualTo("endTime", session.endTime.toNanoOfDay())
             .get()
             .await()
 

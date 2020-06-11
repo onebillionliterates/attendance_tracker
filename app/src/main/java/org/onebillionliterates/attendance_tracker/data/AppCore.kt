@@ -39,7 +39,9 @@ class AppCore {
             teacherRefs = teachersRefs
         )
 
-    suspend fun saveSession(session: Session) {
+    suspend fun saveSession(session: Session): Session {
+        session.adminRef = loggedInUser.adminInfo!!.id!!
+
         if (session.endTime.toNanoOfDay() - session.startTime.toNanoOfDay() < 30 * 60) throw IllegalArgumentException(
             INVALID_DURATION.message
         )
@@ -74,7 +76,7 @@ class AppCore {
 
         if (overlappingSessionsFound.isNotEmpty()) throw IllegalArgumentException(SESSIONS_CONFLICTS_EXISTS.message)
 
-        appData.saveSession(session)
+        return appData.saveSession(session)
     }
 
     suspend fun allSessions(adminRef: String): Map<String, List<Session>> {

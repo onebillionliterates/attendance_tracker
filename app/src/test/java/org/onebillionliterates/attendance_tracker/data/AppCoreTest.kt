@@ -7,6 +7,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE
@@ -449,5 +450,21 @@ class AppCoreTest {
 
             assertThat(loggedInUser.teacherInfo, `is`(teacher))
         }
+    }
+
+    @Test
+    internal fun dataholder_mapper_test() {
+        val allWeekDays = listOf(
+            DataHolder("1", "Monday"),
+            DataHolder("2", "Tuesday"),
+            DataHolder("3", "Wednesday"),
+            DataHolder("4", "Thursday"),
+            DataHolder("5", "Friday"),
+            DataHolder("6", "Saturday"),
+            DataHolder("7", "Sunday")
+        )
+
+        val selectedValues = allWeekDays.map { holder -> holder.selected }
+        println(selectedValues)
     }
 }
