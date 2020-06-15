@@ -44,13 +44,14 @@
 
         </activity>
         <activity android:name="org.onebillionliterates.attendance_tracker.SchoolListingActivity" android:label="Schools Listing">
+
+        </activity>
+        <activity android:name="org.onebillionliterates.attendance_tracker.AddSchoolActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.AddSchoolActivity">
         </activity>
         <activity android:name="org.onebillionliterates.attendance_tracker.TeachersActivity">
         </activity>
