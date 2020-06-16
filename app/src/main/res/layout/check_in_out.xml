@@ -8,9 +8,35 @@
     
     <fragment
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="500dp"
         android:id="@+id/google_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="217dp"
+        android:layout_below="@+id/google_map"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/check_in"
+            android:layout_width="wrap_content"
+            android:layout_height="179dp"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:text="Check In" />
+
+        <Button
+            android:id="@+id/check_out"
+            android:layout_width="91dp"
+            android:layout_height="179dp"
+            android:layout_weight="1"
+            android:text="Check Out"
+            android:textSize="15dp" />
+    </LinearLayout>
 
 </RelativeLayout>
