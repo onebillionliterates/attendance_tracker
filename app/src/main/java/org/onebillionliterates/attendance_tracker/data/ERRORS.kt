@@ -7,5 +7,6 @@ enum class ERRORS(val message: String) {
     SCHOOL_NOT_ASSOCIATED("Session creation needs a school to be associated"),
     DAYS_NOT_ASSOCIATED("Session creation needs days to be associated"),
     TEACHERS_NOT_ASSOCIATED("Session creation needs a teachers to be associated"),
-    SESSIONS_CONFLICTS_EXISTS("Conflicting sessions already associated")
+    SESSIONS_CONFLICTS_EXISTS("Conflicting sessions already associated"),
+    DATA_OPERATION_FAILURE("Something went wrong, please could you retry!")
 }

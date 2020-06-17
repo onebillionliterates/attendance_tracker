@@ -18,7 +18,7 @@ class AppCoreTest {
 
     private fun getSession(
         id: String? = null,
-        adminRef: String = "adminRef",
+        adminRef: String = ADMIN_REF,
         schoolRef: String? = "schoolRef",
         teachersRef: List<String> = listOf("teacherRef"),
         startDate: LocalDate = LocalDate.now(),
@@ -48,13 +48,18 @@ class AppCoreTest {
         mockkObject(AppData)
         every { AppData.instance } returns mockedAppData
         instance = AppCore()
+        // Logging-in before every test
+        runBlocking {
+            coEvery { mockedAppData.getAdminInfo("11111111", "7fa8282ad93047a4d6fe6111c93b308a") } returns Admin(id = ADMIN_REF)
+            instance.login("11111111", "1111111")
+        }
     }
 
     @Test
     internal fun minimum_30_mins_session() {
         val session = getSession(endTime = LocalTime.now())
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session)
             }
@@ -67,7 +72,7 @@ class AppCoreTest {
     internal fun end_is_before_start() {
         val session = getSession(endDate = LocalDate.now().minusDays(1))
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session)
             }
@@ -79,7 +84,7 @@ class AppCoreTest {
     internal fun when_no_days_attached() {
         val session = getSession(weekDaysInfo = (0..6).map { false })
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session)
             }
@@ -91,7 +96,7 @@ class AppCoreTest {
     internal fun when_no_school_attached() {
         val session = getSession(schoolRef = "")
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session)
             }
@@ -103,7 +108,7 @@ class AppCoreTest {
     internal fun when_no_teachers_attached() {
         val session = getSession(teachersRef = emptyList())
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session)
             }
@@ -118,7 +123,7 @@ class AppCoreTest {
         coEvery { mockedAppData.verifySession(session) } returns true
 
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session = session)
             }
@@ -140,7 +145,7 @@ class AppCoreTest {
 
         coEvery {
             mockedAppData.fetchSessions(
-                adminRef = "adminRef",
+                adminRef = ADMIN_REF,
                 schoolRef = "schoolRef",
                 teacherRefs = listOf("teacherRef"),
                 startDate = session.startDate
@@ -181,7 +186,7 @@ class AppCoreTest {
 
         )
 
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
+        val thrown = assertThrows(AppCoreException::class.java) {
             runBlocking {
                 instance.saveSession(session = session)
             }
@@ -204,7 +209,7 @@ class AppCoreTest {
 
             coEvery {
                 mockedAppData.fetchSessions(
-                    adminRef = "adminRef",
+                    adminRef = ADMIN_REF,
                     schoolRef = "schoolRef",
                     teacherRefs = listOf("teacherRef"),
                     startDate = session.startDate
@@ -248,7 +253,7 @@ class AppCoreTest {
         runBlocking {
             coEvery {
                 mockedAppData.fetchActiveSessions(
-                    adminRef = "adminRef"
+                    adminRef = ADMIN_REF
                 )
             } returns listOf(
                 // Active on all days
@@ -258,17 +263,17 @@ class AppCoreTest {
             )
             coEvery {
                 mockedAppData.fetchFutureSessions(
-                    adminRef = "adminRef"
+                    adminRef = ADMIN_REF
                 )
             } returns listOf(getSession())
 
             coEvery {
                 mockedAppData.fetchPastSessions(
-                    adminRef = "adminRef"
+                    adminRef = ADMIN_REF
                 )
             } returns listOf(getSession())
 
-            val sessionsMap: Map<String, List<Session>> = instance.allSessions(adminRef = "adminRef")
+            val sessionsMap: Map<String, List<Session>> = instance.allSessions(adminRef = ADMIN_REF)
             val todaySessions = sessionsMap.get("today")
             val pastSessions = sessionsMap.get("past")
             val futureSessions = sessionsMap.get("future")
@@ -466,5 +471,9 @@ class AppCoreTest {
 
         val selectedValues = allWeekDays.map { holder -> holder.selected }
         println(selectedValues)
+    }
+
+    companion object {
+        private val ADMIN_REF:String = "fw7aJ1dVDpQndyHFhDsv"
     }
 }

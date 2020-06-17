@@ -42,14 +42,14 @@ class AppCore {
     suspend fun saveSession(session: Session): Session {
         session.adminRef = loggedInUser.adminInfo!!.id!!
 
-        if (session.endTime.toNanoOfDay() - session.startTime.toNanoOfDay() < 30 * 60) throw IllegalArgumentException(
+        if (session.endTime.toNanoOfDay() - session.startTime.toNanoOfDay() < 30 * 60) throw AppCoreException(
             INVALID_DURATION.message
         )
-        if (session.endDate.isBefore(session.startDate)) throw IllegalArgumentException(INVALID_END.message)
-        if (session.weekDaysInfo.none { value -> value }) throw IllegalArgumentException(DAYS_NOT_ASSOCIATED.message)
-        if (session.schoolRef.isBlank()) throw IllegalArgumentException(SCHOOL_NOT_ASSOCIATED.message)
-        if (session.teacherRefs.isNullOrEmpty()) throw IllegalArgumentException(TEACHERS_NOT_ASSOCIATED.message)
-        if (appData.verifySession(session)) throw IllegalArgumentException(SESSION_ALREADY_EXISTS.message)
+        if (session.endDate.isBefore(session.startDate)) throw AppCoreException(INVALID_END.message)
+        if (session.weekDaysInfo.none { value -> value }) throw AppCoreException(DAYS_NOT_ASSOCIATED.message)
+        if (session.schoolRef.isBlank()) throw AppCoreException(SCHOOL_NOT_ASSOCIATED.message)
+        if (session.teacherRefs.isNullOrEmpty()) throw AppCoreException(TEACHERS_NOT_ASSOCIATED.message)
+        if (runWithCatch { appData.verifySession(session) }) throw AppCoreException(SESSION_ALREADY_EXISTS.message)
 
         val overlappingSessionsFound = appData.fetchSessions(
             adminRef = session.adminRef,
@@ -74,19 +74,19 @@ class AppCore {
                 }
             }
 
-        if (overlappingSessionsFound.isNotEmpty()) throw IllegalArgumentException(SESSIONS_CONFLICTS_EXISTS.message)
+        if (overlappingSessionsFound.isNotEmpty()) throw AppCoreException(SESSIONS_CONFLICTS_EXISTS.message)
 
-        return appData.saveSession(session)
+        return runWithCatch { appData.saveSession(session) }
     }
 
     suspend fun allSessions(adminRef: String): Map<String, List<Session>> {
         return mapOf(
-            "today" to appData.fetchActiveSessions(adminRef).filter { session ->
+            "today" to runWithCatch { appData.fetchActiveSessions(adminRef) }.filter { session ->
                 val dayVal = LocalDate.now().dayOfWeek.value - 1
                 session.weekDaysInfo[dayVal]
             },
-            "past" to appData.fetchPastSessions(adminRef),
-            "future" to appData.fetchFutureSessions(adminRef)
+            "past" to runWithCatch { appData.fetchPastSessions(adminRef) },
+            "future" to runWithCatch { appData.fetchFutureSessions(adminRef) }
         )
     }
 
@@ -95,7 +95,7 @@ class AppCore {
         fromDate: LocalDate,
         toDate: LocalDate
     ): Map<String, Map<LocalDate, List<Session>>> {
-        val allSessionTillToDate = appData.fetchSessionsTill(adminRef, toDate)
+        val allSessionTillToDate = runWithCatch { appData.fetchSessionsTill(adminRef, toDate) }
 
         val days = Duration.between(
             LocalDateTime.of(fromDate, LocalTime.MIDNIGHT),
@@ -109,7 +109,7 @@ class AppCore {
             val activeForDay = allSessionTillToDate
                 .filter { session -> currentDate.inBetween(session.startDate, session.endDate) }
                 .filter { session -> session.weekDaysInfo[currentDate.dayOfWeek.value - 1] }
-            val attendanceForDay = appData.fetchAttendanceFor(adminRef, currentDate)
+            val attendanceForDay = runWithCatch { appData.fetchAttendanceFor(adminRef, currentDate) }
             var lookUpTable = HashMap<String, Boolean>()
             attendanceForDay.forEach { attendance ->
                 lookUpTable["${attendance.sessionRef}_${attendance.teacherRef}_${attendance.createdAt}"] = true
@@ -139,33 +139,62 @@ class AppCore {
         md5Hashing.update(sixDigitPassCode.toByteArray())
         val hashedPassCode = BigInteger(1, md5Hashing.digest()).toString(16)
 
-        loggedInUser.adminInfo = appData.getAdminInfo(mobileNumber, hashedPassCode)
+        loggedInUser.adminInfo = runWithCatch { appData.getAdminInfo(mobileNumber, hashedPassCode) }
         if (loggedInUser.adminInfo != null)
             return loggedInUser
 
-        loggedInUser.teacherInfo = appData.getTeacherInfo(mobileNumber, hashedPassCode)//Teacher(adminRef = "")
+        loggedInUser.teacherInfo = runWithCatch {
+            appData.getTeacherInfo(mobileNumber, hashedPassCode)//Teacher(adminRef = "")
+        }
         println(loggedInUser)
         return loggedInUser
     }
 
     suspend fun fetchTeachersForAdmin(): List<Teacher> {
-        return AppData.instance.fetchTeachers(loggedInUser.adminInfo!!.id!!)
+        return runWithCatch {
+            appData.fetchTeachers(loggedInUser.adminInfo!!.id!!)
+        }
     }
 
     suspend fun fetchSchoolsForAdmin(): List<School> {
-        return AppData.instance.fetchSchools(loggedInUser.adminInfo!!.id!!)
+        return runWithCatch {
+            appData.fetchSchools(loggedInUser.adminInfo!!.id!!)
+        }
     }
 
     suspend fun fetchTodaysSessionsForAdmin(): List<Session> {
-        return AppData.instance.fetchActiveSessions(loggedInUser.adminInfo!!.id!!)
+        return runWithCatch {
+            appData.fetchActiveSessions(loggedInUser.adminInfo!!.id!!)
+        }
     }
 
     suspend fun fetchFutureSessionsForAdmin(): List<Session> {
-        return AppData.instance.fetchFutureSessions(loggedInUser.adminInfo!!.id!!)
+        return runWithCatch {
+            appData.fetchFutureSessions(loggedInUser.adminInfo!!.id!!)
+        }
     }
 
     suspend fun fetchPastSessionsForAdmin(): List<Session> {
-        return AppData.instance.fetchPastSessions(loggedInUser.adminInfo!!.id!!)
+        return runWithCatch {
+            appData.fetchPastSessions(loggedInUser.adminInfo!!.id!!)
+        }
+    }
+
+    private suspend fun <T> runWithCatch(block: suspend () -> T): T {
+        try {
+            val start = System.currentTimeMillis()
+            val returnedVal: T = block()
+
+            println("RUN_WITH_CATCH | SUCCESS | Total_Time_Take : ${System.currentTimeMillis() - start}")
+            return returnedVal
+        } catch (exception: Exception) {
+            System.err.println("RUN_WITH_CATCH | FAILED | $exception")
+            throw AppCoreException(DATA_OPERATION_FAILURE.message, exception)
+        }
+
     }
 
 }
+
+class AppCoreException(override val message: String, private val exception: Exception? = null) :
+    Exception(message, exception)

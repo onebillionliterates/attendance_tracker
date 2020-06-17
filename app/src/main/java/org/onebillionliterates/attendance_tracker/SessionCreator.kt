@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.shasin.notificationbanner.Banner
 import kotlinx.android.synthetic.main.session_create.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
 import org.onebillionliterates.attendance_tracker.data.AppCore
+import org.onebillionliterates.attendance_tracker.data.AppCoreException
 import org.onebillionliterates.attendance_tracker.data.Session
 import org.onebillionliterates.attendance_tracker.drawables.*
 import org.threeten.bp.LocalDate
@@ -31,6 +33,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
     private lateinit var allSchools: List<DataHolder>
     private lateinit var allTeachers: List<DataHolder>
     private lateinit var allWeekDays: List<DataHolder>
+    private lateinit var rootView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
@@ -40,6 +43,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initView() {
+        rootView = window.decorView.rootView
         schoolIcon.setImageDrawable(SchoolSolidDrawable(this))
         dayIcon.setImageDrawable(CalendarDaySolidDrawable(this))
         teacherIcon.setImageDrawable(UserDrawable(this))
@@ -125,10 +129,10 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 val today = LocalDate.now();
                 datePicker.init(
                     today.year,
-                    today.monthValue,
+                    today.monthValue - 1,
                     today.dayOfMonth
                 ) { _, year, monthOfYear, dayOfMonth ->
-                    val dateString = LocalDate.of(year, monthOfYear, dayOfMonth).toString()
+                    val dateString = LocalDate.of(year, monthOfYear + 1, dayOfMonth).toString()
                     when (clickView) {
                         startDate -> {
                             startDateSelectTextView.text = dateString
@@ -165,6 +169,8 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     createSessionProgress.visibility = View.VISIBLE
 
+                    var bannerType = Banner.SUCCESS
+                    var message = "New session created successfully"
                     val job = GlobalScope.launch(Dispatchers.IO) {
                         try {
                             val schoolData: DataHolder = allSchools.firstOrNull { holder -> holder.selected }!!
@@ -190,11 +196,18 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                             )
                             Log.v(TAG, "Session saved successfully - $savedSession")
                         } catch (exception: Exception) {
+                            bannerType = Banner.ERROR
+                            message = "Please fill all details, before trying to create a new session"
+                            if (exception is AppCoreException)
+                                message = exception.message
+
                             Log.e(TAG, "Error during adding session", exception)
                         }
                     }
                     job.join()
                     createSessionProgress.visibility = View.GONE
+
+                    Banner.make(rootView, this@SessionCreator, bannerType, message, Banner.TOP).show()
                 }
             }
         }
