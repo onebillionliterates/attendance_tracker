@@ -5,11 +5,11 @@ import org.threeten.bp.LocalDateTime
 
 class School(
     val id: String? = null,
-    val adminRef: String,
-    val mobileNumber: String? = null,
-    val name: String? = null,
-    val uniqueCode: String? = null,
-    val remarks: String? = null,
-    val createdAt: LocalDateTime? = null,
-    val location: Location? = null
+    var adminRef: String? = null,
+    var name: String? = null,
+    var uniqueCode: String? = null,
+    var address: String? = null,
+    var postalCode: String? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var location: Location? = null
 )

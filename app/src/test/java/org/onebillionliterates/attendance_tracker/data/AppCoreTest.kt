@@ -65,7 +65,7 @@ class AppCoreTest {
             }
         }
 
-        assertThat(thrown.message, `is`(ERRORS.INVALID_DURATION.message))
+        assertThat(thrown.message, `is`(MESSAGES.INVALID_DURATION.message))
     }
 
     @Test
@@ -77,7 +77,7 @@ class AppCoreTest {
                 instance.saveSession(session)
             }
         }
-        assertThat(thrown.message, `is`(ERRORS.INVALID_END.message))
+        assertThat(thrown.message, `is`(MESSAGES.INVALID_END.message))
     }
 
     @Test
@@ -89,7 +89,7 @@ class AppCoreTest {
                 instance.saveSession(session)
             }
         }
-        assertThat(thrown.message, `is`(ERRORS.DAYS_NOT_ASSOCIATED.message))
+        assertThat(thrown.message, `is`(MESSAGES.DAYS_NOT_ASSOCIATED.message))
     }
 
     @Test
@@ -101,7 +101,7 @@ class AppCoreTest {
                 instance.saveSession(session)
             }
         }
-        assertThat(thrown.message, `is`(ERRORS.SCHOOL_NOT_ASSOCIATED.message))
+        assertThat(thrown.message, `is`(MESSAGES.SCHOOL_NOT_ASSOCIATED.message))
     }
 
     @Test
@@ -113,7 +113,7 @@ class AppCoreTest {
                 instance.saveSession(session)
             }
         }
-        assertThat(thrown.message, `is`(ERRORS.TEACHERS_NOT_ASSOCIATED.message))
+        assertThat(thrown.message, `is`(MESSAGES.TEACHERS_NOT_ASSOCIATED.message))
     }
 
     @Test
@@ -129,7 +129,7 @@ class AppCoreTest {
             }
         }
 
-        assertThat(thrown.message, `is`(ERRORS.SESSION_ALREADY_EXISTS.message))
+        assertThat(thrown.message, `is`(MESSAGES.SESSION_ALREADY_EXISTS.message))
     }
 
     @Test
@@ -192,7 +192,7 @@ class AppCoreTest {
             }
         }
 
-        assertThat(thrown.message, `is`(ERRORS.SESSIONS_CONFLICTS_EXISTS.message))
+        assertThat(thrown.message, `is`(MESSAGES.SESSIONS_CONFLICTS_EXISTS.message))
     }
 
     @Test

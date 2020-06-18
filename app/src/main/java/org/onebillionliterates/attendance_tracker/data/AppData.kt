@@ -3,10 +3,7 @@ package org.onebillionliterates.attendance_tracker.data
 import android.location.Location
 import android.util.Log
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -190,22 +187,25 @@ class AppData {
             }
     }
 
+    private fun mapDocumentToSchool(document: DocumentSnapshot): School {
+        return School(
+            id = document.id,
+            adminRef = document.getDocumentReference("adminRef")!!.id,
+            name = document.getString("name")!!,
+            uniqueCode = document.getString("uniqueCode")!!,
+            postalCode = document.getString("postalCode")!!,
+            createdAt = document.getTimestamp("createdAt")?.toLocalDateTime()!!,
+            location = geoPointToLocation(document.getGeoPoint("location")!!),
+            address = document.getString("address")!!
+        )
+    }
+
     suspend fun fetchSchools(adminRef: String): List<School> {
         return schoolCollection
             .whereEqualTo("adminRef", adminCollection.document(adminRef))
             .get()
             .await()
-            .map { document ->
-                School(
-                    id = document.id,
-                    adminRef = document.getDocumentReference("adminRef")!!.id,
-                    name = document.getString("name"),
-                    uniqueCode = document.getString("uniqueCode"),
-                    remarks = document.getString("remarks"),
-                    createdAt = document.getTimestamp("createdAt")?.toLocalDateTime(),
-                    location = geoPointToLocation(document.getGeoPoint("location")!!)
-                )
-            }
+            .map { document -> mapDocumentToSchool(document) }
     }
 
     suspend fun saveSchool(schoolToSave: School): School {
@@ -214,11 +214,12 @@ class AppData {
         val data: DocumentReference = schoolCollection
             .add(
                 hashMapOf(
-                    "adminRef" to adminCollection.document(schoolToSave.adminRef),
+                    "adminRef" to adminCollection.document(schoolToSave.adminRef!!),
                     "name" to schoolToSave.name,
                     "uniqueCode" to schoolToSave.uniqueCode,
-                    "remarks" to schoolToSave.remarks,
-                    "location" to GeoPoint(schoolToSave.location!!.latitude, schoolToSave.location.longitude),
+                    "postalCode" to schoolToSave.postalCode,
+                    "address" to schoolToSave.address,
+                    "location" to GeoPoint(schoolToSave.location!!.latitude, schoolToSave.location!!.longitude),
                     "createdAt" to createdAt.toTimestamp()
                 )
             )
@@ -229,9 +230,10 @@ class AppData {
             adminRef = schoolToSave.adminRef,
             name = schoolToSave.name,
             uniqueCode = schoolToSave.uniqueCode,
-            remarks = schoolToSave.remarks,
+            postalCode = schoolToSave.postalCode,
             location = schoolToSave.location,
-            createdAt = createdAt
+            createdAt = createdAt,
+            address = schoolToSave.address
         )
     }
 
@@ -243,17 +245,7 @@ class AppData {
             .get()
             .await();
 
-        return data.documents.map { document ->
-            School(
-                id = document.id,
-                adminRef = document.getDocumentReference("adminRef")!!.id,
-                name = document.getString("name"),
-                uniqueCode = document.getString("uniqueCode"),
-                remarks = document.getString("remarks"),
-                createdAt = document.getTimestamp("createdAt")?.toLocalDateTime(),
-                location = geoPointToLocation(document.getGeoPoint("location")!!)
-            )
-        }.first()
+        return data.documents.map { document -> mapDocumentToSchool(document) }.first()
     }
 
     suspend fun saveSession(sessionToSave: Session): Session {

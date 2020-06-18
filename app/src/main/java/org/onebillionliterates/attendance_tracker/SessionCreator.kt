@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -21,6 +22,7 @@ import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.AppCoreException
+import org.onebillionliterates.attendance_tracker.data.MESSAGES
 import org.onebillionliterates.attendance_tracker.data.Session
 import org.onebillionliterates.attendance_tracker.drawables.*
 import org.threeten.bp.LocalDate
@@ -28,6 +30,7 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 
 class SessionCreator : AppCompatActivity(), View.OnClickListener {
+    private var bannerType: Int = Banner.SUCCESS
     private val TAG = "SessionCreator_Activity"
     private val HOUR_12_TIME_FORMAT = DateTimeFormatter.ofPattern("h:mm a")
     private lateinit var allSchools: List<DataHolder>
@@ -107,6 +110,12 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
             createSessionProgress.visibility = View.GONE
         }
 
+        Banner.getInstance().bannerView.findViewById<View>(R.id.rlCancel).setOnClickListener {
+            Banner.getInstance().dismissBanner()
+            if (Banner.SUCCESS == bannerType) {
+                this@SessionCreator.finish()
+            }
+        }
     }
 
     override fun onClick(clickView: View?) {
@@ -169,8 +178,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     createSessionProgress.visibility = View.VISIBLE
 
-                    var bannerType = Banner.SUCCESS
-                    var message = "New session created successfully"
+                    var message = MESSAGES.SESSION_SAVED_MESSAGE.message
                     val job = GlobalScope.launch(Dispatchers.IO) {
                         try {
                             val schoolData: DataHolder = allSchools.firstOrNull { holder -> holder.selected }!!
@@ -197,7 +205,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                             Log.v(TAG, "Session saved successfully - $savedSession")
                         } catch (exception: Exception) {
                             bannerType = Banner.ERROR
-                            message = "Please fill all details, before trying to create a new session"
+                            message = MESSAGES.DATA_VALIDATION_FAILURE.message
                             if (exception is AppCoreException)
                                 message = exception.message
 

@@ -1,6 +1,7 @@
 package org.onebillionliterates.attendance_tracker.data
 
-import org.onebillionliterates.attendance_tracker.data.ERRORS.*
+import com.google.android.gms.maps.model.LatLng
+import org.onebillionliterates.attendance_tracker.data.MESSAGES.*
 import org.threeten.bp.*
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -18,6 +19,7 @@ class AppCore {
     companion object {
         val instance: AppCore by lazy { HOLDER.INSTANCE }
         val loggedInUser: LoggedInUser by lazy { HOLDER.LOGGED_IN_USER }
+        val DEFAULT_LOC = LatLng(12.9542946, 77.4908551)
     }
 
     fun LocalDate.inBetween(referenceStart: LocalDate, referenceEnd: LocalDate): Boolean =
@@ -42,7 +44,8 @@ class AppCore {
     suspend fun saveSession(session: Session): Session {
         session.adminRef = loggedInUser.adminInfo!!.id!!
 
-        if (session.endTime.toNanoOfDay() - session.startTime.toNanoOfDay() < 30 * 60) throw AppCoreException(
+        if (session.endTime.isBefore(session.startTime)) throw AppCoreException(INVALID_DURATION.message)
+        if (session.endTime.toSecondOfDay() - session.startTime.toSecondOfDay() < 30 * 60) throw AppCoreException(
             INVALID_DURATION.message
         )
         if (session.endDate.isBefore(session.startDate)) throw AppCoreException(INVALID_END.message)
@@ -51,12 +54,14 @@ class AppCore {
         if (session.teacherRefs.isNullOrEmpty()) throw AppCoreException(TEACHERS_NOT_ASSOCIATED.message)
         if (runWithCatch { appData.verifySession(session) }) throw AppCoreException(SESSION_ALREADY_EXISTS.message)
 
-        val overlappingSessionsFound = appData.fetchSessions(
-            adminRef = session.adminRef,
-            schoolRef = session.schoolRef,
-            teacherRefs = session.teacherRefs,
-            startDate = session.startDate
-        )
+        val overlappingSessionsFound = runWithCatch {
+            appData.fetchSessions(
+                adminRef = session.adminRef,
+                schoolRef = session.schoolRef,
+                teacherRefs = session.teacherRefs,
+                startDate = session.startDate
+            )
+        }
             .filter { foundSession ->
                 session.startDate.inBetween(foundSession.startDate, foundSession.endDate) ||
                         session.endDate.inBetween(foundSession.startDate, foundSession.endDate)
@@ -177,6 +182,20 @@ class AppCore {
     suspend fun fetchPastSessionsForAdmin(): List<Session> {
         return runWithCatch {
             appData.fetchPastSessions(loggedInUser.adminInfo!!.id!!)
+        }
+    }
+
+    suspend fun saveSchool(school: School): School {
+        school.adminRef = loggedInUser.adminInfo!!.id.toString()
+
+        if (school.location == null || school.location!!.latitude == DEFAULT_LOC.latitude && school.location!!.longitude == DEFAULT_LOC.longitude) throw AppCoreException(
+            SCHOOL_LOCATION_NOT_ADDED.message
+        )
+        if (school.name.isNullOrBlank() || school.uniqueCode.isNullOrBlank() || school.address.isNullOrBlank() || school.postalCode.isNullOrBlank())
+            throw AppCoreException(SCHOOL_INCOMPLETE_INFO.message)
+
+        return runWithCatch {
+            appData.saveSchool(school)
         }
     }
 

@@ -3,8 +3,10 @@ package org.onebillionliterates.attendance_tracker
 import android.app.Activity
 import android.content.Intent
 import android.location.Address
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -12,21 +14,36 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.schibstedspain.leku.*
+import com.shasin.notificationbanner.Banner
 import kotlinx.android.synthetic.main.school_create.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.onebillionliterates.attendance_tracker.data.AppCore
+import org.onebillionliterates.attendance_tracker.data.AppCore.Companion.DEFAULT_LOC
+import org.onebillionliterates.attendance_tracker.data.AppCoreException
+import org.onebillionliterates.attendance_tracker.data.MESSAGES
+import org.onebillionliterates.attendance_tracker.data.School
 import org.onebillionliterates.attendance_tracker.drawables.EmailDrawable
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
 import org.onebillionliterates.attendance_tracker.drawables.SchoolSolidDrawable
+import org.threeten.bp.LocalDateTime
 
 class AddSchoolActivity : AppCompatActivity() {
     companion object {
         private const val MAP_BUTTON_REQUEST_CODE = 1
-        private val DEFAULT_LOC = LatLng(12.9542946, 77.4908551)
     }
 
-    private lateinit var embeddedMap:GoogleMap;
+    private val TAG = "AddSchool_Activity"
+    private lateinit var rootView: View
+    private lateinit var embeddedMap: GoogleMap
+    private lateinit var school: School
+           private var bannerType = Banner.SUCCESS
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.school_create)
 
@@ -35,9 +52,10 @@ class AddSchoolActivity : AppCompatActivity() {
 
 
     private fun initView() {
+        rootView = window.decorView.rootView
+        school = School()
         schoolNameIcon.setImageDrawable(SchoolSolidDrawable(this))
         phoneIcon.setImageDrawable(MobileDrawable(this))
-        emailIcon.setImageDrawable(EmailDrawable(this))
         searchSchool.setOnClickListener {
             val locationPickerIntent = LocationPickerActivity.Builder()
                 .withLocation(DEFAULT_LOC)
@@ -46,8 +64,38 @@ class AddSchoolActivity : AppCompatActivity() {
 
             startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE)
         }
-
         addLocationToMap()
+        addSchool.setOnClickListener {
+            GlobalScope.launch(Dispatchers.Main) {
+                createSchoolProgress.visibility = View.VISIBLE
+
+                var message = MESSAGES.SCHOOL_SAVED_MESSAGE.message
+                val job = GlobalScope.launch(Dispatchers.IO) {
+                    try {
+                        school.name = schoolNameEditText.text.toString()
+                        school.uniqueCode = uniqueCodeEditText.text.toString()
+
+                        AppCore.instance.saveSchool(school)
+                    } catch (exception: Exception) {
+                        bannerType = Banner.ERROR
+                        message = MESSAGES.DATA_VALIDATION_FAILURE.message
+                        if (exception is AppCoreException)
+                            message = exception.message
+
+                        Log.e(TAG, "Error during saving school", exception)
+                    }
+                }
+                job.join()
+                createSchoolProgress.visibility = View.GONE
+                Banner.make(rootView, this@AddSchoolActivity, bannerType, message, Banner.TOP).show()
+                Banner.getInstance().bannerView.setOnClickListener {
+                    Banner.getInstance().dismissBanner()
+                    if (Banner.SUCCESS == bannerType) {
+                        this@AddSchoolActivity.finish()
+                    }
+                }
+            }
+        }
     }
 
     private fun addLocationToMap(position: LatLng = DEFAULT_LOC) {
@@ -61,7 +109,7 @@ class AddSchoolActivity : AppCompatActivity() {
         }
     }
 
-    private fun setMapLocation(map: GoogleMap, position: LatLng, snippet:String) {
+    private fun setMapLocation(map: GoogleMap, position: LatLng, snippet: String) {
         with(map) {
             embeddedMap = map
             moveCamera(CameraUpdateFactory.newLatLngZoom(position, 13f))
@@ -91,6 +139,11 @@ class AddSchoolActivity : AppCompatActivity() {
             }
 
             setMapLocation(embeddedMap, position = LatLng(latitude, longitude), snippet = address)
+            school.address = fullAddress!!.toString()
+            school.location = Location("SELECTED_LOCATION")
+            school.location!!.longitude = longitude
+            school.location!!.latitude = latitude
+            school.postalCode = postalcode!!
         }
         if (resultCode == Activity.RESULT_CANCELED) {
             Log.d("RESULT****", "CANCELLED")

@@ -77,9 +77,10 @@ class DBOperations : AppCompatActivity() {
 
                 val school = School(
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
-                    mobileNumber = "1231231231",
+                    uniqueCode = "1231231231",
                     name = "Gordon Ramsay School",
-                    uniqueCode = "3344123123",
+                    postalCode = "3344123123",
+                    address = "3344123123",
                     location = location
                 )
                 val savedTeacher = appData.saveSchool(school)
