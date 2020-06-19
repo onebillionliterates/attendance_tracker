@@ -37,14 +37,11 @@ public class CheckInOut extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.check_in_out);
 
-        Button checkin = findViewById(R.id.check_in);
-        Button checkout = findViewById(R.id.check_out);
-
-        checkin.setOnClickListener(this);
-        checkout.setOnClickListener(this);
+        this.findViewById(R.id.checkin).setOnClickListener(this);
+        this.findViewById(R.id.checkout).setOnClickListener(this);
         // Assign variable
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.google_map);
+                .findFragmentById(R.id.googlemap);
 
         // Initialize fused location
         client = LocationServices.getFusedLocationProviderClient(this);
@@ -107,9 +104,9 @@ public class CheckInOut extends AppCompatActivity implements View.OnClickListene
     public void onClick(View v) {
         getCurrentLocation();
         switch (v.getId()){
-            case R.id.check_in:
+            case R.id.checkin:
                 // record present/absent depending on the time
-            case R.id.check_out:
+            case R.id.checkout:
                 // location criteria to satisfy at end of session
         }
     }

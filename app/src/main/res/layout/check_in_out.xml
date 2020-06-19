@@ -1,42 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent">
+
     <fragment
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:id="@+id/google_map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/googlemap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/checkin"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="#66299976"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="60dp" android:layout_marginStart="40dp">
+
+        <info.androidhive.fontawesome.FontTextView android:layout_width="50dp" android:layout_height="50dp"
+                                                   app:layout_constraintTop_toTopOf="parent"
+                                                   app:layout_constraintStart_toStartOf="parent"
+                                                   app:layout_constraintBottom_toBottomOf="parent"
+                                                   app:layout_constraintEnd_toEndOf="parent"
+                                                   android:text="@string/fa_sign_in_alt_solid"
+                                                   app:solid_icon="true"
+                                                   android:textColor="#018065" android:id="@+id/checkinIcon"
+                                                   android:textSize="50sp"
+                                                   android:layout_marginBottom="40dp"/>
+        <TextView
+                android:id="@+id/checkinTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="Check in"
+                android:textColor="@color/colorVeryDarkGray"
+                android:textSize="24sp" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkinIcon" android:layout_marginTop="10dp"
+                android:textStyle="bold"/>
+
         />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="217dp"
-        android:layout_below="@+id/google_map"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
-        android:orientation="horizontal">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/checkout"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="#1AD20000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="60dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="40dp"
+            app:layout_constraintStart_toEndOf="@+id/checkin" android:layout_marginStart="50dp">
+        <info.androidhive.fontawesome.FontTextView android:layout_width="50dp" android:layout_height="50dp"
+                                                   app:layout_constraintTop_toTopOf="parent"
+                                                   app:layout_constraintStart_toStartOf="parent"
+                                                   app:layout_constraintBottom_toBottomOf="parent"
+                                                   app:layout_constraintEnd_toEndOf="parent"
+                                                   android:text="@string/fa_sign_out_alt_solid"
+                                                   app:solid_icon="true"
+                                                   android:textColor="#D20000" android:id="@+id/checkoutIcon"
+                                                   android:textSize="50sp"
+                                                   android:layout_marginBottom="40dp"/>
+        <TextView
+                android:id="@+id/checkoutTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="Check out"
+                android:textColor="@color/colorVeryDarkGray"
+                android:textSize="24sp" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkoutIcon" android:layout_marginTop="10dp"
+                android:textStyle="bold"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
-            android:id="@+id/check_in"
-            android:layout_width="wrap_content"
-            android:layout_height="179dp"
-            android:layout_weight="1"
-            android:textSize="15dp"
-            android:text="Check In" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
-            android:id="@+id/check_out"
-            android:layout_width="91dp"
-            android:layout_height="179dp"
-            android:layout_weight="1"
-            android:text="Check Out"
-            android:textSize="15dp" />
-    </LinearLayout>
-
-</RelativeLayout>

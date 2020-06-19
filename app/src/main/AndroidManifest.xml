@@ -44,11 +44,6 @@
 
         </activity>
         <activity android:name=".SchoolListingActivity" android:label="Schools Listing">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity android:name=".AddSchoolActivity">
             <meta-data
@@ -61,7 +56,11 @@
         <activity android:name=".TeacherSessions" android:label="Session list in teacher login">
         </activity>
         <activity android:name=".CheckInOut" android:label="Session Check-in/out">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
         <activity
                 android:name="com.schibstedspain.leku.LocationPickerActivity"
