@@ -1,6 +1,5 @@
 package org.onebillionliterates.attendance_tracker
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
-import org.onebillionliterates.attendance_tracker.adapter.SessionBottomSheetAdapter
+import org.onebillionliterates.attendance_tracker.adapter.ListingAdapter
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.AppCoreException
 import org.onebillionliterates.attendance_tracker.data.MESSAGES
@@ -230,7 +229,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(allWeekDays, singleSelect = false)
+        val adapter = ListingAdapter(allWeekDays, singleSelect = false)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
@@ -254,7 +253,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(allTeachers, singleSelect = false)
+        val adapter = ListingAdapter(allTeachers, singleSelect = false)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
@@ -278,7 +277,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         //crating an arraylist to store users using the data class user
         val dialog = BottomSheetDialog(this)
         //creating our adapter
-        val adapter = SessionBottomSheetAdapter(allSchools, singleSelect = true, bottomDialog = dialog)
+        val adapter = ListingAdapter(allSchools, singleSelect = true, bottomDialog = dialog)
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter

@@ -6,8 +6,10 @@ import android.location.Address
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NavUtils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
@@ -26,10 +28,9 @@ import org.onebillionliterates.attendance_tracker.data.AppCore.Companion.DEFAULT
 import org.onebillionliterates.attendance_tracker.data.AppCoreException
 import org.onebillionliterates.attendance_tracker.data.MESSAGES
 import org.onebillionliterates.attendance_tracker.data.School
-import org.onebillionliterates.attendance_tracker.drawables.EmailDrawable
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
 import org.onebillionliterates.attendance_tracker.drawables.SchoolSolidDrawable
-import org.threeten.bp.LocalDateTime
+
 
 class AddSchoolActivity : AppCompatActivity() {
     companion object {
@@ -46,8 +47,18 @@ class AddSchoolActivity : AppCompatActivity() {
         AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.school_create)
-
+        actionBar?.setDisplayHomeAsUpEnabled(true)
         initView()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.getItemId()) {
+            android.R.id.home -> {
+                NavUtils.navigateUpFromSameTask(this)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 

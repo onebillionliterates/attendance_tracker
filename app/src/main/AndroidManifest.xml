@@ -7,11 +7,11 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-    <uses-feature android:name="android.hardware.location.network" android:required="false" />
-    <uses-feature android:name="android.hardware.location.gps" android:required="false"  />
+    <uses-feature android:name="android.hardware.location.network" android:required="false"/>
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
 
     <application
             android:allowBackup="true"
@@ -23,41 +23,44 @@
             android:theme="@style/AppTheme">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="@string/map_key"/>
+                   android:value="@string/map_key"/>
 
-        <activity android:name="org.onebillionliterates.attendance_tracker.AttendanceListingActivity">
+        <activity android:name=".AttendanceListingActivity">
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.SessionsListingActivity">
+        <activity android:name=".SessionsListingActivity">
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.SessionCreator">
+        <activity android:name=".SessionCreator">
         </activity>
 
-        <activity android:name="org.onebillionliterates.attendance_tracker.DBOperations">
+        <activity android:name=".DBOperations">
         </activity>
 
         <activity
-                android:name="org.onebillionliterates.attendance_tracker.LoginActivity"
+                android:name=".LoginActivity"
                 android:label="OBLF Attendance Tracker">
 
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.AdminLandingActivity" android:label="OBLF Attendance Tracker">
+        <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
 
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.SchoolListingActivity" android:label="Schools Listing">
-
-        </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.AddSchoolActivity">
+        <activity android:name=".SchoolListingActivity" android:label="Schools Listing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.TeachersActivity">
+        <activity android:name=".AddSchoolActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".SchoolListingActivity"/>
+
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.TeacherSessions" android:label="Session list in teacher login" >
+        <activity android:name=".TeachersActivity">
         </activity>
-        <activity android:name="org.onebillionliterates.attendance_tracker.CheckInOut" android:label="Session Check-in/out" >
+        <activity android:name=".TeacherSessions" android:label="Session list in teacher login">
+        </activity>
+        <activity android:name=".CheckInOut" android:label="Session Check-in/out">
 
         </activity>
         <activity
@@ -65,15 +68,15 @@
                 android:label="@string/leku_title_activity_location_picker"
                 android:theme="@style/AppTheme.NoActionBar"
                 android:windowSoftInputMode="adjustPan"
-                android:parentActivityName="org.onebillionliterates.attendance_tracker.SchoolListingActivity">
+                android:parentActivityName=".SchoolListingActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
             <meta-data android:name="android.app.searchable"
-                       android:resource="@xml/leku_searchable" />
+                       android:resource="@xml/leku_searchable"/>
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value="org.onebillionliterates.attendance_tracker.SchoolListingActivity" />
+                    android:value=".SchoolListingActivity"/>
         </activity>
     </application>
 

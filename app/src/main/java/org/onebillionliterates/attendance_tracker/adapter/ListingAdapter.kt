@@ -11,12 +11,12 @@ import info.androidhive.fontawesome.FontTextView
 import org.onebillionliterates.attendance_tracker.R
 
 
-class SessionBottomSheetAdapter(
+class ListingAdapter(
     private val dataList: List<DataHolder>,
     private val singleSelect: Boolean,
     private val bottomDialog: BottomSheetDialog? = null
 ) :
-    RecyclerView.Adapter<SessionBottomSheetAdapter.ViewHolder>() {
+    RecyclerView.Adapter<ListingAdapter.ViewHolder>() {
 
     class ViewHolder(
         itemView: View,
@@ -27,16 +27,20 @@ class SessionBottomSheetAdapter(
         fun bindItems(info: DataHolder) {
             val displayTextView = itemView.findViewById(R.id.displayText) as TextView
             val selectedIcon = itemView.findViewById(R.id.cellSelected) as FontTextView
+            val arrowRight = itemView.findViewById(R.id.arrowRight) as FontTextView
             val displayCheckboxView = itemView.findViewById(R.id.checkedText) as AppCompatCheckBox
 
             if (showSingleSelect) {
                 displayTextView.visibility = View.VISIBLE
                 displayTextView.text = info.displayText
-                if(info.selected) selectedIcon.visibility = View.VISIBLE
+                if (bottomDialogDismiss == null)
+                    arrowRight.visibility = View.VISIBLE
+
+                if (info.selected && bottomDialogDismiss != null) selectedIcon.visibility = View.VISIBLE
 
                 itemView.setOnClickListener { view ->
                     info.selected = true
-                    bottomDialogDismiss!!.dismiss()
+                    bottomDialogDismiss?.dismiss()
                 }
                 return
             }
@@ -51,8 +55,8 @@ class SessionBottomSheetAdapter(
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionBottomSheetAdapter.ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.session_create_bottom_drawer_cell, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListingAdapter.ViewHolder {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.listing_cell, parent, false)
         return ViewHolder(v, singleSelect, bottomDialog)
     }
 
@@ -60,7 +64,7 @@ class SessionBottomSheetAdapter(
         return dataList.size
     }
 
-    override fun onBindViewHolder(holder: SessionBottomSheetAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ListingAdapter.ViewHolder, position: Int) {
         holder.bindItems(dataList[position])
     }
 
