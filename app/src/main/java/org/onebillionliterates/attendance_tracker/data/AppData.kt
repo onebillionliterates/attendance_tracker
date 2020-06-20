@@ -298,6 +298,14 @@ class AppData {
         return mapSessions(data)
     }
 
+    suspend fun fetchSession(sessionRef: String): Session {
+        val data = sessionsCollection.document(sessionRef)
+            .get()
+            .await()
+
+        return mapSession(data)
+    }
+
     suspend fun fetchActiveSessions(
         adminRef: String
     ): List<Session> {
@@ -338,21 +346,24 @@ class AppData {
     }
 
     private fun mapSessions(data: QuerySnapshot): List<Session> {
-        return data.documents.map { document ->
-            Session(
-                id = document.id,
-                adminRef = document.getDocumentReference("adminRef")!!.id,
-                schoolRef = document.getDocumentReference("schoolRef")!!.id,
-                teacherRefs = listOfTeacherRefs(document),
-                startDate = document.getTimestamp("startDate")?.toLocalDate()!!,
-                endDate = document.getTimestamp("endDate")?.toLocalDate()!!,
-                startTime = LocalTime.ofNanoOfDay(document.get("startTime") as Long),
-                endTime = LocalTime.ofNanoOfDay(document.get("endTime") as Long),
-                weekDaysInfo = listOfWeekDays(document),
-                createdAt = document.getTimestamp("createdAt")?.toLocalDateTime()!!,
-                description = document.getString("description")!!
-            )
-        }
+        return data.documents.map { document -> mapSession(document) }
+    }
+
+
+    private fun mapSession(document: DocumentSnapshot): Session {
+        return Session(
+            id = document.id,
+            adminRef = document.getDocumentReference("adminRef")!!.id,
+            schoolRef = document.getDocumentReference("schoolRef")!!.id,
+            teacherRefs = listOfTeacherRefs(document),
+            startDate = document.getTimestamp("startDate")?.toLocalDate()!!,
+            endDate = document.getTimestamp("endDate")?.toLocalDate()!!,
+            startTime = LocalTime.ofNanoOfDay(document.get("startTime") as Long),
+            endTime = LocalTime.ofNanoOfDay(document.get("endTime") as Long),
+            weekDaysInfo = listOfWeekDays(document),
+            createdAt = document.getTimestamp("createdAt")?.toLocalDateTime()!!,
+            description = document.getString("description")!!
+        )
     }
 
     suspend fun verifySession(session: Session): Boolean {
@@ -467,11 +478,15 @@ class AppData {
             }
     }
 
-    fun isSessionAlreadyCheckedIn(sessionToCheckin: Session): Boolean {
+    fun findAttendanceForSession(sessionToCheckin: Session): Attendance? {
         TODO("Not yet implemented")
     }
 
     fun checkedInAttendance(teacherRef: String, sessionToCheckin: Session): Attendance {
+        TODO("Not yet implemented")
+    }
+
+    fun checkedOutAttendance(attendanceRef: String, forcedCheckout: Boolean = false): Attendance {
         TODO("Not yet implemented")
     }
 

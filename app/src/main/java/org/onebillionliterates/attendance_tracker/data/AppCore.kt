@@ -12,7 +12,7 @@ import kotlin.math.abs
 
 class AppCore {
     private val appData: AppData = AppData.instance
-    private lateinit var checkedInAttendance: Attendance
+    private var checkedInAttendance: Attendance? = null
 
     private object HOLDER {
         val INSTANCE = AppCore()
@@ -207,11 +207,11 @@ class AppCore {
         schoolLocation: Location,
         session: Session
     ) {
-        if (::checkedInAttendance.isInitialized && checkedInAttendance.sessionRef == session.id)
+        if (checkedInAttendance?.sessionRef != null && checkedInAttendance?.sessionRef == session.id)
             throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
 
-        val isSessionAlreadyCheckedId = runWithCatch { appData.isSessionAlreadyCheckedIn(session) }
-        if (isSessionAlreadyCheckedId) throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
+        val isSessionAlreadyCheckedId = runWithCatch { appData.findAttendanceForSession(session) }
+        if (isSessionAlreadyCheckedId != null) throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
         if (teacherCurrentLocation.distanceTo(schoolLocation) > 50) throw AppCoreException(
             TEACHER_SESSION_LOCATION_IS_TO_FAR.message
         )
@@ -219,13 +219,27 @@ class AppCore {
         if (abs(timePassTheSessionStartInMins) > 15) throw AppCoreException(TEACHER_SESSION_TIME_MISMATCH_WITH_THRESHOLD.message)
 
         var forcedCheckout = false
-        if (::checkedInAttendance.isInitialized && checkedInAttendance.sessionRef != session.id) {
+        if (checkedInAttendance?.sessionRef != null && checkedInAttendance?.sessionRef != session.id) {
             forcedCheckout = true
-            //#TODO checkout to handle this situation
+            val previousSession = runWithCatch { appData.fetchSession(checkedInAttendance?.sessionRef!!) }
+            checkoutFromSession(previousSession, true)
         }
         checkedInAttendance = runWithCatch { appData.checkedInAttendance(loggedInUser.teacherInfo!!.id!!, session) }
 
         if (forcedCheckout) throw AppCoreWarnException(TEACHER_SESSION_PREVIOUS_FORCED_CHECKOUT.message)
+    }
+
+    suspend fun checkoutFromSession(session: Session, forcedCheckout: Boolean = false) {
+        val checkingOutAttendance = runWithCatch { appData.findAttendanceForSession(session) }
+        if (!forcedCheckout && checkingOutAttendance == null) throw AppCoreWarnException(
+            TEACHER_SESSION_NO_SESSION_CHECKED_IN.message
+        )
+
+        runWithCatch { appData.checkedOutAttendance(checkingOutAttendance?.id!!, forcedCheckout) }
+
+        if (checkedInAttendance?.id == checkingOutAttendance?.id) {
+            checkedInAttendance = null
+        }
     }
 
     private suspend fun <T> runWithCatch(block: suspend () -> T): T {
