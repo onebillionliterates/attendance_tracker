@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker.data
 
+import android.location.Location
 import com.google.android.gms.maps.model.LatLng
 import org.onebillionliterates.attendance_tracker.data.MESSAGES.*
 import org.threeten.bp.*
@@ -7,9 +8,11 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.math.abs
 
 class AppCore {
-    private val appData: AppData = AppData.instance;
+    private val appData: AppData = AppData.instance
+    private lateinit var checkedInAttendance: Attendance
 
     private object HOLDER {
         val INSTANCE = AppCore()
@@ -199,6 +202,32 @@ class AppCore {
         }
     }
 
+    suspend fun checkinToSession(
+        teacherCurrentLocation: Location,
+        schoolLocation: Location,
+        session: Session
+    ) {
+        if (::checkedInAttendance.isInitialized && checkedInAttendance.sessionRef == session.id)
+            throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
+
+        val isSessionAlreadyCheckedId = runWithCatch { appData.isSessionAlreadyCheckedIn(session) }
+        if (isSessionAlreadyCheckedId) throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
+        if (teacherCurrentLocation.distanceTo(schoolLocation) > 50) throw AppCoreException(
+            TEACHER_SESSION_LOCATION_IS_TO_FAR.message
+        )
+        val timePassTheSessionStartInMins = (LocalTime.now().toSecondOfDay() - session.startTime.toSecondOfDay()) / 60
+        if (abs(timePassTheSessionStartInMins) > 15) throw AppCoreException(TEACHER_SESSION_TIME_MISMATCH_WITH_THRESHOLD.message)
+
+        var forcedCheckout = false
+        if (::checkedInAttendance.isInitialized && checkedInAttendance.sessionRef != session.id) {
+            forcedCheckout = true
+            //#TODO checkout to handle this situation
+        }
+        checkedInAttendance = runWithCatch { appData.checkedInAttendance(loggedInUser.teacherInfo!!.id!!, session) }
+
+        if (forcedCheckout) throw AppCoreWarnException(TEACHER_SESSION_PREVIOUS_FORCED_CHECKOUT.message)
+    }
+
     private suspend fun <T> runWithCatch(block: suspend () -> T): T {
         try {
             val start = System.currentTimeMillis()
@@ -216,4 +245,7 @@ class AppCore {
 }
 
 class AppCoreException(override val message: String, private val exception: Exception? = null) :
+    Exception(message, exception)
+
+class AppCoreWarnException(override val message: String, private val exception: Exception? = null) :
     Exception(message, exception)

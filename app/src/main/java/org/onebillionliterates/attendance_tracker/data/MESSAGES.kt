@@ -13,5 +13,9 @@ enum class MESSAGES(val message: String) {
     SCHOOL_SAVED_MESSAGE("New school saved successfully"),
     SESSION_SAVED_MESSAGE("New session created successfully"),
     SCHOOL_LOCATION_NOT_ADDED("School location not added"),
-    SCHOOL_INCOMPLETE_INFO("Please fill all details, before trying to save new school")
+    SCHOOL_INCOMPLETE_INFO("Please fill all details, before trying to save new school"),
+    TEACHER_SESSION_ALREADY_CHECKED_IN("Session already checked in !!!"),
+    TEACHER_SESSION_LOCATION_IS_TO_FAR("We are unable to check-in, we don't find you closer to your school"),
+    TEACHER_SESSION_TIME_MISMATCH_WITH_THRESHOLD("Either you are trying to check in to session very early, or you might have past the threshold for the session"),
+    TEACHER_SESSION_PREVIOUS_FORCED_CHECKOUT("Forced checked out from your previous session")
 }

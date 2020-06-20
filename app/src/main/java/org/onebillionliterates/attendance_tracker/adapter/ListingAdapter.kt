@@ -17,14 +17,15 @@ class ListingAdapter(
     private val bottomDialog: BottomSheetDialog? = null
 ) :
     RecyclerView.Adapter<ListingAdapter.ViewHolder>() {
+    lateinit var adapterListener: AdapterListener
 
     class ViewHolder(
         itemView: View,
         private val showSingleSelect: Boolean,
         private val bottomDialogDismiss: BottomSheetDialog? = null
     ) : RecyclerView.ViewHolder(itemView) {
-
-        fun bindItems(info: DataHolder) {
+        lateinit var adapterCellListener: AdapterListener
+        fun bindItems(info: DataHolder, position: Int) {
             val displayTextView = itemView.findViewById(R.id.displayText) as TextView
             val selectedIcon = itemView.findViewById(R.id.cellSelected) as FontTextView
             val arrowRight = itemView.findViewById(R.id.arrowRight) as FontTextView
@@ -41,6 +42,8 @@ class ListingAdapter(
                 itemView.setOnClickListener { view ->
                     info.selected = true
                     bottomDialogDismiss?.dismiss()
+                    if (::adapterCellListener.isInitialized)
+                        adapterCellListener.onAdapterItemClicked(position)
                 }
                 return
             }
@@ -55,7 +58,7 @@ class ListingAdapter(
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListingAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.listing_cell, parent, false)
         return ViewHolder(v, singleSelect, bottomDialog)
     }
@@ -64,9 +67,8 @@ class ListingAdapter(
         return dataList.size
     }
 
-    override fun onBindViewHolder(holder: ListingAdapter.ViewHolder, position: Int) {
-        holder.bindItems(dataList[position])
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.adapterCellListener = adapterListener
+        holder.bindItems(dataList[position], position)
     }
-
-
 }

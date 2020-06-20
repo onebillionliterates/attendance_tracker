@@ -391,7 +391,7 @@ class AppData {
                     "teacherRef" to teacherCollection.document(attendanceToSave.teacherRef),
                     "schoolRef" to schoolCollection.document(attendanceToSave.schoolRef),
                     "inTime" to attendanceToSave.inTime.toNanoOfDay(),
-                    "outTime" to attendanceToSave.outTime.toNanoOfDay(),
+                    "outTime" to attendanceToSave.outTime?.toNanoOfDay(),
                     "createdAt" to attendanceToSave.createdAt.toTimestamp(),
                     "remarks" to attendanceToSave.remarks
                 )
@@ -466,4 +466,13 @@ class AppData {
                 teacher.adminRef == adminRef
             }
     }
+
+    fun isSessionAlreadyCheckedIn(sessionToCheckin: Session): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    fun checkedInAttendance(teacherRef: String, sessionToCheckin: Session): Attendance {
+        TODO("Not yet implemented")
+    }
+
 }

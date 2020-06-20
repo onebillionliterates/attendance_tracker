@@ -11,6 +11,7 @@ data class Attendance(
     val schoolRef: String,
     val createdAt: LocalDate,
     val inTime: LocalTime,
-    val outTime: LocalTime,
+    val outTime: LocalTime?,
+    val forceLoggedOut: Boolean? = false,
     val remarks: String? = null
 )

@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.school_listing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.onebillionliterates.attendance_tracker.adapter.AdapterListener
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.ListingAdapter
 import org.onebillionliterates.attendance_tracker.data.AppCore
@@ -19,7 +20,7 @@ import org.onebillionliterates.attendance_tracker.data.AppCoreException
 import org.onebillionliterates.attendance_tracker.data.MESSAGES
 import org.onebillionliterates.attendance_tracker.data.School
 
-class SchoolListingActivity : AppCompatActivity() {
+class SchoolListingActivity : AppCompatActivity(), AdapterListener {
 
     private lateinit var allSchools: List<School>
     private var bannerType: Int = Banner.SUCCESS
@@ -83,6 +84,11 @@ class SchoolListingActivity : AppCompatActivity() {
                 displayText = school.name!!
             )
         }, singleSelect = true)
+        adapter.adapterListener = this
         listContainer.adapter = adapter
+    }
+
+    override fun onAdapterItemClicked(clickedIndex: Int) {
+        Log.d(TAG, "CLICKED CELL :: $clickedIndex ::")
     }
 }

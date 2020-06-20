@@ -1,20 +1,31 @@
 package org.onebillionliterates.attendance_tracker.data
 
+import android.location.Location
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE
 
+@ExtendWith(MockKExtension::class)
 class AppCoreTest {
     private lateinit var mockedAppData: AppData
     private lateinit var instance: AppCore
+
+    @MockK
+    private lateinit var schoolLocation: Location
+
+    @MockK
+    private lateinit var teacherCurrentLocation: Location
 
     private fun getSession(
         id: String? = null,
@@ -40,6 +51,29 @@ class AppCoreTest {
         )
     }
 
+    private fun getAttendance(
+        id: String? = null,
+        adminRef: String = ADMIN_REF,
+        schoolRef: String? = "schoolRef",
+        sessionRef: String = "sessionRef",
+        inTime: LocalTime = LocalTime.now(),
+        outTime: LocalTime? = null,
+        createdAt: LocalDate = LocalDate.now(),
+        forceLoggedOut: Boolean = false
+    ): Attendance {
+        return Attendance(
+            id = id,
+            adminRef = adminRef,
+            schoolRef = schoolRef!!,
+            sessionRef = sessionRef,
+            teacherRef = TEACHER_REF,
+            inTime = inTime,
+            outTime = outTime,
+            createdAt = createdAt,
+            forceLoggedOut = forceLoggedOut
+        )
+    }
+
     fun parseISODate(isoDate: String) = LocalDate.parse(isoDate, ISO_LOCAL_DATE)
 
     @BeforeEach
@@ -50,9 +84,16 @@ class AppCoreTest {
         instance = AppCore()
         // Logging-in before every test
         runBlocking {
-            coEvery { mockedAppData.getAdminInfo("11111111", "7fa8282ad93047a4d6fe6111c93b308a") } returns Admin(id = ADMIN_REF)
+            coEvery {
+                mockedAppData.getAdminInfo(
+                    "11111111",
+                    "7fa8282ad93047a4d6fe6111c93b308a"
+                )
+            } returns Admin(id = ADMIN_REF)
             instance.login("11111111", "1111111")
         }
+
+        every { teacherCurrentLocation.distanceTo(schoolLocation) } returns 0f
     }
 
     @Test
@@ -434,7 +475,6 @@ class AppCoreTest {
 
     @Test
     internal fun teacher_login_with_passcode_encryption() {
-        return
         runBlocking {
             val sixDigitPassCode = "678912"
             val teacher = Teacher(adminRef = "adminRef")
@@ -473,7 +513,198 @@ class AppCoreTest {
         println(selectedValues)
     }
 
+    @Test
+    internal fun check_in_when_session_already_checked_In() {
+        runBlocking {
+            loginAsTeacher()
+
+            val sessionToCheckin = getSession()
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(sessionToCheckin)
+            } returns true
+
+
+            val thrown = assertThrows(AppCoreWarnException::class.java) {
+                runBlocking {
+                    instance.checkinToSession(
+                        session = sessionToCheckin,
+                        teacherCurrentLocation = teacherCurrentLocation,
+                        schoolLocation = schoolLocation
+                    )
+                }
+            }
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_ALREADY_CHECKED_IN.message))
+        }
+    }
+
+    @Test
+    internal fun check_in_when_session_already_checked_in_with_previous_successful_checkin() {
+        runBlocking {
+            loginAsTeacher()
+            val sessionToCheckin = getSession(id = "sessionRef")
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(sessionToCheckin)
+            } returns false
+
+            coEvery {
+                mockedAppData.checkedInAttendance(TEACHER_REF, sessionToCheckin)
+            } returns getAttendance()
+
+            instance.checkinToSession(
+                session = sessionToCheckin,
+                teacherCurrentLocation = teacherCurrentLocation,
+                schoolLocation = schoolLocation
+            )
+
+            val thrown = assertThrows(AppCoreWarnException::class.java) {
+                runBlocking {
+                    instance.checkinToSession(
+                        session = sessionToCheckin,
+                        teacherCurrentLocation = teacherCurrentLocation,
+                        schoolLocation = schoolLocation
+                    )
+                }
+            }
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_ALREADY_CHECKED_IN.message))
+        }
+    }
+
+    @Test
+    internal fun check_in_when_location_perimeter_does_not_meet() {
+        runBlocking {
+            loginAsTeacher()
+            val sessionToCheckin = getSession(id = "sessionRef")
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(sessionToCheckin)
+            } returns false
+
+            every { teacherCurrentLocation.distanceTo(schoolLocation) } returns 51f
+
+            val thrown = assertThrows(AppCoreException::class.java) {
+                runBlocking {
+                    instance.checkinToSession(
+                        session = sessionToCheckin,
+                        schoolLocation = schoolLocation,
+                        teacherCurrentLocation = teacherCurrentLocation
+                    )
+                }
+            }
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_LOCATION_IS_TO_FAR.message))
+        }
+    }
+
+    @Test
+    internal fun check_in_when_session_checkin_time_past_specified_threshold() {
+        runBlocking {
+            loginAsTeacher()
+            val sessionToCheckin = getSession(id = "sessionRef", startTime = LocalTime.now().minusMinutes(20))
+
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(sessionToCheckin)
+            } returns false
+
+            val thrown = assertThrows(AppCoreException::class.java) {
+                runBlocking {
+                    instance.checkinToSession(
+                        session = sessionToCheckin,
+                        schoolLocation = schoolLocation,
+                        teacherCurrentLocation = teacherCurrentLocation
+                    )
+                }
+            }
+
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_TIME_MISMATCH_WITH_THRESHOLD.message))
+        }
+    }
+
+    @Test
+    internal fun check_in_at_earlier_time_then_the_session_time() {
+        runBlocking {
+            loginAsTeacher()
+            val sessionToCheckin = getSession(id = "sessionRef", startTime = LocalTime.now().plusMinutes(20))
+
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(sessionToCheckin)
+            } returns false
+
+            val thrown = assertThrows(AppCoreException::class.java) {
+                runBlocking {
+                    instance.checkinToSession(
+                        session = sessionToCheckin,
+                        schoolLocation = schoolLocation,
+                        teacherCurrentLocation = teacherCurrentLocation
+                    )
+                }
+            }
+
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_TIME_MISMATCH_WITH_THRESHOLD.message))
+        }
+    }
+
+    @Test
+    internal fun checkin_to_different_session_with_previous_session_checked_in() {
+        runBlocking {
+            loginAsTeacher()
+            val firstSession = getSession(id = "sessionRef1")
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(firstSession)
+            } returns false
+
+            coEvery {
+                mockedAppData.checkedInAttendance(TEACHER_REF, firstSession)
+            } returns getAttendance()
+
+            instance.checkinToSession(
+                session = firstSession,
+                teacherCurrentLocation = teacherCurrentLocation,
+                schoolLocation = schoolLocation
+            )
+
+            val secondSession = getSession(id = "sessionRef2")
+            coEvery {
+                mockedAppData.isSessionAlreadyCheckedIn(secondSession)
+            } returns false
+
+            coEvery {
+                mockedAppData.checkedInAttendance(TEACHER_REF, secondSession)
+            } returns getAttendance()
+
+            val thrown = assertThrows(AppCoreWarnException::class.java) {
+                runBlocking {
+                    instance.checkinToSession(
+                        session = secondSession,
+                        teacherCurrentLocation = teacherCurrentLocation,
+                        schoolLocation = schoolLocation
+                    )
+                }
+            }
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_PREVIOUS_FORCED_CHECKOUT.message))
+            coVerify {
+                mockedAppData.checkedInAttendance(TEACHER_REF, secondSession)
+            }
+        }
+    }
+
+    private suspend fun loginAsTeacher() {
+        coEvery {
+            mockedAppData.getAdminInfo(
+                "11111111",
+                "7fa8282ad93047a4d6fe6111c93b308a"
+            )
+        } returns null
+
+        coEvery {
+            mockedAppData.getTeacherInfo(
+                "11111111",
+                "7fa8282ad93047a4d6fe6111c93b308a"
+            )
+        } returns Teacher(id = TEACHER_REF, adminRef = ADMIN_REF)
+
+        instance.login("11111111", "1111111")
+    }
+
     companion object {
-        private val ADMIN_REF:String = "fw7aJ1dVDpQndyHFhDsv"
+        private val ADMIN_REF: String = "fw7aJ1dVDpQndyHFhDsv"
+        private val TEACHER_REF: String = "fw7aJ1dVDpQndyHFhDsv"
     }
 }

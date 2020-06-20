@@ -1,5 +1,6 @@
 package org.onebillionliterates
 
+import android.location.Location
 import android.util.Log
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -49,7 +50,7 @@ class AppDataTest {
         assertNotNull(appDataTest)
     }
 
-    @Test
+    /*@Test
     fun get_admin_info() {
         runBlocking {
             val TAG = "TESTING APP COROUTINE"
@@ -74,6 +75,26 @@ class AppDataTest {
 
             assertThat(teachersForIds, Is(notNullValue()))
             Log.d(TAG, "PARTICULAR => $teachersForIds")
+        }
+    }*/
+
+
+    // https://www.google.com/maps/place/Delhi+Public+School,+Bangalore+East/@12.8844321,77.7232494,17z/data=!3m1!4b1!4m8!1m2!2m1!1sDPS!3m4!1s0x0:0xe7851645e27bf86c!8m2!3d12.8844266!4d77.7254391
+    // https://www.google.com/maps/place/KIDS+PLAY+AREA+BIRTHDAY+VENUE+FIELD+TRIP+%7C+KIDZTOPIAA+IN+SARJAPUR+ROAD/@12.8868623,77.7199532,15z/data=!4m8!1m2!2m1!1sDPS!3m4!1s0x3bae138de4edd285:0xf575953dad24146d!8m2!3d12.8946576!4d77.7246505
+    @Test
+    fun location_distance_verification() {
+        runBlocking {
+            val TAG = "TESTING LOCATION"
+            val schoolLocation = Location("SAVED_LOCATION")
+            schoolLocation.latitude = 12.8844321
+            schoolLocation.longitude = 77.7232494
+
+            val teacherCurrentLocation = Location("GPS_LOCATION")
+            teacherCurrentLocation.latitude = 12.8868623
+            teacherCurrentLocation.longitude = 77.7199532
+
+            val distanceBetween = teacherCurrentLocation.distanceTo(schoolLocation)
+            Log.d(TAG, "PARTICULAR => $distanceBetween")
         }
     }
 
