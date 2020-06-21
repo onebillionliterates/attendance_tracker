@@ -78,7 +78,7 @@ class AppCoreTest {
 
     @BeforeEach
     internal fun setUp() {
-        mockedAppData = mockk<AppData>()
+        mockedAppData = mockk()
         mockkObject(AppData)
         every { AppData.instance } returns mockedAppData
         instance = AppCore()
@@ -95,7 +95,7 @@ class AppCoreTest {
 
         every { teacherCurrentLocation.distanceTo(schoolLocation) } returns 0f
         coEvery {
-            mockedAppData.findAttendanceForSession(any())
+            mockedAppData.findAttendanceForSession(any(), any())
         } returns null
     }
 
@@ -523,7 +523,7 @@ class AppCoreTest {
 
             val sessionToCheckin = getSession()
             coEvery {
-                mockedAppData.findAttendanceForSession(sessionToCheckin)
+                mockedAppData.findAttendanceForSession(TEACHER_REF, sessionToCheckin)
             } returns getAttendance()
 
 
@@ -654,11 +654,11 @@ class AppCoreTest {
             } returns firstSession
 
             coEvery {
-                mockedAppData.findAttendanceForSession(firstSession)
+                mockedAppData.findAttendanceForSession(TEACHER_REF, firstSession)
             } returns firstAttendance
 
             coEvery {
-                mockedAppData.checkedOutAttendance(ATTENDANCE_REF)
+                mockedAppData.checkedOutAttendance(firstAttendance, true)
             } returns mockk()
 
             coEvery {
@@ -679,7 +679,7 @@ class AppCoreTest {
                 mockedAppData.checkedInAttendance(TEACHER_REF, secondSession)
             }
             coVerify {
-                mockedAppData.checkedOutAttendance(ATTENDANCE_REF)
+                mockedAppData.checkedOutAttendance(firstAttendance, true)
             }
         }
     }
@@ -708,13 +708,14 @@ class AppCoreTest {
         runBlocking {
             loginAsTeacher()
             val sessionToCheckin = getSession(id = "sessionRef", startTime = LocalTime.now().plusMinutes(20))
+            val attendanceSaved = getAttendance(id = ATTENDANCE_REF)
 
             coEvery {
-                mockedAppData.findAttendanceForSession(sessionToCheckin)
-            } returns getAttendance(id = ATTENDANCE_REF)
+                mockedAppData.findAttendanceForSession(TEACHER_REF, sessionToCheckin)
+            } returns attendanceSaved
 
             coEvery {
-                mockedAppData.checkedOutAttendance(ATTENDANCE_REF)
+                mockedAppData.checkedOutAttendance(attendanceSaved)
             } returns getAttendance()
 
             instance.checkoutFromSession(
@@ -722,7 +723,7 @@ class AppCoreTest {
             )
 
             coVerify {
-                mockedAppData.checkedOutAttendance(ATTENDANCE_REF)
+                mockedAppData.checkedOutAttendance(attendanceSaved)
             }
         }
     }

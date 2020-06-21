@@ -207,10 +207,11 @@ class AppCore {
         schoolLocation: Location,
         session: Session
     ) {
+        val teacherRef = loggedInUser.teacherInfo!!.id!!
         if (checkedInAttendance?.sessionRef != null && checkedInAttendance?.sessionRef == session.id)
             throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
 
-        val isSessionAlreadyCheckedId = runWithCatch { appData.findAttendanceForSession(session) }
+        val isSessionAlreadyCheckedId = runWithCatch { appData.findAttendanceForSession(teacherRef, session) }
         if (isSessionAlreadyCheckedId != null) throw AppCoreWarnException(TEACHER_SESSION_ALREADY_CHECKED_IN.message)
         if (teacherCurrentLocation.distanceTo(schoolLocation) > 50) throw AppCoreException(
             TEACHER_SESSION_LOCATION_IS_TO_FAR.message
@@ -224,18 +225,20 @@ class AppCore {
             val previousSession = runWithCatch { appData.fetchSession(checkedInAttendance?.sessionRef!!) }
             checkoutFromSession(previousSession, true)
         }
-        checkedInAttendance = runWithCatch { appData.checkedInAttendance(loggedInUser.teacherInfo!!.id!!, session) }
+
+        checkedInAttendance = runWithCatch { appData.checkedInAttendance(teacherRef, session) }
 
         if (forcedCheckout) throw AppCoreWarnException(TEACHER_SESSION_PREVIOUS_FORCED_CHECKOUT.message)
     }
 
     suspend fun checkoutFromSession(session: Session, forcedCheckout: Boolean = false) {
-        val checkingOutAttendance = runWithCatch { appData.findAttendanceForSession(session) }
+        val teacherRef = loggedInUser.teacherInfo!!.id!!
+        val checkingOutAttendance = runWithCatch { appData.findAttendanceForSession(teacherRef, session) }
         if (!forcedCheckout && checkingOutAttendance == null) throw AppCoreWarnException(
             TEACHER_SESSION_NO_SESSION_CHECKED_IN.message
         )
 
-        runWithCatch { appData.checkedOutAttendance(checkingOutAttendance?.id!!, forcedCheckout) }
+        runWithCatch { appData.checkedOutAttendance(checkingOutAttendance!!, forcedCheckout) }
 
         if (checkedInAttendance?.id == checkingOutAttendance?.id) {
             checkedInAttendance = null

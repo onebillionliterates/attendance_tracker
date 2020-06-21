@@ -442,16 +442,7 @@ class AppData {
             .await()
 
         return return data.documents.map { document ->
-            Attendance(
-                id = document.id,
-                adminRef = document.getDocumentReference("adminRef")!!.id,
-                sessionRef = document.getDocumentReference("sessionRef")!!.id,
-                schoolRef = document.getDocumentReference("schoolRef")!!.id,
-                teacherRef = document.getDocumentReference("teacherRef")!!.id,
-                createdAt = document.getTimestamp("createdAt")?.toLocalDate()!!,
-                inTime = LocalTime.ofNanoOfDay(document.get("inTime") as Long),
-                outTime = LocalTime.ofNanoOfDay(document.get("outTime") as Long)
-            )
+            mapAttendance(document)
         }
     }
 
@@ -478,16 +469,60 @@ class AppData {
             }
     }
 
-    fun findAttendanceForSession(sessionToCheckin: Session): Attendance? {
-        TODO("Not yet implemented")
+    suspend fun findAttendanceForSession(teacherRef: String, session: Session): Attendance? {
+        val data = attendanceCollection
+            .whereEqualTo("adminRef", session.adminRef)
+            .whereEqualTo("sessionRef", session.id)
+            .whereEqualTo("teacherRef", teacherRef)
+            .whereEqualTo("createdAt", LocalDate.now())
+            .get()
+            .await()
+
+        return data.documents.map { document ->
+            mapAttendance(document)
+        }.firstOrNull()
     }
 
-    fun checkedInAttendance(teacherRef: String, sessionToCheckin: Session): Attendance {
-        TODO("Not yet implemented")
+    private fun mapAttendance(document: DocumentSnapshot): Attendance {
+        val attendance = Attendance(
+            id = document.id,
+            adminRef = document.getDocumentReference("adminRef")!!.id,
+            sessionRef = document.getDocumentReference("sessionRef")!!.id,
+            schoolRef = document.getDocumentReference("schoolRef")!!.id,
+            teacherRef = document.getDocumentReference("teacherRef")!!.id,
+            createdAt = document.getTimestamp("createdAt")?.toLocalDate()!!,
+            inTime = LocalTime.ofNanoOfDay(document.get("inTime") as Long),
+            forceLoggedOut = document.getBoolean("forceLoggedOut"),
+            outTime = null
+        )
+
+        if (document.contains("outTime")) {
+            attendance.outTime = LocalTime.ofNanoOfDay(document.get("outTime") as Long)
+        }
+
+
+        return attendance
     }
 
-    fun checkedOutAttendance(attendanceRef: String, forcedCheckout: Boolean = false): Attendance {
-        TODO("Not yet implemented")
+    suspend fun checkedInAttendance(teacherRef: String, sessionToCheckin: Session): Attendance {
+        return saveAttendance(
+            Attendance(
+                adminRef = sessionToCheckin.adminRef,
+                teacherRef = teacherRef,
+                sessionRef = sessionToCheckin.id!!,
+                schoolRef = sessionToCheckin.schoolRef,
+                createdAt = LocalDate.now(),
+                inTime = LocalTime.now(),
+                outTime = null
+            )
+        )
+    }
+
+    suspend fun checkedOutAttendance(attendance: Attendance, forcedCheckout: Boolean = false): Attendance {
+        attendance.outTime = LocalTime.now()
+        attendance.forceLoggedOut = forcedCheckout
+
+        return saveAttendance(attendance)
     }
 
 }
