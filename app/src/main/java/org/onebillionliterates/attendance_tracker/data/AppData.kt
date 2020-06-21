@@ -27,15 +27,15 @@ class AppData {
         val instance: AppData by lazy { HOLDER.INSTANCE }
     }
 
-    fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneOffset.UTC) =
+    private fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneOffset.UTC) =
         LocalDateTime.ofInstant(Instant.ofEpochMilli(seconds * 1000 + nanoseconds / 1000000), zone)
 
-    fun Timestamp.toLocalDate(zone: ZoneId = ZoneId.systemDefault()) = this.toLocalDateTime().toLocalDate()
+    private fun Timestamp.toLocalDate() = this.toLocalDateTime().toLocalDate()
 
-    fun LocalDateTime.toTimestamp(zone: ZoneId = ZoneOffset.UTC) =
+    private fun LocalDateTime.toTimestamp(zone: ZoneId = ZoneOffset.UTC) =
         Timestamp(toEpochSecond(ZoneOffset.of(zone.id)), nano)
 
-    fun LocalDate.toTimestamp(zone: ZoneId = ZoneOffset.UTC) = this.atStartOfDay().toTimestamp(zone)
+    private fun LocalDate.toTimestamp(zone: ZoneId = ZoneOffset.UTC) = this.atStartOfDay().toTimestamp(zone)
 
 
     fun geoPointToLocation(geoPoint: GeoPoint): Location {
@@ -471,10 +471,10 @@ class AppData {
 
     suspend fun findAttendanceForSession(teacherRef: String, session: Session): Attendance? {
         val data = attendanceCollection
-            .whereEqualTo("adminRef", session.adminRef)
-            .whereEqualTo("sessionRef", session.id)
-            .whereEqualTo("teacherRef", teacherRef)
-            .whereEqualTo("createdAt", LocalDate.now())
+            .whereEqualTo("adminRef", adminCollection.document(session.adminRef))
+            .whereEqualTo("sessionRef", sessionsCollection.document(session.id!!))
+            .whereEqualTo("teacherRef", teacherCollection.document(teacherRef))
+            .whereEqualTo("createdAt", LocalDate.now().toTimestamp())
             .get()
             .await()
 
@@ -496,7 +496,7 @@ class AppData {
             outTime = null
         )
 
-        if (document.contains("outTime")) {
+        if (document.get("outTime") != null) {
             attendance.outTime = LocalTime.ofNanoOfDay(document.get("outTime") as Long)
         }
 
@@ -519,10 +519,24 @@ class AppData {
     }
 
     suspend fun checkedOutAttendance(attendance: Attendance, forcedCheckout: Boolean = false): Attendance {
-        attendance.outTime = LocalTime.now()
-        attendance.forceLoggedOut = forcedCheckout
+        attendanceCollection.document(attendance.id!!)
+            .update(
+                mapOf(
+                    "outTime" to LocalTime.now().toNanoOfDay(),
+                    "forcedCheckout" to forcedCheckout
+                )
+            )
+            .await()
 
-        return saveAttendance(attendance)
+        return mapAttendance(attendanceCollection.document(attendance.id).get().await())
+    }
+
+    suspend fun fetchSchool(session: Session): School? {
+        val data = schoolCollection.document(session.schoolRef)
+            .get()
+            .await()
+
+        return mapDocumentToSchool(data)
     }
 
 }

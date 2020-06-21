@@ -659,7 +659,7 @@ class AppCoreTest {
 
             coEvery {
                 mockedAppData.checkedOutAttendance(firstAttendance, true)
-            } returns mockk()
+            } returns firstAttendance
 
             coEvery {
                 mockedAppData.checkedInAttendance(TEACHER_REF, secondSession)
@@ -704,10 +704,33 @@ class AppCoreTest {
     }
 
     @Test
+    internal fun checkout_for_ongoing_session() {
+        runBlocking {
+            loginAsTeacher()
+            val session = getSession(id = "sessionRef", endTime = LocalTime.now().plusMinutes(25))
+            val attendance = getAttendance(id = ATTENDANCE_REF, sessionRef = session.id!!)
+
+            coEvery {
+                mockedAppData.findAttendanceForSession(TEACHER_REF, session)
+            } returns attendance
+
+            val thrown = assertThrows(AppCoreWarnException::class.java) {
+                runBlocking {
+                    instance.checkoutFromSession(
+                        session = session
+                    )
+                }
+            }
+
+            assertThat(thrown.message, `is`(MESSAGES.TEACHER_SESSION_CHECKOUT_BEFORE_ENDTIME.message))
+        }
+    }
+
+    @Test
     internal fun checkout_for_checked_in_session() {
         runBlocking {
             loginAsTeacher()
-            val sessionToCheckin = getSession(id = "sessionRef", startTime = LocalTime.now().plusMinutes(20))
+            val sessionToCheckin = getSession(id = "sessionRef", endTime = LocalTime.now().minusMinutes(15))
             val attendanceSaved = getAttendance(id = ATTENDANCE_REF)
 
             coEvery {
@@ -726,6 +749,13 @@ class AppCoreTest {
                 mockedAppData.checkedOutAttendance(attendanceSaved)
             }
         }
+    }
+
+    @Test
+    internal fun name() {
+        println("START TIME ${LocalTime.now().toNanoOfDay()}")
+        println("END TIME ${LocalTime.now().plusHours(1).toNanoOfDay()}")
+
     }
 
     private suspend fun loginAsTeacher() {

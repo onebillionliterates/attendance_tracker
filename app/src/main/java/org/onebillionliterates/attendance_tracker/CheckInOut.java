@@ -31,6 +31,7 @@ public class CheckInOut extends AppCompatActivity implements View.OnClickListene
     // Initialize variable
     SupportMapFragment supportMapFragment;
     FusedLocationProviderClient client;
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -68,7 +68,8 @@ class ListingAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.adapterCellListener = adapterListener
+        if (::adapterListener.isInitialized)
+            holder.adapterCellListener = adapterListener
         holder.bindItems(dataList[position], position)
     }
 }

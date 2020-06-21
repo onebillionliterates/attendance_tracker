@@ -223,7 +223,7 @@ class AppCore {
         if (checkedInAttendance?.sessionRef != null && checkedInAttendance?.sessionRef != session.id) {
             forcedCheckout = true
             val previousSession = runWithCatch { appData.fetchSession(checkedInAttendance?.sessionRef!!) }
-            checkoutFromSession(previousSession, true)
+            checkoutFromSession(previousSession!!, true)
         }
 
         checkedInAttendance = runWithCatch { appData.checkedInAttendance(teacherRef, session) }
@@ -234,15 +234,26 @@ class AppCore {
     suspend fun checkoutFromSession(session: Session, forcedCheckout: Boolean = false) {
         val teacherRef = loggedInUser.teacherInfo!!.id!!
         val checkingOutAttendance = runWithCatch { appData.findAttendanceForSession(teacherRef, session) }
-        if (!forcedCheckout && checkingOutAttendance == null) throw AppCoreWarnException(
-            TEACHER_SESSION_NO_SESSION_CHECKED_IN.message
+            ?: throw AppCoreWarnException(
+                TEACHER_SESSION_NO_SESSION_CHECKED_IN.message
+            )
+
+        if(!forcedCheckout && (LocalTime.now().toSecondOfDay() - session.endTime.toSecondOfDay())<0)throw AppCoreWarnException(
+            TEACHER_SESSION_CHECKOUT_BEFORE_ENDTIME.message
         )
+        val updatedAttendance = runWithCatch { appData.checkedOutAttendance(checkingOutAttendance, forcedCheckout) }
 
-        runWithCatch { appData.checkedOutAttendance(checkingOutAttendance!!, forcedCheckout) }
-
-        if (checkedInAttendance?.id == checkingOutAttendance?.id) {
+        if (checkedInAttendance?.id == updatedAttendance.id) {
             checkedInAttendance = null
         }
+    }
+
+    suspend fun fetchSchool(session: Session): School? {
+        return runWithCatch { appData.fetchSchool(session) }
+    }
+
+    suspend fun fetchSession(sessionRef: String): Session? {
+        return runWithCatch { appData.fetchSession(sessionRef) }
     }
 
     private suspend fun <T> runWithCatch(block: suspend () -> T): T {
@@ -258,7 +269,6 @@ class AppCore {
         }
 
     }
-
 }
 
 class AppCoreException(override val message: String, private val exception: Exception? = null) :

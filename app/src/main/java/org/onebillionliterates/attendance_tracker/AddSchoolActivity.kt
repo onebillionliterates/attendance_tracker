@@ -41,7 +41,7 @@ class AddSchoolActivity : AppCompatActivity() {
     private lateinit var rootView: View
     private lateinit var embeddedMap: GoogleMap
     private lateinit var school: School
-           private var bannerType = Banner.SUCCESS
+    private var bannerType = Banner.SUCCESS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
@@ -150,7 +150,7 @@ class AddSchoolActivity : AppCompatActivity() {
             }
 
             setMapLocation(embeddedMap, position = LatLng(latitude, longitude), snippet = address)
-            school.address = fullAddress!!.toString()
+            school.address = address.toString()
             school.location = Location("SELECTED_LOCATION")
             school.location!!.longitude = longitude
             school.location!!.latitude = latitude

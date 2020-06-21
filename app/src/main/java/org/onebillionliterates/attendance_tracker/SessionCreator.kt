@@ -109,7 +109,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
             createSessionProgress.visibility = View.GONE
         }
 
-        Banner.getInstance().bannerView.findViewById<View>(R.id.rlCancel).setOnClickListener {
+        Banner.getInstance()?.bannerView?.setOnClickListener {
             Banner.getInstance().dismissBanner()
             if (Banner.SUCCESS == bannerType) {
                 this@SessionCreator.finish()
