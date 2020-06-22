@@ -12,10 +12,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_SET_USER_VISIBLE_HINT
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
@@ -42,8 +44,6 @@ class SessionsListingActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
-        val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
 
 
         findViewById<View>(R.id.addNewSession).setOnClickListener {
@@ -64,41 +64,48 @@ class SessionsListingActivity : AppCompatActivity() {
             }
             job.join()
             sessionsLoader.visibility = View.GONE
+            val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
+            val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
+
             viewPager.adapter = SessionListingPager(
-                supportFragmentManager, tabLayout.tabCount,
+                supportFragmentManager,
                 todays = todaysSessions,
                 futures = futureSessions,
                 past = pastSessions
             )
+
+            tabLayout.setupWithViewPager(viewPager)
         }
     }
 }
 
 class SessionListingPager(
     fragmentManger: FragmentManager,
-    private val tabCount: Int,
     private val todays: List<Session>,
     private val futures: List<Session>,
     private val past: List<Session>
 ) :
-    FragmentStatePagerAdapter(fragmentManger, tabCount) {
+    FragmentStatePagerAdapter(fragmentManger, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
     override fun getItem(position: Int): Fragment {
-        when (position) {
-            0 -> {
-                return SessionsListFragment(todays)
-            }
-            1 -> {
-                return SessionsListFragment(futures)
-            }
-            2 -> {
-                return SessionsListFragment(past)
-            }
+        return when (position) {
+            0 -> SessionsListFragment(todays)
+            1 -> SessionsListFragment(futures)
+            else -> SessionsListFragment(past)
         }
-        throw IllegalStateException("No Tabs Found")
     }
 
     override fun getCount(): Int {
-        return tabCount
+        return 3
+    }
+
+    override fun getPageTitle(position: Int): CharSequence {
+        return when (position) {
+            0 -> "Today"
+            1 -> "Upcoming"
+            else -> {
+                return "Past"
+            }
+        }
     }
 }
 

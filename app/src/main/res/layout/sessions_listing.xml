@@ -4,18 +4,7 @@
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
-android:background="#ffffff">
-
-    <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:id="@+id/sessionsLoader"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" android:visibility="gone"/>
-
+                                                   android:background="#ffffff">
     <com.google.android.material.tabs.TabLayout
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -23,23 +12,10 @@ android:background="#ffffff">
             android:layout_marginEnd="1dp" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="1dp"
             app:layout_constraintHorizontal_bias="0.0" app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="1dp" android:id="@+id/sessionsTabs">
-
-        <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Today"/>
-
-        <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upcoming"/>
-
-        <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Past"/>
-    </com.google.android.material.tabs.TabLayout>
+            android:layout_marginTop="1dp"
+            android:id="@+id/sessionsTabs"
+            app:tabMode="fixed"
+    />
     <androidx.viewpager.widget.ViewPager
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -61,4 +37,13 @@ android:background="#ffffff">
             android:textColor="#FFFFFF"
             app:color="#FFFFFF" tools:layout_editor_absoluteX="5dp"
             app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="40dp"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/sessionsLoader"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
