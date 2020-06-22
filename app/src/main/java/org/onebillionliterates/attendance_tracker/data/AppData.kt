@@ -298,6 +298,20 @@ class AppData {
         return mapSessions(data)
     }
 
+    suspend fun fetchTeacherSessionsForToday(
+        adminRef: String,
+        teacherRef: String
+    ): List<Session> {
+        val data = sessionsCollection
+            .whereEqualTo("adminRef", adminCollection.document(adminRef))
+            .whereArrayContainsAny("teachersRef", listOf(teacherRef).map { ref -> teacherCollection.document(ref) })
+            .whereGreaterThanOrEqualTo("endDate", LocalDate.now().toTimestamp())
+            .get()
+            .await()
+
+        return mapSessions(data)
+    }
+
     suspend fun fetchSession(sessionRef: String): Session {
         val data = sessionsCollection.document(sessionRef)
             .get()

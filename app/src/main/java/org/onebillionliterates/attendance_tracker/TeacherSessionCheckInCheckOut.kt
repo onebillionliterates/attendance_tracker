@@ -1,6 +1,5 @@
 package org.onebillionliterates.attendance_tracker
 
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -26,12 +25,12 @@ import org.onebillionliterates.attendance_tracker.data.*
 
 class TeacherSessionCheckInCheckOut : AppCompatActivity() {
 
-    private val TAG = "AddSchool_Activity"
+    private val TAG = "TeacherSessionCheckInCheckOut_Activity"
     private lateinit var rootView: View
     private lateinit var embeddedMap: GoogleMap
     private lateinit var school: School
     private lateinit var session: Session
-    private lateinit var sessionRef: String
+    private lateinit var selectedSession: String
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +58,7 @@ class TeacherSessionCheckInCheckOut : AppCompatActivity() {
         adjustMap()
 
         uiHandler({
-            val selectedSession = "qKVe8Q7qj6QHjW0RrvPx"//intent.extras!!.get("selectedSession") as String
+            selectedSession = intent.extras!!.get("selectedSession") as String
             session = AppCore.instance.fetchSession(selectedSession)!!
             school = AppCore.instance.fetchSchool(session)!!
         }, {

@@ -3,11 +3,12 @@ package org.onebillionliterates.attendance_tracker.data
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
 import org.onebillionliterates.attendance_tracker.data.MESSAGES.*
-import org.threeten.bp.*
+import org.threeten.bp.Duration
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalTime
 import java.math.BigInteger
 import java.security.MessageDigest
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.math.abs
 
 class AppCore {
@@ -238,7 +239,9 @@ class AppCore {
                 TEACHER_SESSION_NO_SESSION_CHECKED_IN.message
             )
 
-        if(!forcedCheckout && (LocalTime.now().toSecondOfDay() - session.endTime.toSecondOfDay())<0)throw AppCoreWarnException(
+        if (!forcedCheckout && (LocalTime.now()
+                .toSecondOfDay() - session.endTime.toSecondOfDay()) < 0
+        ) throw AppCoreWarnException(
             TEACHER_SESSION_CHECKOUT_BEFORE_ENDTIME.message
         )
         val updatedAttendance = runWithCatch { appData.checkedOutAttendance(checkingOutAttendance, forcedCheckout) }
@@ -256,19 +259,32 @@ class AppCore {
         return runWithCatch { appData.fetchSession(sessionRef) }
     }
 
-    private suspend fun <T> runWithCatch(block: suspend () -> T): T {
-        try {
-            val start = System.currentTimeMillis()
-            val returnedVal: T = block()
-
-            println("RUN_WITH_CATCH | SUCCESS | Total_Time_Take : ${System.currentTimeMillis() - start}")
-            return returnedVal
-        } catch (exception: Exception) {
-            System.err.println("RUN_WITH_CATCH | FAILED | $exception")
-            throw AppCoreException(DATA_OPERATION_FAILURE.message, exception)
+    suspend fun fetchTeacherSessionsForToday(): List<Session> {
+        val allSessions: List<Session> = runWithCatch {
+            appData.fetchTeacherSessionsForToday(
+                loggedInUser.teacherInfo!!.adminRef,
+                loggedInUser.teacherInfo!!.id!!
+            )
         }
 
+        return allSessions.filter { session ->
+            session.weekDaysInfo[LocalDate.now().dayOfWeek.value - 1]
+        }
     }
+}
+
+private suspend fun <T> runWithCatch(block: suspend () -> T): T {
+    try {
+        val start = System.currentTimeMillis()
+        val returnedVal: T = block()
+
+        println("RUN_WITH_CATCH | SUCCESS | Total_Time_Take : ${System.currentTimeMillis() - start}")
+        return returnedVal
+    } catch (exception: Exception) {
+        System.err.println("RUN_WITH_CATCH | FAILED | $exception")
+        throw AppCoreException(DATA_OPERATION_FAILURE.message, exception)
+    }
+
 }
 
 class AppCoreException(override val message: String, private val exception: Exception? = null) :

@@ -54,14 +54,14 @@
         </activity>
         <activity android:name=".TeachersActivity">
         </activity>
-        <activity android:name=".TeacherSessions" android:label="Session list in teacher login">
-        </activity>
-        <activity android:name=".TeacherSessionCheckInCheckOut" android:label="Session Check-in/out">
+        <activity android:name=".TeacherSessions" android:label="Welcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".TeacherSessionCheckInCheckOut" android:label="Session Check-in/out">
         </activity>
         <activity
                 android:name="com.schibstedspain.leku.LocationPickerActivity"

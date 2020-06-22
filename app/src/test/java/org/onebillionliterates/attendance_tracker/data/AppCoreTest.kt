@@ -752,6 +752,24 @@ class AppCoreTest {
     }
 
     @Test
+    internal fun fetching_sessions_for_day() {
+        runBlocking {
+            loginAsTeacher()
+            val sessionActiveForDay = getSession(id = "sessionRef1", weekDaysInfo = (0..6).map { true })
+            val sessionInActiveForDay = getSession(id = "sessionRef2", weekDaysInfo = (0..6).map { false })
+
+            coEvery {
+                mockedAppData.fetchTeacherSessionsForToday(ADMIN_REF, TEACHER_REF)
+            } returns listOf(sessionActiveForDay, sessionInActiveForDay)
+
+            val sessions = instance.fetchTeacherSessionsForToday()
+
+            assertThat(sessions.size, `is`(1))
+            assertThat(sessions[0], `is`(sessionActiveForDay))
+        }
+    }
+
+    @Test
     internal fun name() {
         println("START TIME ${LocalTime.now().toNanoOfDay()}")
         println("END TIME ${LocalTime.now().plusHours(1).toNanoOfDay()}")
