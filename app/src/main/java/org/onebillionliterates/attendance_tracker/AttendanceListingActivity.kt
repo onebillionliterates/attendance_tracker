@@ -3,6 +3,7 @@ package org.onebillionliterates.attendance_tracker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +17,27 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.shasin.notificationbanner.Banner
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
+import kotlinx.android.synthetic.main.attendance_listing.*
+import kotlinx.android.synthetic.main.check_in_out.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
+import org.onebillionliterates.attendance_tracker.data.*
+import org.threeten.bp.LocalDate
 
 class AttendanceListingActivity : AppCompatActivity() {
+    private val TAG = "AttendanceListingActivity"
+    private lateinit var rootView: View
+    private lateinit var attendanceSessions: Map<String, Map<LocalDate, List<Session>>>
+    private lateinit var startDate: LocalDate
+    private lateinit var endDate: LocalDate
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
@@ -31,38 +46,89 @@ class AttendanceListingActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
-        val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
-        viewPager.adapter = AttendanceListingPager(supportFragmentManager, tabLayout.tabCount)
+        rootView = window.decorView.rootView
+        startDate = LocalDate.now()
+        endDate = LocalDate.now()
 
-        findViewById<View>(R.id.durationSelect).setOnClickListener {
-            val intent = Intent(this, SessionCreator::class.java)
-            startActivity(intent)
+        uiHandler(
+            {
+                attendanceSessions = AppCore.instance.fetchAttendance(startDate, endDate)
+            },
+            {
+                val tabLayout = findViewById<TabLayout>(R.id.attendanceTab)
+                val viewPager = findViewById<ViewPager>(R.id.attendancePager)
+
+                viewPager.adapter = AttendanceListingPager(supportFragmentManager, attendanceSessions)
+
+                tabLayout.setupWithViewPager(viewPager)
+            }
+        )
+
+    }
+
+    private fun uiHandler(beforeBlock: suspend () -> Unit, onUIBlock: suspend () -> Unit) {
+        GlobalScope.launch(Dispatchers.Main) {
+            attendanceLoader.visibility = View.VISIBLE
+
+            var message: String? = null
+            var bannerType: Int? = null
+            val job = GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    beforeBlock.invoke()
+                } catch (exception: Exception) {
+                    bannerType = Banner.ERROR
+                    message = MESSAGES.DATA_OPERATION_FAILURE.message
+                    if (exception is AppCoreWarnException)
+                        bannerType = Banner.WARNING
+
+                    if (exception is AppCoreException || exception is AppCoreWarnException)
+                        message = exception.message!!
+
+                    Log.e(TAG, "Error during saving school", exception)
+                }
+            }
+            job.join()
+            attendanceLoader.visibility = View.GONE
+            if (message != null) {
+                Banner.make(rootView, this@AttendanceListingActivity, bannerType!!, message, Banner.TOP).show()
+                Banner.getInstance().bannerView.setOnClickListener {
+                    Banner.getInstance().dismissBanner()
+                }
+            }
+            if (message == null) {
+                onUIBlock.invoke()
+            }
         }
     }
 }
 
 class AttendanceListingPager(
     fragmentManger: FragmentManager,
-    private val tabCount: Int,
-    private val data: Map<String, List<*>>? = null
+    private val data: Map<String, Map<LocalDate, List<Session>>> = emptyMap()
 ) :
-    FragmentStatePagerAdapter(fragmentManger, tabCount) {
+    FragmentStatePagerAdapter(fragmentManger, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
     override fun getItem(position: Int): Fragment {
-        when (position) {
-            0, 1, 2 -> {
-                return AttendanceListFragment()
-            }
+        return when (position) {
+            0 -> AttendanceListFragment(data.getOrElse("present") { emptyMap() })
+            else -> AttendanceListFragment(data.getOrElse("absent") { emptyMap() })
         }
-        throw IllegalStateException("No Tabs Found")
     }
 
     override fun getCount(): Int {
-        return tabCount
+        return 2
+    }
+
+    override fun getPageTitle(position: Int): CharSequence {
+        return when (position) {
+            0 -> "Present"
+            else -> {
+                return "Absent"
+            }
+        }
     }
 }
 
-class AttendanceListFragment : Fragment() {
+class AttendanceListFragment(private val dateSeparatedSessions: Map<LocalDate, List<Session>>) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = RecyclerView(requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -133,7 +199,11 @@ class AttendanceSessionExpandableListAdapter(
         holder!!.setSessionDetails(group!!.items[childIndex] as DataHolder)
     }
 
-    override fun onBindGroupViewHolder(holder: AttendanceSchoolDetails?, flatPosition: Int, group: ExpandableGroup<*>?) {
+    override fun onBindGroupViewHolder(
+        holder: AttendanceSchoolDetails?,
+        flatPosition: Int,
+        group: ExpandableGroup<*>?
+    ) {
         holder!!.setSchoolDetails(group!! as ExpandableGroup<DataHolder>)
     }
 }

@@ -160,10 +160,10 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                     val formattedTime = LocalTime.of(hourOfDay, minute).format(HOUR_12_TIME_FORMAT)
                     when (clickView) {
                         startTime -> {
-                            startTimeSelectTextView.text = formattedTime
+                            attendanceStartDate.text = formattedTime
                         }
                         endTime -> {
-                            endTimeSelectTextView.text = formattedTime
+                            attendanceEndDate.text = formattedTime
                         }
                     }
                 }
@@ -184,8 +184,8 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                             val teacherRefs: List<String> =
                                 allTeachers.filter { holder -> holder.selected }.map { holder -> holder.id!! }
                             val daysSelected: List<Boolean> = allWeekDays.map { holder -> holder.selected }
-                            val startTime = LocalTime.parse(startTimeSelectTextView.text, HOUR_12_TIME_FORMAT)!!
-                            val endTime = LocalTime.parse(endTimeSelectTextView.text, HOUR_12_TIME_FORMAT)!!
+                            val startTime = LocalTime.parse(attendanceStartDate.text, HOUR_12_TIME_FORMAT)!!
+                            val endTime = LocalTime.parse(attendanceEndDate.text, HOUR_12_TIME_FORMAT)!!
                             val startDate = LocalDate.parse(startDateSelectTextView.text)!!
                             val endDate = LocalDate.parse(endDateSelectTextView.text)!!
 
@@ -198,7 +198,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                                     endDate = endDate,
                                     startTime = startTime,
                                     endTime = endTime,
-                                    description = "${startTimeSelectTextView.text} @ ${schoolData.displayText}"
+                                    description = "${attendanceStartDate.text} @ ${schoolData.displayText}"
                                 )
                             )
                             Log.v(TAG, "Session saved successfully - $savedSession")

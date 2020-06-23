@@ -26,13 +26,14 @@
                    android:value="@string/map_key"/>
 
         <activity android:name=".AttendanceListingActivity">
-        </activity>
-        <activity android:name=".SessionsListingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".SessionsListingActivity">
+
         </activity>
         <activity android:name=".SessionCreator">
         </activity>

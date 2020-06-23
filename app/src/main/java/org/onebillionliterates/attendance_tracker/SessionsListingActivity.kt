@@ -12,12 +12,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_SET_USER_VISIBLE_HINT
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
@@ -148,19 +146,19 @@ class SessionDetails(itemView: View) : ChildViewHolder(itemView) {
 class SessionExpandableListAdapter(
     private val context: Context,
     groupedData: List<ExpandableGroup<DataHolder>>
-) : ExpandableRecyclerViewAdapter<AttendanceSchoolDetails, AttendanceSessionDetails>(groupedData) {
-    override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): AttendanceSchoolDetails {
+) : ExpandableRecyclerViewAdapter<SchoolDetails, SessionDetails>(groupedData) {
+    override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): SchoolDetails {
         val view = LayoutInflater.from(context).inflate(R.layout.session_title, parent, false)
-        return AttendanceSchoolDetails(view);
+        return SchoolDetails(view);
     }
 
-    override fun onCreateChildViewHolder(parent: ViewGroup?, viewType: Int): AttendanceSessionDetails {
+    override fun onCreateChildViewHolder(parent: ViewGroup?, viewType: Int): SessionDetails {
         val view = LayoutInflater.from(context).inflate(R.layout.session_item, parent, false)
-        return AttendanceSessionDetails(view);
+        return SessionDetails(view);
     }
 
     override fun onBindChildViewHolder(
-        holder: AttendanceSessionDetails?,
+        holder: SessionDetails?,
         flatPosition: Int,
         group: ExpandableGroup<*>?,
         childIndex: Int
@@ -169,7 +167,7 @@ class SessionExpandableListAdapter(
     }
 
     override fun onBindGroupViewHolder(
-        holder: AttendanceSchoolDetails?,
+        holder: SchoolDetails?,
         flatPosition: Int,
         group: ExpandableGroup<*>?
     ) {

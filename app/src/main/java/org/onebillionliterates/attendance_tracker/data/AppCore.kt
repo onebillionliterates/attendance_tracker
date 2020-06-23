@@ -100,10 +100,11 @@ class AppCore {
     }
 
     suspend fun fetchAttendance(
-        adminRef: String,
         fromDate: LocalDate,
         toDate: LocalDate
     ): Map<String, Map<LocalDate, List<Session>>> {
+        val adminRef: String = loggedInUser.adminInfo!!.id!!
+
         val allSessionTillToDate = runWithCatch { appData.fetchSessionsTill(adminRef, toDate) }
 
         val days = Duration.between(
@@ -133,8 +134,16 @@ class AppCore {
                 val teachersAbsent =
                     session.teacherRefs.filter { teacherRef -> !lookUpTable.containsKey("${session.id}_${teacherRef}_${currentDate}") }
 
-                if (teachersPresent.isNotEmpty()) presentSessionList[currentDate]!!.add(session.clone(teachersPresent))
-                if (teachersAbsent.isNotEmpty()) absentSessionList[currentDate]!!.add(session.clone(teachersAbsent))
+                if (teachersPresent.isNotEmpty()) {
+                    val teachersInfo: List<Teacher> =
+                        runWithCatch { appData.fetchTeachersForRefs(adminRef, teachersPresent) }
+                    presentSessionList[currentDate]!!.add(session.clone(teachersInfo.map { teacher -> teacher.name!! }))
+                }
+                if (teachersAbsent.isNotEmpty()) {
+                    val teachersInfo: List<Teacher> =
+                        runWithCatch { appData.fetchTeachersForRefs(adminRef, teachersAbsent) }
+                    absentSessionList[currentDate]!!.add(session.clone(teachersInfo.map { teacher -> teacher.name!! }))
+                }
             }
 
 

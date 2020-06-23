@@ -368,7 +368,7 @@ class AppCoreTest {
             )
             coEvery {
                 mockedAppData.fetchSessionsTill(
-                    adminRef = "adminRef",
+                    adminRef = ADMIN_REF,
                     tillDate = today
                 )
             } returns allSession
@@ -416,7 +416,7 @@ class AppCoreTest {
 
             coEvery {
                 mockedAppData.fetchAttendanceFor(
-                    adminRef = "adminRef",
+                    adminRef = ADMIN_REF,
                     tillDate = today
                 )
             } returns allAttendance
@@ -424,7 +424,7 @@ class AppCoreTest {
 
             coEvery {
                 mockedAppData.fetchAttendanceFor(
-                    adminRef = "adminRef",
+                    adminRef = ADMIN_REF,
                     tillDate = today.minusDays(2)
                 )
             } returns listOf(
@@ -441,17 +441,24 @@ class AppCoreTest {
 
             coEvery {
                 mockedAppData.fetchAttendanceFor(
-                    adminRef = "adminRef",
+                    adminRef = ADMIN_REF,
                     tillDate = today.minusDays(1)
                 )
             } returns emptyList()
 
+            coEvery {
+                mockedAppData.fetchTeachersForRefs(
+                    adminRef = ADMIN_REF,
+                    teacherRefs = any()
+                )
+            } returns emptyList()
+
             val fetchAttendanceForADay =
-                instance.fetchAttendance(adminRef = "adminRef", fromDate = today, toDate = today)
+                instance.fetchAttendance(fromDate = today, toDate = today)
             fetchAttendanceForADay
 
             val fetchAttendanceForADuration =
-                instance.fetchAttendance(adminRef = "adminRef", fromDate = today.minusDays(2), toDate = today)
+                instance.fetchAttendance(fromDate = today.minusDays(2), toDate = today)
             fetchAttendanceForADuration
 
         }
