@@ -462,7 +462,7 @@ class AppData {
 
     suspend fun fetchTeachersForRefs(adminRef: String, teacherRefs: List<String>): List<Teacher> {
 
-        val data = teacherRefs.map { ref -> teacherCollection.document(ref).get().await() }
+        val data = teacherRefs.map { ref -> teacherCollection.document(ref).get(Source.CACHE).await() }
 
         return data.map { document ->
             Teacher(

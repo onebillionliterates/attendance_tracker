@@ -1,12 +1,12 @@
 package org.onebillionliterates.attendance_tracker
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.shasin.notificationbanner.Banner
@@ -23,7 +24,7 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import kotlinx.android.synthetic.main.attendance_listing.*
-import kotlinx.android.synthetic.main.check_in_out.*
+import kotlinx.android.synthetic.main.session_create.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -31,12 +32,16 @@ import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.data.*
 import org.threeten.bp.LocalDate
 
-class AttendanceListingActivity : AppCompatActivity() {
+class AttendanceListingActivity : AppCompatActivity(), View.OnClickListener {
     private val TAG = "AttendanceListingActivity"
     private lateinit var rootView: View
-    private lateinit var attendanceSessions: Map<String, Map<LocalDate, List<Session>>>
     private lateinit var startDate: LocalDate
     private lateinit var endDate: LocalDate
+    private lateinit var startDateView: TextView
+    private lateinit var endDateView: TextView
+
+    private val durationChanged: MutableSet<View> = mutableSetOf();
+    private val attendanceSessions: MutableMap<String, Map<LocalDate, List<Session>>> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
@@ -49,21 +54,36 @@ class AttendanceListingActivity : AppCompatActivity() {
         rootView = window.decorView.rootView
         startDate = LocalDate.now()
         endDate = LocalDate.now()
+        startDateView = findViewById(R.id.attendanceStartDate)
+        endDateView = findViewById(R.id.attendanceEndDate)
+        startDateView.setOnClickListener(this)
+        endDateView.setOnClickListener(this)
+        durationChanged.add(startDateView)
+        durationChanged.add(endDateView)
+        val tabLayout = findViewById<TabLayout>(R.id.attendanceTab)
+        val viewPager = findViewById<ViewPager>(R.id.attendancePager)
+        viewPager.adapter = AttendanceListingPager(supportFragmentManager, attendanceSessions)
+        tabLayout.setupWithViewPager(viewPager)
+        updateAttendanceList()
+    }
+
+    private fun updateAttendanceList() {
+        if(durationChanged.size!=2)
+            return
 
         uiHandler(
             {
-                attendanceSessions = AppCore.instance.fetchAttendance(startDate, endDate)
+                if (durationChanged.size == 2) {
+                    durationChanged.clear()
+                    attendanceSessions.clear()
+                    attendanceSessions.putAll(AppCore.instance.fetchAttendance(startDate, endDate))
+                }
             },
             {
-                val tabLayout = findViewById<TabLayout>(R.id.attendanceTab)
                 val viewPager = findViewById<ViewPager>(R.id.attendancePager)
-
                 viewPager.adapter = AttendanceListingPager(supportFragmentManager, attendanceSessions)
-
-                tabLayout.setupWithViewPager(viewPager)
             }
         )
-
     }
 
     private fun uiHandler(beforeBlock: suspend () -> Unit, onUIBlock: suspend () -> Unit) {
@@ -100,6 +120,34 @@ class AttendanceListingActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onClick(clickView: View?) {
+        val dialog = BottomSheetDialog(this)
+        val datePicker = DatePicker(this)
+        val today = LocalDate.now();
+        datePicker.init(
+            today.year,
+            today.monthValue - 1,
+            today.dayOfMonth
+        ) { _, year, monthOfYear, dayOfMonth ->
+
+            when (clickView) {
+                startDateView -> {
+                    startDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
+                    durationChanged.add(startDateView)
+                    startDateView.text = startDate.toString()
+                }
+                endDateView -> {
+                    endDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
+                    durationChanged.add(endDateView)
+                    endDateView.text = endDate.toString()
+                }
+            }
+            updateAttendanceList()
+        }
+        dialog.setContentView(datePicker)
+        dialog.show()
+    }
 }
 
 class AttendanceListingPager(
@@ -135,29 +183,25 @@ class AttendanceListFragment(private val dateSeparatedSessions: Map<LocalDate, L
         //crating an arraylist to store users using the data class user
         //creating our adapter
 
-        val adapter = AttendanceSessionExpandableListAdapter(
-            requireContext(),
-            listOf(
-                ExpandableGroup(
-                    "School ", listOf(
-                        DataHolder("1", "Session 1 @ Sometime"),
-                        DataHolder("2", "Session 1 @ Sometime")
+        val attendanceList: List<ExpandableGroup<DataHolder>> = dateSeparatedSessions.keys.flatMap { date ->
+            dateSeparatedSessions[date]
+                ?.sortedBy { session -> session.schoolRef }
+                ?.map { session ->
+                    val schoolName = session.description.split("@")[1]
+                    val sessionTime = session.description.split("@")[0]
+                    ExpandableGroup("$date sessions in $schoolName",
+                        session.teacherRefs.map { teacher ->
+                            DataHolder(
+                                id = session.id!!,
+                                displayText = "$sessionTime Session",
+                                additionalText = teacher
+                            )
+                        }
                     )
-                ),
-                ExpandableGroup(
-                    "School 2", listOf(
-                        DataHolder("1", "Session 2 @ Sometime"),
-                        DataHolder("2", "Session 3 @ Sometime")
-                    )
-                ),
-                ExpandableGroup(
-                    "School 3", listOf(
-                        DataHolder("1", "Session 4 @ Sometime"),
-                        DataHolder("2", "Session 5 @ Sometime")
-                    )
-                )
-            )
-        )
+                }!!
+        }
+
+        val adapter = AttendanceSessionExpandableListAdapter(requireContext(), attendanceList)
         recyclerView.adapter = adapter
 
         return recyclerView
@@ -173,6 +217,8 @@ class AttendanceSchoolDetails(itemView: View) : GroupViewHolder(itemView) {
 class AttendanceSessionDetails(itemView: View) : ChildViewHolder(itemView) {
     fun setSessionDetails(session: DataHolder) {
         itemView.findViewById<TextView?>(R.id.displayText)!!.text = session.displayText
+        itemView.findViewById<TextView?>(R.id.additionalInfo)!!.visibility = View.VISIBLE
+        itemView.findViewById<TextView?>(R.id.additionalInfo)!!.text = session.additionalText
     }
 }
 

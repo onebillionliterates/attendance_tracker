@@ -42,7 +42,8 @@ class AppCore {
             endDate = endDate,
             startTime = startTime,
             endTime = endTime,
-            teacherRefs = teachersRefs
+            teacherRefs = teachersRefs,
+            description = description
         )
 
     suspend fun saveSession(session: Session): Session {

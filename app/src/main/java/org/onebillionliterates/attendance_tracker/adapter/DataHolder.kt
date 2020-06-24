@@ -6,12 +6,14 @@ import android.os.Parcelable
 class DataHolder(
     val id: String,
     val displayText: String,
+    val additionalText: String? = null,
     var selected: Boolean = false
 ):Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readString()!!,
+        parcel.readString(),
         parcel.readByte() != 0.toByte()
     ) {
     }
@@ -19,6 +21,7 @@ class DataHolder(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
         parcel.writeString(displayText)
+        parcel.writeString(additionalText)
         parcel.writeByte(if (selected) 1 else 0)
     }
 
