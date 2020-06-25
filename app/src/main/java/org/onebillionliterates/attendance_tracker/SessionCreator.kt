@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,6 +18,7 @@ import kotlinx.android.synthetic.main.session_create.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SESSION_ADD_ACTIVITY
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.ListingAdapter
 import org.onebillionliterates.attendance_tracker.data.AppCore
@@ -112,7 +114,7 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
         Banner.getInstance()?.bannerView?.setOnClickListener {
             Banner.getInstance().dismissBanner()
             if (Banner.SUCCESS == bannerType) {
-                this@SessionCreator.finish()
+                this@SessionCreator.finishActivity(SESSION_ADD_ACTIVITY.requestCode)
             }
         }
     }
@@ -214,7 +216,16 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                     job.join()
                     createSessionProgress.visibility = View.GONE
 
-                    Banner.make(rootView, this@SessionCreator, bannerType, message, Banner.TOP).show()
+                    val infoBanner = Banner.make(rootView, this@SessionCreator, bannerType, message, Banner.TOP)
+                    infoBanner.bannerView.setOnClickListener {
+                        infoBanner.dismissBanner()
+                        if (Banner.SUCCESS == bannerType) {
+                            setResult(Activity.RESULT_OK )
+                            finish()
+                        }
+                    }
+
+                    infoBanner.show()
                 }
             }
         }

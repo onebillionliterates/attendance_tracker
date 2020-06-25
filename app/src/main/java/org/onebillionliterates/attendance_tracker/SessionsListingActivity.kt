@@ -2,6 +2,7 @@
 
 package org.onebillionliterates.attendance_tracker
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,14 +27,15 @@ import kotlinx.android.synthetic.main.sessions_listing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SESSION_ADD_ACTIVITY
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.Session
 
 class SessionsListingActivity : AppCompatActivity() {
-    private lateinit var todaysSessions: List<Session>
-    private lateinit var futureSessions: List<Session>
-    private lateinit var pastSessions: List<Session>
+    private var todaysSessions: MutableList<Session> = mutableListOf()
+    private var futureSessions: MutableList<Session> = mutableListOf()
+    private var pastSessions: MutableList<Session> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
@@ -41,12 +43,31 @@ class SessionsListingActivity : AppCompatActivity() {
         initView()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == SESSION_ADD_ACTIVITY.requestCode && resultCode == Activity.RESULT_OK) {
+            sessionsLoader.visibility = View.VISIBLE
+            GlobalScope.launch(Dispatchers.Main) {
+                sessionsLoader.visibility = View.VISIBLE
+
+                val job = GlobalScope.launch(Dispatchers.IO) {
+                    todaysSessions.clear()
+                    futureSessions.clear()
+                    pastSessions.clear()
+                    todaysSessions.addAll(AppCore.instance.fetchTodaysSessionsForAdmin())
+                    futureSessions.addAll(AppCore.instance.fetchFutureSessionsForAdmin())
+                    pastSessions.addAll(AppCore.instance.fetchPastSessionsForAdmin())
+                }
+                job.join()
+                sessionsLoader.visibility = View.GONE
+            }
+        }
+    }
+
     private fun initView() {
-
-
         findViewById<View>(R.id.addNewSession).setOnClickListener {
             val intent = Intent(this, SessionCreator::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, SESSION_ADD_ACTIVITY.requestCode)
         }
 
         /**
@@ -56,9 +77,12 @@ class SessionsListingActivity : AppCompatActivity() {
             sessionsLoader.visibility = View.VISIBLE
 
             val job = GlobalScope.launch(Dispatchers.IO) {
-                todaysSessions = AppCore.instance.fetchTodaysSessionsForAdmin()
-                futureSessions = AppCore.instance.fetchFutureSessionsForAdmin()
-                pastSessions = AppCore.instance.fetchPastSessionsForAdmin()
+                todaysSessions.clear()
+                futureSessions.clear()
+                pastSessions.clear()
+                todaysSessions.addAll(AppCore.instance.fetchTodaysSessionsForAdmin())
+                futureSessions.addAll(AppCore.instance.fetchFutureSessionsForAdmin())
+                pastSessions.addAll(AppCore.instance.fetchPastSessionsForAdmin())
             }
             job.join()
             sessionsLoader.visibility = View.GONE

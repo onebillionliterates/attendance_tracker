@@ -1,5 +1,6 @@
 package org.onebillionliterates.attendance_tracker
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import kotlinx.android.synthetic.main.school_listing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_ADD_ACTIVITY
 import org.onebillionliterates.attendance_tracker.adapter.AdapterListener
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.ListingAdapter
@@ -22,7 +24,7 @@ import org.onebillionliterates.attendance_tracker.data.School
 
 class SchoolListingActivity : AppCompatActivity(), AdapterListener {
 
-    private lateinit var allSchools: List<School>
+    private var allSchools: MutableList<School> = mutableListOf()
     private var bannerType: Int = Banner.SUCCESS
     private val TAG = "SchoolListing_Activity"
     private lateinit var rootView: View
@@ -33,10 +35,39 @@ class SchoolListingActivity : AppCompatActivity(), AdapterListener {
 
         addNewSchool.setOnClickListener {
             val intent = Intent(this, AddSchoolActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, SCHOOL_ADD_ACTIVITY.requestCode)
         }
 
         initView()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == SCHOOL_ADD_ACTIVITY.requestCode && resultCode == Activity.RESULT_OK) {
+            GlobalScope.launch(Dispatchers.Main) {
+                schoolsProgress.visibility = View.VISIBLE
+
+                var message = MESSAGES.SCHOOL_SAVED_MESSAGE.message
+                val job = GlobalScope.launch(Dispatchers.IO) {
+                    try {
+                        allSchools.clear()
+                        allSchools.addAll(AppCore.instance.fetchSchoolsForAdmin())
+                    } catch (exception: Exception) {
+                        bannerType = Banner.ERROR
+                        message = MESSAGES.DATA_VALIDATION_FAILURE.message
+                        if (exception is AppCoreException)
+                            message = exception.message
+
+                        Log.e(TAG, "Error during saving school", exception)
+                    }
+                }
+                job.join()
+                schoolsProgress.visibility = View.GONE
+                if (bannerType == Banner.ERROR) {
+                    Banner.make(rootView, this@SchoolListingActivity, bannerType, message, Banner.TOP).show()
+                }
+            }
+        }
     }
 
     private fun initView() {
@@ -48,7 +79,8 @@ class SchoolListingActivity : AppCompatActivity(), AdapterListener {
             var message = MESSAGES.SCHOOL_SAVED_MESSAGE.message
             val job = GlobalScope.launch(Dispatchers.IO) {
                 try {
-                    allSchools = AppCore.instance.fetchSchoolsForAdmin()
+                    allSchools.clear()
+                    allSchools.addAll(AppCore.instance.fetchSchoolsForAdmin())
                 } catch (exception: Exception) {
                     bannerType = Banner.ERROR
                     message = MESSAGES.DATA_VALIDATION_FAILURE.message
@@ -72,9 +104,6 @@ class SchoolListingActivity : AppCompatActivity(), AdapterListener {
 
 
     private fun initListContainer() {
-        if (!::allSchools.isInitialized)
-            return
-
         val listContainer = findViewById<RecyclerView>(R.id.school_list_container)
         listContainer.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 

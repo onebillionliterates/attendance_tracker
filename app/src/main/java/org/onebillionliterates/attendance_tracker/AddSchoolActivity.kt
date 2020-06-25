@@ -23,6 +23,8 @@ import kotlinx.android.synthetic.main.school_create.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_ADD_ACTIVITY
+import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_MAP_ACTIVITY
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.AppCore.Companion.DEFAULT_LOC
 import org.onebillionliterates.attendance_tracker.data.AppCoreException
@@ -33,10 +35,6 @@ import org.onebillionliterates.attendance_tracker.drawables.SchoolSolidDrawable
 
 
 class AddSchoolActivity : AppCompatActivity() {
-    companion object {
-        private const val MAP_BUTTON_REQUEST_CODE = 1
-    }
-
     private val TAG = "AddSchool_Activity"
     private lateinit var rootView: View
     private lateinit var embeddedMap: GoogleMap
@@ -73,13 +71,13 @@ class AddSchoolActivity : AppCompatActivity() {
                 .withSearchZone("en_IN")
                 .build(applicationContext)
 
-            startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE)
+            startActivityForResult(locationPickerIntent, SCHOOL_MAP_ACTIVITY.requestCode)
         }
         addLocationToMap()
         addSchool.setOnClickListener {
             GlobalScope.launch(Dispatchers.Main) {
                 createSchoolProgress.visibility = View.VISIBLE
-
+                bannerType = Banner.SUCCESS
                 var message = MESSAGES.SCHOOL_SAVED_MESSAGE.message
                 val job = GlobalScope.launch(Dispatchers.IO) {
                     try {
@@ -98,13 +96,16 @@ class AddSchoolActivity : AppCompatActivity() {
                 }
                 job.join()
                 createSchoolProgress.visibility = View.GONE
-                Banner.make(rootView, this@AddSchoolActivity, bannerType, message, Banner.TOP).show()
-                Banner.getInstance().bannerView.setOnClickListener {
-                    Banner.getInstance().dismissBanner()
+                val infoBanner = Banner.make(rootView, this@AddSchoolActivity, bannerType, message, Banner.TOP)
+                infoBanner.bannerView.setOnClickListener {
+                    infoBanner.dismissBanner()
                     if (Banner.SUCCESS == bannerType) {
-                        this@AddSchoolActivity.finish()
+                        setResult(Activity.RESULT_OK )
+                        finish()
                     }
                 }
+
+                infoBanner.show()
             }
         }
     }
