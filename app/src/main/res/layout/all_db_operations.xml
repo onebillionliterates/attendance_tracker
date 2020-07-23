@@ -15,11 +15,19 @@
             android:layout_marginStart="150dp" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="150dp" android:textStyle="bold" app:layout_constraintHorizontal_bias="0.461"/>
     <Button
+            android:text="SAVE ADMIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/saveAdmin"
+            tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/dbops_title"
+            android:layout_marginTop="5dp"/>
+
+    <Button
             android:text="GET ADMIN"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/getAdmin"
             tools:layout_editor_absoluteX="160dp" android:textSize="20sp" android:typeface="normal"
-            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/dbops_title"
+            android:textStyle="bold" app:layout_constraintTop_toBottomOf="@+id/saveAdmin"
             android:layout_marginTop="5dp"/>
 
     <Button

@@ -45,6 +45,30 @@ class AppData {
         return location
     }
 
+    suspend fun saveAdmin(adminToSave: Admin): Admin {
+        val createdAt = LocalDateTime.now(ZoneOffset.UTC)
+        val data: DocumentReference = adminCollection
+            .add(
+                hashMapOf(
+                    "mobileNumber" to adminToSave.mobileNumber,
+                    "name" to adminToSave.name,
+                    "passCode" to adminToSave.passCode,
+                    "remarks" to adminToSave.remarks,
+                    "createdAt" to createdAt.toTimestamp()
+                )
+            )
+            .await()
+
+        return Admin(
+            id = data.id,
+            mobileNumber = adminToSave.mobileNumber,
+            name = adminToSave.name,
+            passCode = adminToSave.passCode,
+            remarks = adminToSave.remarks,
+            createdAt = createdAt
+        )
+    }
+
     suspend fun getAdminInfo(mobileNumber: String, passCode: String): Admin? {
         val data = adminCollection
             .whereEqualTo("mobileNumber", mobileNumber)

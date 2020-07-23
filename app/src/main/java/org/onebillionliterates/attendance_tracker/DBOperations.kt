@@ -30,10 +30,26 @@ class DBOperations : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.all_db_operations)
 
+        saveAdmin.setOnClickListener { view ->
+            val admin = Admin(
+                mobileNumber = "1231231231",
+                name = "New Admin",
+                passCode = "3344123123",
+                remarks = "REPRESENTATION ROW"
+            )
+
+            GlobalScope.launch {
+                val savedTeacher = appData.saveAdmin(admin)
+                Log.d(TAG, Thread.currentThread().name)
+                Log.d(TAG, "PARTICULAR => $savedTeacher")
+            }
+            Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
+        }
+
         getAdmin.setOnClickListener { view ->
             GlobalScope.launch {
-                val mobileNumber = "8884410287"
-                val passCode = "337703"
+                val mobileNumber = "1231231231"
+                val passCode = "3344123123"
                 val admin = appData.getAdminInfo(mobileNumber, passCode)
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $admin")
@@ -47,9 +63,10 @@ class DBOperations : AppCompatActivity() {
                 val teacher = Teacher(
                     id = "id",
                     adminRef = "fw7aJ1dVDpQndyHFhDsv",
-                    mobileNumber = "1231231231",
+                    mobileNumber = "3213213211",
                     name = "Gordon",
-                    passCode = "3344123123"
+                    passCode = "3344123123",
+                    remarks = "REPRESENTATION ROW"
                 )
                 val savedTeacher = appData.saveTeacher(teacher)
 
@@ -61,7 +78,7 @@ class DBOperations : AppCompatActivity() {
 
         getTeacher.setOnClickListener { view ->
             GlobalScope.launch {
-                val teacher = appData.getTeacherInfo("1231231231", passCode = "")
+                val teacher = appData.getTeacherInfo("3213213211", passCode = "3344123123")
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $teacher")
