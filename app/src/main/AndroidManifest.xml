@@ -25,39 +25,40 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
                    android:value="@string/map_key"/>
 
-        <activity android:name=".AttendanceListingActivity">
+        <activity android:name=".AttendanceListingActivity" android:label="Attendance">
         </activity>
-        <activity android:name=".SessionsListingActivity">
+        <activity android:name=".SessionsListingActivity" android:label="Sessions">
 
         </activity>
-        <activity android:name=".SessionCreator">
+        <activity android:name=".SessionCreator" android:label="Create session">
         </activity>
 
-        <activity android:name=".DBOperations">
+        <activity android:name=".DBOperations" android:label="DB connection test">
+
         </activity>
 
         <activity
                 android:name=".LoginActivity"
                 android:label="OBLF Attendance Tracker">
-
-        </activity>
-        <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".SchoolListingActivity" android:label="Schools Listing">
+        <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
 
         </activity>
-        <activity android:name=".AddSchoolActivity">
+        <activity android:name=".SchoolListingActivity" android:label="Schools">
+
+        </activity>
+        <activity android:name=".AddSchoolActivity" android:label="Add school">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".SchoolListingActivity"/>
 
         </activity>
-        <activity android:name=".TeachersActivity">
+        <activity android:name=".TeachersActivity" android:label="Teachers">
         </activity>
         <activity android:name=".TeacherSessions" android:label="Welcome">
         </activity>

@@ -31,7 +31,6 @@ class LoginActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
-        setSupportActionBar(toolbar)
 
         login.setOnClickListener { view ->
             GlobalScope.launch(Dispatchers.Main) {
