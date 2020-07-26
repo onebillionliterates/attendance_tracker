@@ -163,7 +163,7 @@ class AppCore {
             return loggedInUser
 
         loggedInUser.teacherInfo = runWithCatch {
-            appData.getTeacherInfo(mobileNumber, hashedPassCode)//Teacher(adminRef = "")
+            appData.getTeacherInfo(mobileNumber, hashedPassCode)
         }
         println(loggedInUser)
         return loggedInUser

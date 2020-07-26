@@ -19,5 +19,6 @@ enum class MESSAGES(val message: String) {
     TEACHER_SESSION_TIME_MISMATCH_WITH_THRESHOLD("Either you are trying to check in to session very early, or you might have past the threshold for the session"),
     TEACHER_SESSION_CHECKOUT_BEFORE_ENDTIME("Please checkout post the session is finished"),
     TEACHER_SESSION_PREVIOUS_FORCED_CHECKOUT("Forced checked out from your previous session"),
-    TEACHER_SESSION_NO_SESSION_CHECKED_IN("No checked in session to checkout")
+    TEACHER_SESSION_NO_SESSION_CHECKED_IN("No checked in session to checkout"),
+    UNSUCCESSFUL_LOGIN("Sorry, please check your login credentials!!")
 }

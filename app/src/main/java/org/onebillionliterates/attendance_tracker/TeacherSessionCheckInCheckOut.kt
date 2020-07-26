@@ -54,7 +54,7 @@ class TeacherSessionCheckInCheckOut : AppCompatActivity() {
 
 
     private fun initView() {
-        rootView = window.decorView.rootView
+
         adjustMap()
 
         uiHandler({
