@@ -1,10 +1,13 @@
 package org.onebillionliterates.attendance_tracker
 
 import android.app.Activity
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.shasin.notificationbanner.Banner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -18,6 +21,11 @@ abstract class ActivityUIHandler: AppCompatActivity(){
     lateinit var progressTracker: ProgressBar
     var TAG: String = "ActivityUIHandler"
     lateinit var activity: Activity
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidThreeTen.init(this)
+    }
 
     fun uiHandler(beforeBlock: suspend () -> Unit, onUIBlock: suspend () -> Unit) {
         rootView = window.decorView.rootView
@@ -57,6 +65,13 @@ abstract class ActivityUIHandler: AppCompatActivity(){
 
     fun showWarningBanner(message:String){
         Banner.make(rootView, activity, Banner.WARNING, message, Banner.TOP).show()
+        Banner.getInstance().bannerView.setOnClickListener {
+            Banner.getInstance().dismissBanner()
+        }
+    }
+
+    fun showSuccessBanner(message:String){
+        Banner.make(rootView, activity, Banner.SUCCESS, message, Banner.TOP).show()
         Banner.getInstance().bannerView.setOnClickListener {
             Banner.getInstance().dismissBanner()
         }

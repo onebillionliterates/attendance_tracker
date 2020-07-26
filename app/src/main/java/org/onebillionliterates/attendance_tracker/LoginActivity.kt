@@ -1,12 +1,17 @@
 package org.onebillionliterates.attendance_tracker
 
+import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
+import android.content.Context.TELEPHONY_SERVICE
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -18,7 +23,6 @@ import org.onebillionliterates.attendance_tracker.drawables.PasswordDrawable
 
 class LoginActivity : ActivityUIHandler() {
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
         super.progressTracker = loginInProgress
@@ -66,7 +70,9 @@ class LoginActivity : ActivityUIHandler() {
 
         val phoneIcon = findViewById<View>(R.id.phoneInfo).findViewById<ImageView>(R.id.phoneIcon)
         phoneIcon.setImageDrawable(MobileDrawable(this))
-
+        if (ActivityCompat.checkSelfPermission(this, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            showWarningBanner("Permission for reading phone number not provided")
+        }
         val telephonyManager = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val devicePhoneNumber: String? = telephonyManager.line1Number
         if (!devicePhoneNumber.isNullOrBlank()) {
