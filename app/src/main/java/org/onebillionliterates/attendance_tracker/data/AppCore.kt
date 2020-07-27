@@ -153,10 +153,7 @@ class AppCore {
     }
 
     suspend fun login(mobileNumber: String, sixDigitPassCode: String): LoggedInUser {
-
-        val md5Hashing = MessageDigest.getInstance("MD5")
-        md5Hashing.update(sixDigitPassCode.toByteArray())
-        val hashedPassCode = BigInteger(1, md5Hashing.digest()).toString(16)
+        val hashedPassCode = hashPassCode(sixDigitPassCode)
 
         loggedInUser.adminInfo = runWithCatch { appData.getAdminInfo(mobileNumber, hashedPassCode) }
         if (loggedInUser.adminInfo != null)
@@ -167,6 +164,12 @@ class AppCore {
         }
         println(loggedInUser)
         return loggedInUser
+    }
+
+    fun hashPassCode(sixDigitPassCode: String): String {
+        val md5Hashing = MessageDigest.getInstance("MD5")
+        md5Hashing.update(sixDigitPassCode.toByteArray())
+        return BigInteger(1, md5Hashing.digest()).toString(16)
     }
 
     suspend fun fetchTeachersForAdmin(): List<Teacher> {
@@ -200,6 +203,20 @@ class AppCore {
     }
 
     suspend fun saveSchool(school: School): School {
+        school.adminRef = loggedInUser.adminInfo!!.id.toString()
+
+        if (school.location == null || school.location!!.latitude == DEFAULT_LOC.latitude && school.location!!.longitude == DEFAULT_LOC.longitude) throw AppCoreException(
+            SCHOOL_LOCATION_NOT_ADDED.message
+        )
+        if (school.name.isNullOrBlank() || school.uniqueCode.isNullOrBlank() || school.address.isNullOrBlank() || school.postalCode.isNullOrBlank())
+            throw AppCoreException(SCHOOL_INCOMPLETE_INFO.message)
+
+        return runWithCatch {
+            appData.saveSchool(school)
+        }
+    }
+
+    suspend fun saveTeacher(school: School): School {
         school.adminRef = loggedInUser.adminInfo!!.id.toString()
 
         if (school.location == null || school.location!!.latitude == DEFAULT_LOC.latitude && school.location!!.longitude == DEFAULT_LOC.longitude) throw AppCoreException(

@@ -111,12 +111,12 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
             createSessionProgress.visibility = View.GONE
         }
 
-        Banner.getInstance()?.bannerView?.setOnClickListener {
-            Banner.getInstance().dismissBanner()
-            if (Banner.SUCCESS == bannerType) {
-                this@SessionCreator.finishActivity(SESSION_ADD_ACTIVITY.requestCode)
-            }
-        }
+//        Banner.getInstance()?.bannerView?.setOnClickListener {
+//            Banner.getInstance().dismissBanner()
+//            if (Banner.SUCCESS == bannerType) {
+//                this@SessionCreator.finishActivity(SESSION_ADD_ACTIVITY.requestCode)
+//            }
+//        }
     }
 
     override fun onClick(clickView: View?) {
@@ -219,10 +219,6 @@ class SessionCreator : AppCompatActivity(), View.OnClickListener {
                     val infoBanner = Banner.make(rootView, this@SessionCreator, bannerType, message, Banner.TOP)
                     infoBanner.bannerView.setOnClickListener {
                         infoBanner.dismissBanner()
-                        if (Banner.SUCCESS == bannerType) {
-                            setResult(Activity.RESULT_OK )
-                            finish()
-                        }
                     }
 
                     infoBanner.show()

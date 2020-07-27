@@ -33,6 +33,7 @@ import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.Session
 
 class SessionsListingActivity : AppCompatActivity() {
+    lateinit var adapter:SessionListingPager;
     private var todaysSessions: MutableList<Session> = mutableListOf()
     private var futureSessions: MutableList<Session> = mutableListOf()
     private var pastSessions: MutableList<Session> = mutableListOf()
@@ -45,7 +46,7 @@ class SessionsListingActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SESSION_ADD_ACTIVITY.requestCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == SESSION_ADD_ACTIVITY.requestCode) {
             sessionsLoader.visibility = View.VISIBLE
             GlobalScope.launch(Dispatchers.Main) {
                 sessionsLoader.visibility = View.VISIBLE
@@ -60,6 +61,9 @@ class SessionsListingActivity : AppCompatActivity() {
                 }
                 job.join()
                 sessionsLoader.visibility = View.GONE
+                if (::adapter.isInitialized) {
+                    adapter.notifyDataSetChanged()
+                }
             }
         }
     }
@@ -89,13 +93,14 @@ class SessionsListingActivity : AppCompatActivity() {
             val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
             val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
 
-            viewPager.adapter = SessionListingPager(
+            adapter = SessionListingPager(
                 supportFragmentManager,
                 todays = todaysSessions,
                 futures = futureSessions,
                 past = pastSessions
             )
 
+            viewPager.adapter = adapter
             tabLayout.setupWithViewPager(viewPager)
         }
     }
@@ -103,21 +108,23 @@ class SessionsListingActivity : AppCompatActivity() {
 
 class SessionListingPager(
     fragmentManger: FragmentManager,
-    private val todays: List<Session>,
-    private val futures: List<Session>,
-    private val past: List<Session>
+    todays: List<Session>,
+    futures: List<Session>,
+    past: List<Session>
 ) :
     FragmentStatePagerAdapter(fragmentManger, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    val tabsData:Map<Int, SessionsListFragment> = mapOf(
+        0 to SessionsListFragment(todays),
+        1 to SessionsListFragment(futures),
+        2 to SessionsListFragment(past)
+    )
+
     override fun getItem(position: Int): Fragment {
-        return when (position) {
-            0 -> SessionsListFragment(todays)
-            1 -> SessionsListFragment(futures)
-            else -> SessionsListFragment(past)
-        }
+        return tabsData.getValue(position)
     }
 
     override fun getCount(): Int {
-        return 3
+        return tabsData.size
     }
 
     override fun getPageTitle(position: Int): CharSequence {
@@ -129,17 +136,37 @@ class SessionListingPager(
             }
         }
     }
+
+    override fun notifyDataSetChanged() {
+        super.notifyDataSetChanged()
+        tabsData.forEach { (_: Int, listFragment: SessionsListFragment) ->
+            listFragment.notifyDataSetChanged()
+        }
+    }
 }
 
 class SessionsListFragment(private val sessions: List<Session>) : Fragment() {
+    lateinit var adapter: SessionExpandableListAdapter
+    lateinit var groupedSessions: Map<String, List<Session>>
+    lateinit var expandableList: List<ExpandableGroup<DataHolder>>
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = RecyclerView(requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         //crating an arraylist to store users using the data class user
         //creating our adapter
 
-        val groupedSessions = sessions.groupBy { session -> session.schoolRef }
-        val expandableList: List<ExpandableGroup<DataHolder>> = groupedSessions.map { entry ->
+        groupAndGenerateExpandableList()
+
+        adapter = SessionExpandableListAdapter(requireContext(), expandableList)
+        recyclerView.adapter = adapter
+
+        return recyclerView
+    }
+
+    private fun groupAndGenerateExpandableList() {
+        groupedSessions = sessions.groupBy { session -> session.schoolRef }
+        expandableList = groupedSessions.map { entry ->
             val schoolName = entry.value.first().description.split("@")[1]
             val sessions: List<DataHolder> = entry.value.map { session ->
                 val sessionTime = session.description.split("@")[0]
@@ -148,10 +175,13 @@ class SessionsListFragment(private val sessions: List<Session>) : Fragment() {
 
             ExpandableGroup(schoolName, sessions)
         }
-        val adapter = SessionExpandableListAdapter(requireContext(), expandableList)
-        recyclerView.adapter = adapter
+    }
 
-        return recyclerView
+    fun notifyDataSetChanged() {
+        if (this::adapter.isInitialized) {
+            groupAndGenerateExpandableList()
+            adapter.notifyDataSetChanged()
+        }
     }
 }
 

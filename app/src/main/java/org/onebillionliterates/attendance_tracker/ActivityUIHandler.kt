@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.shasin.notificationbanner.Banner
@@ -25,10 +24,11 @@ abstract class ActivityUIHandler: AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidThreeTen.init(this)
+        rootView = window.decorView.rootView
+        activity = this
     }
 
     fun uiHandler(beforeBlock: suspend () -> Unit, onUIBlock: suspend () -> Unit) {
-        rootView = window.decorView.rootView
         GlobalScope.launch(Dispatchers.Main) {
            progressTracker.visibility = View.VISIBLE
 

@@ -32,10 +32,10 @@ class DBOperations : AppCompatActivity() {
 
         saveAdmin.setOnClickListener { view ->
             val admin = Admin(
-                mobileNumber = "1231231231",
-                name = "New Admin",
-                passCode = "3344123123",
-                remarks = "REPRESENTATION ROW"
+                mobileNumber = "8884410287",
+                name = "Ramesh",
+                passCode = AppCore.instance.hashPassCode("789789"),
+                remarks = "For Test"
             )
 
             GlobalScope.launch {

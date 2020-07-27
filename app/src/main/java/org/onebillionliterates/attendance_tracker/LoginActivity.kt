@@ -2,7 +2,6 @@ package org.onebillionliterates.attendance_tracker
 
 import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
-import android.content.Context.TELEPHONY_SERVICE
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.pm.PackageManager
@@ -10,12 +9,8 @@ import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.login.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.MESSAGES.UNSUCCESSFUL_LOGIN
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
@@ -26,21 +21,18 @@ class LoginActivity : ActivityUIHandler() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
         super.progressTracker = loginInProgress
-        super.activity = this@LoginActivity
 
         initView()
 
         login.setOnClickListener { view ->
             uiHandler(
                 {
-                    val job = GlobalScope.launch(Dispatchers.IO) {
-                        val mobileNumber = mobileNumberEditText.text
-                        val passCode = passCodeEditText.text
-                        AppCore.instance.login(
-                            mobileNumber = mobileNumber.toString(),
-                            sixDigitPassCode = passCode.toString()
-                        )
-                    }
+                    val mobileNumber = mobileNumberEditText.text
+                    val passCode = passCodeEditText.text
+                    AppCore.instance.login(
+                        mobileNumber = mobileNumber.toString(),
+                        sixDigitPassCode = passCode.toString()
+                    )
                 },
                 {
                     if (AppCore.loggedInUser.adminInfo == null && AppCore.loggedInUser.teacherInfo == null) {
@@ -74,7 +66,7 @@ class LoginActivity : ActivityUIHandler() {
             showWarningBanner("Permission for reading phone number not provided")
         }
         val telephonyManager = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val devicePhoneNumber: String? = telephonyManager.line1Number
+        val devicePhoneNumber: String? = "8884410287"
         if (!devicePhoneNumber.isNullOrBlank()) {
             mobileNumberEditText.isClickable = false
             mobileNumberEditText.isEnabled = false

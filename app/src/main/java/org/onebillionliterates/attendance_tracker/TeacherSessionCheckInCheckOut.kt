@@ -28,7 +28,6 @@ class TeacherSessionCheckInCheckOut : ActivityUIHandler() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.TAG = "TeacherSessionCheckInCheckOut_Activity"
-        super.activity = this@TeacherSessionCheckInCheckOut
 
         setContentView(R.layout.check_in_out)
         actionBar?.setDisplayHomeAsUpEnabled(true)
