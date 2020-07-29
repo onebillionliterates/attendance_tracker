@@ -1,8 +1,5 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package org.onebillionliterates.attendance_tracker
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -18,53 +14,33 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
-import com.jakewharton.threetenabp.AndroidThreeTen
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import kotlinx.android.synthetic.main.sessions_listing.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SESSION_ADD_ACTIVITY
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.Session
 
-class SessionsListingActivity : AppCompatActivity() {
-    lateinit var adapter:SessionListingPager;
+class SessionsListingActivity : ActivityUIHandler() {
+    lateinit var adapter: SessionListingPager;
     private var todaysSessions: MutableList<Session> = mutableListOf()
     private var futureSessions: MutableList<Session> = mutableListOf()
     private var pastSessions: MutableList<Session> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.sessions_listing)
+        super.TAG = "SessionsListingActivity"
+        super.progressTracker = sessionsLoader
         initView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SESSION_ADD_ACTIVITY.requestCode) {
-            sessionsLoader.visibility = View.VISIBLE
-            GlobalScope.launch(Dispatchers.Main) {
-                sessionsLoader.visibility = View.VISIBLE
-
-                val job = GlobalScope.launch(Dispatchers.IO) {
-                    todaysSessions.clear()
-                    futureSessions.clear()
-                    pastSessions.clear()
-                    todaysSessions.addAll(AppCore.instance.fetchTodaysSessionsForAdmin())
-                    futureSessions.addAll(AppCore.instance.fetchFutureSessionsForAdmin())
-                    pastSessions.addAll(AppCore.instance.fetchPastSessionsForAdmin())
-                }
-                job.join()
-                sessionsLoader.visibility = View.GONE
-                if (::adapter.isInitialized) {
-                    adapter.notifyDataSetChanged()
-                }
-            }
+            uiHandler({ loadSessions() }, { updateTabs() })
         }
     }
 
@@ -77,32 +53,32 @@ class SessionsListingActivity : AppCompatActivity() {
         /**
          * Loading all the data for the drawers
          */
-        GlobalScope.launch(Dispatchers.Main) {
-            sessionsLoader.visibility = View.VISIBLE
+        uiHandler({ loadSessions() }, { updateTabs() })
+    }
 
-            val job = GlobalScope.launch(Dispatchers.IO) {
-                todaysSessions.clear()
-                futureSessions.clear()
-                pastSessions.clear()
-                todaysSessions.addAll(AppCore.instance.fetchTodaysSessionsForAdmin())
-                futureSessions.addAll(AppCore.instance.fetchFutureSessionsForAdmin())
-                pastSessions.addAll(AppCore.instance.fetchPastSessionsForAdmin())
-            }
-            job.join()
-            sessionsLoader.visibility = View.GONE
-            val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
-            val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
-
+    private fun updateTabs() {
+        val tabLayout = findViewById<TabLayout>(R.id.sessionsTabs)
+        val viewPager = findViewById<ViewPager>(R.id.sessionsPager)
+        if (!::adapter.isInitialized) {
             adapter = SessionListingPager(
                 supportFragmentManager,
                 todays = todaysSessions,
                 futures = futureSessions,
                 past = pastSessions
             )
-
-            viewPager.adapter = adapter
-            tabLayout.setupWithViewPager(viewPager)
         }
+
+        viewPager.adapter = adapter
+        tabLayout.setupWithViewPager(viewPager)
+    }
+
+    private suspend fun loadSessions() {
+        todaysSessions.clear()
+        futureSessions.clear()
+        pastSessions.clear()
+        todaysSessions.addAll(AppCore.instance.fetchTodaysSessionsForAdmin())
+        futureSessions.addAll(AppCore.instance.fetchFutureSessionsForAdmin())
+        pastSessions.addAll(AppCore.instance.fetchPastSessionsForAdmin())
     }
 }
 
@@ -113,7 +89,7 @@ class SessionListingPager(
     past: List<Session>
 ) :
     FragmentStatePagerAdapter(fragmentManger, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    val tabsData:Map<Int, SessionsListFragment> = mapOf(
+    private val tabsData: Map<Int, SessionsListFragment> = mapOf(
         0 to SessionsListFragment(todays),
         1 to SessionsListFragment(futures),
         2 to SessionsListFragment(past)
@@ -225,6 +201,7 @@ class SessionExpandableListAdapter(
         flatPosition: Int,
         group: ExpandableGroup<*>?
     ) {
+        @Suppress("UNCHECKED_CAST")
         holder!!.setSchoolDetails(group!! as ExpandableGroup<DataHolder>)
     }
 }

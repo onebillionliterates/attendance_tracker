@@ -15,341 +15,367 @@
             android:layout_marginEnd="10dp" android:background="@color/colorPrimary"
             android:textColor="@android:color/white" android:textSize="16sp" android:typeface="normal"
             android:fontFamily="sans-serif-medium"/>
-    <!-- Select School -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_view"
-            android:id="@+id/school"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="20dp"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="20dp">
-        <ImageView
-                android:id="@+id/schoolIcon"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="TODO"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        <TextView
-                android:hint="Select School"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/schoolSelectTextView"
-                app:layout_constraintStart_toEndOf="@+id/schoolIcon"
-                android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+    <androidx.core.widget.NestedScrollView android:layout_height="0dp"
+                                           android:layout_width="0dp"
+                                           app:layout_constraintStart_toStartOf="parent"
+                                           app:layout_constraintEnd_toEndOf="parent"
+                                           android:id="@+id/nestedScrollView" app:layout_constraintTop_toTopOf="parent"
+                                           app:layout_constraintBottom_toTopOf="@+id/addSession"
+                                           android:layout_marginBottom="1dp">
 
-        <include
-                android:id="@+id/includedRightIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="15dp"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Select Start Date -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_view"
-            android:id="@+id/startDate"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/school"
-            android:layout_marginTop="25dp">
-
-        <include
-                android:id="@+id/includedDateIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="TODO"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        <TextView
-                android:hint="Select start date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/startDateSelectTextView"
-                app:layout_constraintStart_toEndOf="@+id/includedDateIcon"
-                android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <include
-                android:id="@+id/includedRightIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="15dp"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Select End Date -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_view"
-            android:id="@+id/endDate"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/startDate"
-            android:layout_marginTop="25dp">
-        <include
-                android:id="@+id/includedDateIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="TODO"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        <TextView
-                android:hint="Select end date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/endDateSelectTextView"
-                app:layout_constraintStart_toEndOf="@+id/includedDateIcon"
-                android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <include
-                android:id="@+id/includedRightIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="15dp"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Select Start And End Time -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:id="@+id/duration"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/endDate"
-            android:layout_marginTop="25dp">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="175dp"
-                android:layout_height="60dp"
-                android:background="@drawable/button_view"
-                android:id="@+id/startTime"
-                app:layout_constraintRight_toLeftOf="@+id/endTime"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent">
-            <include
-                    android:id="@+id/includedTimeIcon"
-                    layout="@layout/reusable_icon_view"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="TODO"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                    app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            <TextView
-                    android:hint="Start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/attendanceStartDate"
-                    android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintVertical_bias="0.50"
-                    app:layout_constraintEnd_toStartOf="@+id/includedRightIcon"
-                    app:layout_constraintStart_toEndOf="@+id/includedTimeIcon" android:textAlignment="center"/>
-
-            <include
-                    android:id="@+id/includedRightIcon"
-                    layout="@layout/reusable_icon_view"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginEnd="15dp"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="175dp"
-                android:layout_height="60dp"
-                android:background="@drawable/button_view"
-                android:id="@+id/endTime"
-                app:layout_constraintLeft_toRightOf="@+id/startTime"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintEnd_toEndOf="parent">
-            <include
-                    android:id="@+id/includedTimeIcon"
-                    layout="@layout/reusable_icon_view"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="TODO"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                    app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            <TextView
-                    android:hint="End"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content" android:id="@+id/attendanceEndDate"
-                    android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/includedTimeIcon"
-                    app:layout_constraintEnd_toStartOf="@+id/includedRightIcon" android:textAlignment="center"/>
-
-            <include
-                    android:id="@+id/includedRightIcon"
-                    layout="@layout/reusable_icon_view"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginEnd="15dp"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Select Days -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_view"
-            android:id="@+id/days"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/duration"
-            android:layout_marginTop="25dp">
-        <ImageView
-                android:id="@+id/dayIcon"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="TODO"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        <TextView
-                android:hint="Select days"
-                android:layout_width="wrap_content"
+        <TableLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/daySelectTextView"
-                app:layout_constraintStart_toEndOf="@+id/dayIcon"
-                android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:stretchColumns="1">
 
-        <include
-                android:id="@+id/includedRightIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="15dp"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Select Teacher -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_view"
-            android:id="@+id/teachers"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/days"
-            android:layout_marginTop="25dp">
-        <ImageView
-                android:id="@+id/teacherIcon"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="TODO"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" android:layout_marginTop="25dp"
-                app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        <TextView
-                android:hint="Select teacher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/teacherSelectTextView"
-                app:layout_constraintStart_toEndOf="@+id/teacherIcon"
-                android:layout_marginStart="20dp" android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <include
-                android:id="@+id/includedRightIcon"
-                layout="@layout/reusable_icon_view"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="15dp"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Select School -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/button_view"
+                    android:id="@+id/school"
+                    app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="20dp">
+                <ImageView
+                        android:id="@+id/schoolIcon"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="TODO"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+                        app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                        android:hint="Select School"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:id="@+id/schoolSelectTextView"
+                        app:layout_constraintStart_toEndOf="@+id/schoolIcon"
+                        android:layout_marginStart="20dp" android:textSize="23sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <include
+                        android:id="@+id/includedRightIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="15dp"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Select Start Date -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/button_view"
+                    android:id="@+id/startDate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/school"
+                    android:layout_marginTop="25dp">
+
+                <include
+                        android:id="@+id/includedDateIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="TODO"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+                        app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                        android:hint="Select start date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:id="@+id/startDateSelectTextView"
+                        app:layout_constraintStart_toEndOf="@+id/includedDateIcon"
+                        android:layout_marginStart="20dp" android:textSize="23sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <include
+                        android:id="@+id/includedRightIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="15dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Select End Date -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/button_view"
+                    android:id="@+id/endDate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/startDate"
+                    android:layout_marginTop="25dp">
+                <include
+                        android:id="@+id/includedDateIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="TODO"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+                        app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                        android:hint="Select end date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:id="@+id/endDateSelectTextView"
+                        app:layout_constraintStart_toEndOf="@+id/includedDateIcon"
+                        android:layout_marginStart="20dp" android:textSize="23sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <include
+                        android:id="@+id/includedRightIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="15dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Select Start And End Time -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:id="@+id/duration"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/endDate"
+                    android:layout_marginTop="25dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:minWidth="130dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/button_view"
+                        android:id="@+id/startTime"
+                        app:layout_constraintRight_toLeftOf="@+id/endTime"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintVertical_bias="0.0" android:layout_marginStart="10dp">
+                    <include
+                            android:id="@+id/includedTimeIcon"
+                            layout="@layout/reusable_icon_view"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:contentDescription="TODO"
+                            app:layout_constraintStart_toStartOf="parent"
+                            android:layout_marginTop="25dp"
+                            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="2dp"/>
+                    <TextView
+                            android:hint="Start"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/attendanceStartDate"
+                            android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintVertical_bias="0.50"
+                            app:layout_constraintEnd_toStartOf="@+id/includedRightIcon"
+                            app:layout_constraintStart_toEndOf="@+id/includedTimeIcon" android:textAlignment="center"/>
+
+                    <include
+                            android:id="@+id/includedRightIcon"
+                            layout="@layout/reusable_icon_view"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                    />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:minWidth="130dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/button_view"
+                        android:id="@+id/endTime"
+                        app:layout_constraintLeft_toRightOf="@+id/startTime"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintVertical_bias="0.0"
+                        android:layout_marginEnd="10dp">
+                    <include
+                            android:id="@+id/includedTimeIcon"
+                            layout="@layout/reusable_icon_view"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:contentDescription="TODO"
+                            app:layout_constraintStart_toStartOf="parent"
+                            android:layout_marginTop="25dp"
+                            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="2dp"/>
+                    <TextView
+                            android:hint="End"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/attendanceEndDate"
+                            android:textSize="23sp" app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/includedTimeIcon"
+                            app:layout_constraintEnd_toStartOf="@+id/includedRightIcon" android:textAlignment="center"/>
+
+                    <include
+                            android:id="@+id/includedRightIcon"
+                            layout="@layout/reusable_icon_view"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                    />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Select Days -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/button_view"
+                    android:id="@+id/days"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/duration"
+                    android:layout_marginTop="25dp">
+                <ImageView
+                        android:id="@+id/dayIcon"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="TODO"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+                        app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                        android:hint="Select days"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/daySelectTextView"
+                        app:layout_constraintStart_toEndOf="@+id/dayIcon"
+                        android:layout_marginStart="20dp" android:textSize="23sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <include
+                        android:id="@+id/includedRightIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="15dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Select Teacher -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/button_view"
+                    android:id="@+id/teachers"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/days"
+                    android:layout_marginTop="25dp">
+                <ImageView
+                        android:id="@+id/teacherIcon"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="TODO"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="15dp" android:layout_marginTop="25dp"
+                        app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                        android:hint="Select teacher"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/teacherSelectTextView"
+                        app:layout_constraintStart_toEndOf="@+id/teacherIcon"
+                        android:layout_marginStart="20dp" android:textSize="23sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="25dp" android:layout_marginBottom="25dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <include
+                        android:id="@+id/includedRightIcon"
+                        layout="@layout/reusable_icon_view"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="25dp" app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginBottom="25dp" app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="15dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </TableLayout>
+    </androidx.core.widget.NestedScrollView>
     <ProgressBar
             style="?android:attr/progressBarStyle"
             android:layout_width="48dp"

@@ -27,9 +27,10 @@ class TeacherSessionCheckInCheckOut : ActivityUIHandler() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        super.TAG = "TeacherSessionCheckInCheckOut_Activity"
-
         setContentView(R.layout.check_in_out)
+        super.TAG = "TeacherSessionCheckInCheckOut_Activity"
+        super.progressTracker = checkInOutProgress
+
         actionBar?.setDisplayHomeAsUpEnabled(true)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         initView()
