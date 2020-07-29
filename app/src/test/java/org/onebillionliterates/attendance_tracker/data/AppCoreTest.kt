@@ -780,7 +780,11 @@ class AppCoreTest {
     internal fun name() {
         println("START TIME ${LocalTime.now().toNanoOfDay()}")
         println("END TIME ${LocalTime.now().plusHours(1).toNanoOfDay()}")
+    }
 
+    @Test
+    internal fun hashPasscodeGeneration() {
+        println("MD5 HASH ${instance.hashPassCode("8888")}")
     }
 
     private suspend fun loginAsTeacher() {
