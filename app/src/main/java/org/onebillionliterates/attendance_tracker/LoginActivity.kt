@@ -66,7 +66,7 @@ class LoginActivity : ActivityUIHandler() {
             showWarningBanner("Permission for reading phone number not provided")
         }
         val telephonyManager = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val devicePhoneNumber: String? = "8884410287"
+        val devicePhoneNumber: String? = telephonyManager.line1Number
         if (!devicePhoneNumber.isNullOrBlank()) {
             mobileNumberEditText.isClickable = false
             mobileNumberEditText.isEnabled = false
