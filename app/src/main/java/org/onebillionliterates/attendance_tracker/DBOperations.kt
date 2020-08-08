@@ -100,7 +100,7 @@ class DBOperations : AppCompatActivity() {
                     address = "3344123123",
                     location = location
                 )
-                val savedTeacher = appData.saveSchool(school)
+                val savedTeacher = appData.saveOrUpdate(school)
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $savedTeacher")
@@ -117,7 +117,7 @@ class DBOperations : AppCompatActivity() {
                 )
 
                 Log.d(TAG, Thread.currentThread().name)
-                Log.d(TAG, "PARTICULAR => ${school.id}")
+                Log.d(TAG, "PARTICULAR => ${school!!.id}")
             }
             Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
         }

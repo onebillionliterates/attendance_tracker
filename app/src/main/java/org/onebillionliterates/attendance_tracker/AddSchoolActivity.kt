@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.school_create.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_ADD_ACTIVITY
 import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_MAP_ACTIVITY
 import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.AppCore.Companion.DEFAULT_LOC
@@ -84,7 +83,7 @@ class AddSchoolActivity : AppCompatActivity() {
                         school.name = schoolNameEditText.text.toString()
                         school.uniqueCode = uniqueCodeEditText.text.toString()
 
-                        AppCore.instance.saveSchool(school)
+                        AppCore.instance.saveOrUpdate(school)
                     } catch (exception: Exception) {
                         bannerType = Banner.ERROR
                         message = MESSAGES.DATA_VALIDATION_FAILURE.message

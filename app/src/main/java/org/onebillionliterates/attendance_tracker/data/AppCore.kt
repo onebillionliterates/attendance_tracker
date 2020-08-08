@@ -202,7 +202,7 @@ class AppCore {
         }
     }
 
-    suspend fun saveSchool(school: School): School {
+    suspend fun saveOrUpdate(school: School): School {
         school.adminRef = loggedInUser.adminInfo!!.id.toString()
 
         if (school.location == null || school.location!!.latitude == DEFAULT_LOC.latitude && school.location!!.longitude == DEFAULT_LOC.longitude) throw AppCoreException(
@@ -211,8 +211,17 @@ class AppCore {
         if (school.name.isNullOrBlank() || school.uniqueCode.isNullOrBlank() || school.address.isNullOrBlank() || school.postalCode.isNullOrBlank())
             throw AppCoreException(SCHOOL_INCOMPLETE_INFO.message)
 
+        val isSchoolWithSameNameAndUniqueCodeAlreadySaved = appData.getSchoolInfo(
+            adminRef = school.adminRef!!,
+            name = school.name!!,
+            uniqueCode = school.uniqueCode!!
+        ) != null
+
+        if (school.id.isNullOrBlank() && isSchoolWithSameNameAndUniqueCodeAlreadySaved)
+            throw AppCoreException(SCHOOL_ALREADY_EXISTS.message)
+
         return runWithCatch {
-            appData.saveSchool(school)
+            appData.saveOrUpdate(school)
         }
     }
 
@@ -226,7 +235,7 @@ class AppCore {
             throw AppCoreException(SCHOOL_INCOMPLETE_INFO.message)
 
         return runWithCatch {
-            appData.saveSchool(school)
+            appData.saveOrUpdate(school)
         }
     }
 
