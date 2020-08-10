@@ -47,7 +47,6 @@ class TeacherSessionCheckInCheckOut : ActivityUIHandler() {
     }
 
     private fun initView() {
-        adjustMap()
         uiHandler({
             selectedSession = intent.extras!!.get("selectedSession") as String
             session = AppCore.instance.fetchSession(selectedSession)!!
@@ -74,13 +73,15 @@ class TeacherSessionCheckInCheckOut : ActivityUIHandler() {
     }
 
     private fun adjustMap() {
+        val position = LatLng(school.location!!.latitude, school.location!!.longitude)
+        
         val mapFragment = googlemap as SupportMapFragment
         with(mapFragment) {
             onCreate(null)
             getMapAsync() {
                 MapsInitializer.initialize(applicationContext)
                 if (!::school.isInitialized) {
-                    setMapLocation(it, AppCore.DEFAULT_LOC, "Bangalore")
+                    setMapLocation(it, position, "Default location")
                     return@getMapAsync
                 }
 

@@ -112,9 +112,9 @@
     <Button
             android:id="@+id/addSchool"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="48dp"
             android:background="@color/colorPrimary"
-            android:text="Add"
+            android:text="Add/Update"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +124,7 @@
     <Button
             android:id="@+id/searchSchool"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="48dp"
             android:background="@color/colorPrimary"
             android:text="Search School"
             android:textColor="@android:color/white"

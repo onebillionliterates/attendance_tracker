@@ -99,11 +99,11 @@ class TeacherSessions : AppCompatActivity(), AdapterListener {
         }
     }
 
-    override fun onAdapterItemClicked(clickedIndex: Int) {
+    override fun onAdapterItemClicked(dataHolder: DataHolder) {
         startActivity(
             Intent(this, TeacherSessionCheckInCheckOut::class.java).putExtra(
                 "selectedSession",
-                sessions[clickedIndex].id
+                dataHolder.id
             )
         )
     }

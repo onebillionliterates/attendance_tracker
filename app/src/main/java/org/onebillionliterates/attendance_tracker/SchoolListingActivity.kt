@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.shasin.notificationbanner.Banner
 import kotlinx.android.synthetic.main.school_listing.*
 import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_ADD_ACTIVITY
+import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_UPDATE_ACTIVITY
 import org.onebillionliterates.attendance_tracker.adapter.AdapterListener
 import org.onebillionliterates.attendance_tracker.adapter.DataHolder
 import org.onebillionliterates.attendance_tracker.adapter.ListingAdapter
@@ -77,7 +77,11 @@ class SchoolListingActivity : ActivityUIHandler(), AdapterListener {
         listContainer.adapter = listAdapter
     }
 
-    override fun onAdapterItemClicked(clickedIndex: Int) {
-        Log.d(TAG, "CLICKED CELL :: $clickedIndex ::")
+    override fun onAdapterItemClicked(dataHolder: DataHolder) {
+        Log.d(TAG, "CLICKED CELL :: ${dataHolder.id} ::")
+        
+        val intent = Intent(this, AddSchoolActivity::class.java)
+        intent.putExtra(SCHOOL_UPDATE_ACTIVITY.name, dataHolder.id)
+        startActivityForResult(intent, SCHOOL_UPDATE_ACTIVITY.requestCode)
     }
 }

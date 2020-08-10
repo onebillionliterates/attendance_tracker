@@ -48,12 +48,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".AdminLandingActivity" android:label="OBLF Attendance Tracker">
-
         </activity>
         <activity android:name=".SchoolListingActivity" android:label="Schools">
 
         </activity>
-        <activity android:name=".AddSchoolActivity" android:label="Add school">
+        <activity 
+                android:name=".AddSchoolActivity" 
+                android:label="Add/Update school" 
+                android:parentActivityName=".SchoolListingActivity"
+        >
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".SchoolListingActivity"/>

@@ -576,4 +576,12 @@ class AppData {
 
         return mapDocumentToSchool(data)
     }
+
+    suspend fun loadSchool(schoolId: String): School {
+        val data = schoolCollection.document(schoolId)
+            .get()
+            .await()
+
+        return mapDocumentToSchool(data)
+    }
 }
