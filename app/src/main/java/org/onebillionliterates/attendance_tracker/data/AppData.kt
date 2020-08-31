@@ -160,37 +160,7 @@ class AppData {
             )
         }.firstOrNull()
     }
-
-    suspend fun getTeachersCollection(): MutableList<Teacher> {
-
-        val teachersList: MutableList<Teacher> = ArrayList()
-
-        teacherCollection
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    teachersList.add(
-                        Teacher(
-                            document.id,
-                            document.getDocumentReference("adminRef")!!.id,
-                            document.getString("mobileNumber"),
-                            document.getString("name"),
-                            document.getString("passCode"),
-                            document.getString("remarks"),
-                            document.getTimestamp("createdAt")?.toLocalDateTime(),
-                            document.getString("emailId"),
-                            document.getString("verificationId")
-                        )
-                    )
-                    Log.d(TAG, "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }.await()
-        return teachersList
-    }
-
+    
     suspend fun fetchTeachers(adminRef: String): List<Teacher> {
         return teacherCollection
             .whereEqualTo("adminRef", adminCollection.document(adminRef))

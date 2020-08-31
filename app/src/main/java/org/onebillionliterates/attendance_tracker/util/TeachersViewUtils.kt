@@ -63,33 +63,11 @@ class TeachersViewUtils {
             val bottomSheet: View = LayoutInflater.from(con).inflate(resource, null)
 
             initImageIcons(con, bottomSheet)
-            initRemoveLayout(con, bottomSheet)
             initView(con, bottomSheet)
 
             dialog = BottomSheetDialog(con)
             dialog.setContentView(bottomSheet)
             dialog.show()
-        }
-
-        private fun initRemoveLayout(con: Context, view: View) {
-            trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
-            removeText = view.findViewById(R.id.delete) as TextView
-            trashIcon.setOnClickListener {
-                removeTeacher(con)
-            }
-            removeText.setOnClickListener {
-                removeTeacher(con)
-            }
-        }
-
-        private fun removeTeacher(con: Context) {
-            trashIcon.setImageResource(R.drawable.trash_black);
-            removeText.setTextColor(Color.parseColor("#0a0a0a"))
-            //teachers.removeAt(pos.index)
-//                mListener.onListChanged(teachers)
-//                Toast.makeText(con, "deleted the teacher successfully", Toast.LENGTH_LONG).show()
-//                Log.d(TAG,"deleted the teacher successfully at position " + pos.index)
-//            dialog.dismiss()
         }
 
         private fun initView(con: Context, view: View) {
