@@ -6,16 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.onebillionliterates.attendance_tracker.adapter.TeachersAdapter
+import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.AppData
 import org.onebillionliterates.attendance_tracker.data.Teacher
-import org.onebillionliterates.attendance_tracker.model.Position
-import org.onebillionliterates.attendance_tracker.util.DbUtils
 import org.onebillionliterates.attendance_tracker.util.TeachersViewUtils
-import java.util.concurrent.Future
 
 
 class TeachersActivity : AppCompatActivity(), TeachersViewUtils.CustomListListener {
@@ -49,15 +45,13 @@ class TeachersActivity : AppCompatActivity(), TeachersViewUtils.CustomListListen
 
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        var teachers: MutableList<Teacher> = mutableListOf<Teacher>()
-        var adapter: TeachersAdapter //= TeachersAdapter(this@TeachersActivity, teachers)
+        var teachers: MutableList<Teacher> = mutableListOf()
 
         val job = GlobalScope.launch {
-            teachers = AppData.instance.getTeachersCollection()
-            adapter = TeachersAdapter(this@TeachersActivity, teachers)
-
+            teachers.addAll(AppCore.instance.fetchTeachersForAdmin())
+            
             this@TeachersActivity.runOnUiThread(java.lang.Runnable {
-                recyclerView.adapter = adapter
+                recyclerView.adapter = TeachersAdapter(this@TeachersActivity, teachers)
             })
         }
         job.join()

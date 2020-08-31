@@ -1,10 +1,7 @@
 package org.onebillionliterates.attendance_tracker
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -14,19 +11,14 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.jakewharton.threetenabp.AndroidThreeTen
-import com.shasin.notificationbanner.Banner
 import kotlinx.android.synthetic.main.check_in_out.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import org.onebillionliterates.attendance_tracker.data.*
+import org.onebillionliterates.attendance_tracker.data.AppCore
+import org.onebillionliterates.attendance_tracker.data.School
+import org.onebillionliterates.attendance_tracker.data.Session
 
-class TeacherSessionCheckInCheckOut : AppCompatActivity() {
+class TeacherSessionCheckInCheckOut : ActivityUIHandler() {
 
-    private val TAG = "TeacherSessionCheckInCheckOut_Activity"
-    private lateinit var rootView: View
     private lateinit var embeddedMap: GoogleMap
     private lateinit var school: School
     private lateinit var session: Session
@@ -34,9 +26,11 @@ class TeacherSessionCheckInCheckOut : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.check_in_out)
+        super.TAG = "TeacherSessionCheckInCheckOut_Activity"
+        super.progressTracker = checkInOutProgress
+
         actionBar?.setDisplayHomeAsUpEnabled(true)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         initView()
@@ -52,11 +46,7 @@ class TeacherSessionCheckInCheckOut : AppCompatActivity() {
         }
     }
 
-
     private fun initView() {
-        rootView = window.decorView.rootView
-        adjustMap()
-
         uiHandler({
             selectedSession = intent.extras!!.get("selectedSession") as String
             session = AppCore.instance.fetchSession(selectedSession)!!
@@ -70,79 +60,28 @@ class TeacherSessionCheckInCheckOut : AppCompatActivity() {
                 val currentTeacherLocation = fusedLocationClient.lastLocation.await()
                 AppCore.instance.checkinToSession(currentTeacherLocation!!, school.location!!, session)
             }, {
-                Banner.make(
-                    rootView,
-                    this@TeacherSessionCheckInCheckOut,
-                    Banner.SUCCESS,
-                    "Checked-In to session successfully",
-                    Banner.TOP
-                ).show()
-                Banner.getInstance().bannerView.setOnClickListener {
-                    Banner.getInstance().dismissBanner()
-                }
+                showSuccessBanner("Checked-In to session successfully")
             })
         }
         checkout.setOnClickListener() {
             uiHandler({
                 AppCore.instance.checkoutFromSession(session)
             }, {
-                Banner.make(
-                    rootView,
-                    this@TeacherSessionCheckInCheckOut,
-                    Banner.SUCCESS,
-                    "Checked-out from session successfully",
-                    Banner.TOP
-                ).show()
-                Banner.getInstance().bannerView.setOnClickListener {
-                    Banner.getInstance().dismissBanner()
-                }
+                showSuccessBanner("Checked-Out to session successfully")
             })
         }
     }
 
-    private fun uiHandler(beforeBlock: suspend () -> Unit, onUIBlock: suspend () -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            checkInOutProgress.visibility = View.VISIBLE
-
-            var message: String? = null
-            var bannerType: Int? = null
-            val job = GlobalScope.launch(Dispatchers.IO) {
-                try {
-                    beforeBlock.invoke()
-                } catch (exception: Exception) {
-                    bannerType = Banner.ERROR
-                    message = MESSAGES.DATA_OPERATION_FAILURE.message
-                    if (exception is AppCoreWarnException)
-                        bannerType = Banner.WARNING
-
-                    if (exception is AppCoreException || exception is AppCoreWarnException)
-                        message = exception.message!!
-
-                    Log.e(TAG, "Error during saving school", exception)
-                }
-            }
-            job.join()
-            checkInOutProgress.visibility = View.GONE
-            if (message != null) {
-                Banner.make(rootView, this@TeacherSessionCheckInCheckOut, bannerType!!, message, Banner.TOP).show()
-                Banner.getInstance().bannerView.setOnClickListener {
-                    Banner.getInstance().dismissBanner()
-                }
-            }
-            if (message == null) {
-                onUIBlock.invoke()
-            }
-        }
-    }
-
     private fun adjustMap() {
+        val position = LatLng(school.location!!.latitude, school.location!!.longitude)
+        
         val mapFragment = googlemap as SupportMapFragment
         with(mapFragment) {
             onCreate(null)
             getMapAsync() {
                 MapsInitializer.initialize(applicationContext)
                 if (!::school.isInitialized) {
-                    setMapLocation(it, AppCore.DEFAULT_LOC, "Bangalore")
+                    setMapLocation(it, position, "Default location")
                     return@getMapAsync
                 }
 

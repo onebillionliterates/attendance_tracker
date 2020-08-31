@@ -107,4 +107,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" android:visibility="gone"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version: 20200831.6.30"
+            android:ems="10"
+            android:id="@+id/editText"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="99dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="99dp" android:layout_marginBottom="2dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:textAlignment="center"
+            android:textSize="24sp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

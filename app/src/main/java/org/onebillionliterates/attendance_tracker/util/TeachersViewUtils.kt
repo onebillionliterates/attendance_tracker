@@ -4,17 +4,19 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.util.Log
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.onebillionliterates.attendance_tracker.R
+import org.onebillionliterates.attendance_tracker.data.AppCore
 import org.onebillionliterates.attendance_tracker.data.Teacher
 import org.onebillionliterates.attendance_tracker.drawables.EmailDrawable
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
-import org.onebillionliterates.attendance_tracker.drawables.TrashDrawable
 import org.onebillionliterates.attendance_tracker.drawables.UserDrawable
 import org.onebillionliterates.attendance_tracker.model.Position
 import org.onebillionliterates.attendance_tracker.model.TeacherBoolean
@@ -55,39 +57,17 @@ class TeachersViewUtils {
             teachersList: MutableList<Teacher>,
             index: Int
         ) {
-            activity=act
+            activity = act
             teachers = teachersList
             pos = Position(index)
             val bottomSheet: View = LayoutInflater.from(con).inflate(resource, null)
 
             initImageIcons(con, bottomSheet)
-            initRemoveLayout(con, bottomSheet)
             initView(con, bottomSheet)
 
             dialog = BottomSheetDialog(con)
             dialog.setContentView(bottomSheet)
             dialog.show()
-        }
-
-        private fun initRemoveLayout(con: Context, view: View) {
-            trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
-            removeText = view.findViewById(R.id.delete) as TextView
-            trashIcon.setOnClickListener {
-                removeTeacher(con)
-            }
-            removeText.setOnClickListener {
-                removeTeacher(con)
-            }
-        }
-
-        private fun removeTeacher(con: Context){
-            trashIcon.setImageResource (R.drawable.trash_black);
-            removeText.setTextColor(Color.parseColor("#0a0a0a"))
-            //teachers.removeAt(pos.index)
-//                mListener.onListChanged(teachers)
-//                Toast.makeText(con, "deleted the teacher successfully", Toast.LENGTH_LONG).show()
-//                Log.d(TAG,"deleted the teacher successfully at position " + pos.index)
-//            dialog.dismiss()
         }
 
         private fun initView(con: Context, view: View) {
@@ -146,7 +126,7 @@ class TeachersViewUtils {
             if (pos.index == -1) {
                 val teacher = Teacher(
                     "dummy_id",
-                    "fw7aJ1dVDpQndyHFhDsv",
+                    AppCore.loggedInUser.adminInfo!!.id!!,
                     mobile,
                     name,
                     "dummy_pass_code",
@@ -155,14 +135,14 @@ class TeachersViewUtils {
                     email,
                     "verificationId"
                 )
-                Log.d(TAG,"adding to teacher to teachers list. now size is " + teachers.size)
+                Log.d(TAG, "adding to teacher to teachers list. now size is " + teachers.size)
                 teachers.add(teacher)
                 SmsUtils.sendVerificationCode2(activity, con, teacher, teacherBoolean)
             } else {
 
                 teacherBoolean.isUpdate = true
 
-                Log.d(TAG,"updating to teacher at position " + pos.index)
+                Log.d(TAG, "updating to teacher at position " + pos.index)
                 teachers[pos.index].emailId = email
                 teachers[pos.index].mobileNumber = mobile
                 teachers[pos.index].name = name

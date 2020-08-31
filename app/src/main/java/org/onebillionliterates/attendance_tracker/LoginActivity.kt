@@ -1,79 +1,73 @@
 package org.onebillionliterates.attendance_tracker
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
+import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.TelephonyManager
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
-import com.jakewharton.threetenabp.AndroidThreeTen
-import kotlinx.android.synthetic.main.activity_main.*
+import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.login.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.onebillionliterates.attendance_tracker.data.AppCore
-import org.onebillionliterates.attendance_tracker.data.LoggedInUser
+import org.onebillionliterates.attendance_tracker.data.MESSAGES.UNSUCCESSFUL_LOGIN
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
 import org.onebillionliterates.attendance_tracker.drawables.PasswordDrawable
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : ActivityUIHandler() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidThreeTen.init(this);
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
-        setSupportActionBar(toolbar)
+        super.progressTracker = loginInProgress
+
+        initView()
 
         login.setOnClickListener { view ->
-            GlobalScope.launch(Dispatchers.Main) {
-                loginInProgress.visibility = VISIBLE
-
-                val job = GlobalScope.launch(Dispatchers.IO) {
+            uiHandler(
+                {
                     val mobileNumber = mobileNumberEditText.text
                     val passCode = passCodeEditText.text
-                 AppCore.instance.login(
+                    AppCore.instance.login(
                         mobileNumber = mobileNumber.toString(),
                         sixDigitPassCode = passCode.toString()
                     )
+                },
+                {
+                    if (AppCore.loggedInUser.adminInfo == null && AppCore.loggedInUser.teacherInfo == null) {
+                        showWarningBanner(UNSUCCESSFUL_LOGIN.message)
+                        return@uiHandler
+                    }
+
+                    if (AppCore.loggedInUser.adminInfo != null) {
+                        intent = Intent(super.activity, AdminLandingActivity::class.java)
+                    }
+
+                    if (AppCore.loggedInUser.teacherInfo != null) {
+                        intent = Intent(super.activity, TeacherSessions::class.java)
+                    }
+
+                    intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(intent)
+                    finish()
                 }
-                job.join()
-                if (AppCore.loggedInUser.adminInfo != null) {
-                    startActivity(Intent(this@LoginActivity, AdminLandingActivity::class.java))
-                }
-
-                if (AppCore.loggedInUser.teacherInfo != null) {
-                    startActivity(Intent(this@LoginActivity, TeacherSessions::class.java))
-                }
-
-                loginInProgress.visibility = GONE
-            }
-
-
+            )
         }
-
-        initView()
     }
-    @SuppressLint("MissingPermission")
-    private fun initView() {
 
+    private fun initView() {
         val passCodeIcon = findViewById<View>(R.id.passCodeInfo).findViewById<ImageView>(R.id.passCodeIcon)
         passCodeIcon.setImageDrawable(PasswordDrawable(this))
 
         val phoneIcon = findViewById<View>(R.id.phoneInfo).findViewById<ImageView>(R.id.phoneIcon)
         phoneIcon.setImageDrawable(MobileDrawable(this))
-
+        if (ActivityCompat.checkSelfPermission(this, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            showWarningBanner("Permission for reading phone number not provided")
+        }
         val telephonyManager = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val devicePhoneNumber: String? = telephonyManager.line1Number
-        if(!devicePhoneNumber.isNullOrBlank()) {
+        if (!devicePhoneNumber.isNullOrBlank()) {
             mobileNumberEditText.isClickable = false
             mobileNumberEditText.isEnabled = false
             mobileNumberEditText.isFocusableInTouchMode = false
@@ -82,36 +76,5 @@ class LoginActivity : AppCompatActivity() {
         }
 
 
-    }
-    private fun showLoginFailedDailog() {
-        val dialog = this?.let {
-            // Use the Builder class for convenient dialog construction
-            val builder = AlertDialog.Builder(it)
-            builder.setMessage("LOGIN FAILED - Use admin/12345")
-                .setNegativeButton("CANCEL",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        // User cancelled the dialog
-                    })
-            // Create the AlertDialog object and return it
-            builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
-
-        dialog.show();
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 }

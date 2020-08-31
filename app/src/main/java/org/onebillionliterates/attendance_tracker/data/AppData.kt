@@ -160,37 +160,7 @@ class AppData {
             )
         }.firstOrNull()
     }
-
-    suspend fun getTeachersCollection(): MutableList<Teacher> {
-
-        val teachersList: MutableList<Teacher> = ArrayList()
-
-        teacherCollection
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    teachersList.add(
-                        Teacher(
-                            document.id,
-                            document.getDocumentReference("adminRef")!!.id,
-                            document.getString("mobileNumber"),
-                            document.getString("name"),
-                            document.getString("passCode"),
-                            document.getString("remarks"),
-                            document.getTimestamp("createdAt")?.toLocalDateTime(),
-                            document.getString("emailId"),
-                            document.getString("verificationId")
-                        )
-                    )
-                    Log.d(TAG, "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }.await()
-        return teachersList
-    }
-
+    
     suspend fun fetchTeachers(adminRef: String): List<Teacher> {
         return teacherCollection
             .whereEqualTo("adminRef", adminCollection.document(adminRef))
@@ -232,36 +202,39 @@ class AppData {
             .map { document -> mapDocumentToSchool(document) }
     }
 
-    suspend fun saveSchool(schoolToSave: School): School {
+    suspend fun saveOrUpdate(school: School): School {
 
         val createdAt = LocalDateTime.now()
-        val data: DocumentReference = schoolCollection
-            .add(
-                hashMapOf(
-                    "adminRef" to adminCollection.document(schoolToSave.adminRef!!),
-                    "name" to schoolToSave.name,
-                    "uniqueCode" to schoolToSave.uniqueCode,
-                    "postalCode" to schoolToSave.postalCode,
-                    "address" to schoolToSave.address,
-                    "location" to GeoPoint(schoolToSave.location!!.latitude, schoolToSave.location!!.longitude),
-                    "createdAt" to createdAt.toTimestamp()
-                )
-            )
-            .await()
+        val mapToPersist = hashMapOf(
+            "adminRef" to adminCollection.document(school.adminRef!!),
+            "name" to school.name,
+            "uniqueCode" to school.uniqueCode,
+            "postalCode" to school.postalCode,
+            "address" to school.address,
+            "location" to GeoPoint(school.location!!.latitude, school.location!!.longitude),
+            "createdAt" to createdAt.toTimestamp()
+        )
+        val updateAlreadySavedSchool = !school.id.isNullOrEmpty()
+        if (updateAlreadySavedSchool) {
+            schoolCollection.document(school.id!!).set(mapToPersist).await()
+            return school
+        }
+
+        val data: DocumentReference = schoolCollection.add(mapToPersist).await()
 
         return School(
             id = data.id,
-            adminRef = schoolToSave.adminRef,
-            name = schoolToSave.name,
-            uniqueCode = schoolToSave.uniqueCode,
-            postalCode = schoolToSave.postalCode,
-            location = schoolToSave.location,
+            adminRef = school.adminRef,
+            name = school.name,
+            uniqueCode = school.uniqueCode,
+            postalCode = school.postalCode,
+            location = school.location,
             createdAt = createdAt,
-            address = schoolToSave.address
+            address = school.address
         )
     }
 
-    suspend fun getSchoolInfo(adminRef: String, name: String, uniqueCode: String): School {
+    suspend fun getSchoolInfo(adminRef: String, name: String, uniqueCode: String): School? {
         val data = schoolCollection
             .whereEqualTo("adminRef", adminCollection.document(adminRef))
             .whereEqualTo("name", name)
@@ -269,7 +242,7 @@ class AppData {
             .get()
             .await();
 
-        return data.documents.map { document -> mapDocumentToSchool(document) }.first()
+        return data.documents.map { document -> mapDocumentToSchool(document) }.firstOrNull()
     }
 
     suspend fun saveSession(sessionToSave: Session): Session {
@@ -574,4 +547,11 @@ class AppData {
         return mapDocumentToSchool(data)
     }
 
+    suspend fun loadSchool(schoolId: String): School {
+        val data = schoolCollection.document(schoolId)
+            .get()
+            .await()
+
+        return mapDocumentToSchool(data)
+    }
 }

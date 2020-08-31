@@ -32,10 +32,10 @@ class DBOperations : AppCompatActivity() {
 
         saveAdmin.setOnClickListener { view ->
             val admin = Admin(
-                mobileNumber = "1231231231",
-                name = "New Admin",
-                passCode = "3344123123",
-                remarks = "REPRESENTATION ROW"
+                mobileNumber = "8884410287",
+                name = "Ramesh",
+                passCode = AppCore.instance.hashPassCode("789789"),
+                remarks = "For Test"
             )
 
             GlobalScope.launch {
@@ -100,7 +100,7 @@ class DBOperations : AppCompatActivity() {
                     address = "3344123123",
                     location = location
                 )
-                val savedTeacher = appData.saveSchool(school)
+                val savedTeacher = appData.saveOrUpdate(school)
 
                 Log.d(TAG, Thread.currentThread().name)
                 Log.d(TAG, "PARTICULAR => $savedTeacher")
@@ -117,7 +117,7 @@ class DBOperations : AppCompatActivity() {
                 )
 
                 Log.d(TAG, Thread.currentThread().name)
-                Log.d(TAG, "PARTICULAR => ${school.id}")
+                Log.d(TAG, "PARTICULAR => ${school!!.id}")
             }
             Snackbar.make(view, "Check your LogCat-DBOperations_Activity", Snackbar.LENGTH_LONG).show()
         }

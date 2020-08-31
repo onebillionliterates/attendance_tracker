@@ -1,7 +1,6 @@
 package org.onebillionliterates.attendance_tracker.data
 
 import android.location.Location
-import com.google.android.gms.maps.model.LatLng
 import org.onebillionliterates.attendance_tracker.data.MESSAGES.*
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
@@ -23,7 +22,6 @@ class AppCore {
     companion object {
         val instance: AppCore by lazy { HOLDER.INSTANCE }
         val loggedInUser: LoggedInUser by lazy { HOLDER.LOGGED_IN_USER }
-        val DEFAULT_LOC = LatLng(12.9542946, 77.4908551)
     }
 
     fun LocalDate.inBetween(referenceStart: LocalDate, referenceEnd: LocalDate): Boolean =
@@ -153,20 +151,23 @@ class AppCore {
     }
 
     suspend fun login(mobileNumber: String, sixDigitPassCode: String): LoggedInUser {
-
-        val md5Hashing = MessageDigest.getInstance("MD5")
-        md5Hashing.update(sixDigitPassCode.toByteArray())
-        val hashedPassCode = BigInteger(1, md5Hashing.digest()).toString(16)
+        val hashedPassCode = hashPassCode(sixDigitPassCode)
 
         loggedInUser.adminInfo = runWithCatch { appData.getAdminInfo(mobileNumber, hashedPassCode) }
         if (loggedInUser.adminInfo != null)
             return loggedInUser
 
         loggedInUser.teacherInfo = runWithCatch {
-            appData.getTeacherInfo(mobileNumber, hashedPassCode)//Teacher(adminRef = "")
+            appData.getTeacherInfo(mobileNumber, hashedPassCode)
         }
         println(loggedInUser)
         return loggedInUser
+    }
+
+    fun hashPassCode(sixDigitPassCode: String): String {
+        val md5Hashing = MessageDigest.getInstance("MD5")
+        md5Hashing.update(sixDigitPassCode.toByteArray())
+        return BigInteger(1, md5Hashing.digest()).toString(16)
     }
 
     suspend fun fetchTeachersForAdmin(): List<Teacher> {
@@ -199,20 +200,30 @@ class AppCore {
         }
     }
 
-    suspend fun saveSchool(school: School): School {
+    suspend fun saveOrUpdate(school: School): School {
         school.adminRef = loggedInUser.adminInfo!!.id.toString()
-
-        if (school.location == null || school.location!!.latitude == DEFAULT_LOC.latitude && school.location!!.longitude == DEFAULT_LOC.longitude) throw AppCoreException(
-            SCHOOL_LOCATION_NOT_ADDED.message
-        )
-        if (school.name.isNullOrBlank() || school.uniqueCode.isNullOrBlank() || school.address.isNullOrBlank() || school.postalCode.isNullOrBlank())
+        
+        if (school.name.isNullOrBlank() || school.uniqueCode.isNullOrBlank())
             throw AppCoreException(SCHOOL_INCOMPLETE_INFO.message)
 
+        val isSchoolWithSameNameAndUniqueCodeAlreadySaved = appData.getSchoolInfo(
+            adminRef = school.adminRef!!,
+            name = school.name!!,
+            uniqueCode = school.uniqueCode!!
+        ) != null
+        
+        if (school.id.isNullOrBlank() && isSchoolWithSameNameAndUniqueCodeAlreadySaved)
+            throw AppCoreException(SCHOOL_ALREADY_EXISTS.message)
+        
+        if (school.location == null && school.address.isNullOrBlank() || school.postalCode.isNullOrBlank()) throw AppCoreException(
+            SCHOOL_LOCATION_NOT_ADDED.message
+        )
+        
         return runWithCatch {
-            appData.saveSchool(school)
+            appData.saveOrUpdate(school)
         }
     }
-
+    
     suspend fun checkinToSession(
         teacherCurrentLocation: Location,
         schoolLocation: Location,
@@ -280,6 +291,10 @@ class AppCore {
         return allSessions.filter { session ->
             session.weekDaysInfo[LocalDate.now().dayOfWeek.value - 1]
         }
+    }
+
+    suspend fun loadSchool(schoolId: String): School {
+        return AppData.instance.loadSchool(schoolId) 
     }
 }
 

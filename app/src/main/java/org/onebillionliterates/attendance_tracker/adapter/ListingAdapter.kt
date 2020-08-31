@@ -43,7 +43,7 @@ class ListingAdapter(
                     info.selected = true
                     bottomDialogDismiss?.dismiss()
                     if (::adapterCellListener.isInitialized)
-                        adapterCellListener.onAdapterItemClicked(position)
+                        adapterCellListener.onAdapterItemClicked(info)
                 }
                 return
             }

@@ -7,8 +7,6 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -16,35 +14,26 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.jakewharton.threetenabp.AndroidThreeTen
 import com.schibstedspain.leku.*
-import com.shasin.notificationbanner.Banner
 import kotlinx.android.synthetic.main.school_create.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_ADD_ACTIVITY
 import org.onebillionliterates.attendance_tracker.ActivityRequestCodes.SCHOOL_MAP_ACTIVITY
 import org.onebillionliterates.attendance_tracker.data.AppCore
-import org.onebillionliterates.attendance_tracker.data.AppCore.Companion.DEFAULT_LOC
-import org.onebillionliterates.attendance_tracker.data.AppCoreException
-import org.onebillionliterates.attendance_tracker.data.MESSAGES
+import org.onebillionliterates.attendance_tracker.data.MESSAGES.SCHOOL_SAVED_MESSAGE
 import org.onebillionliterates.attendance_tracker.data.School
 import org.onebillionliterates.attendance_tracker.drawables.MobileDrawable
 import org.onebillionliterates.attendance_tracker.drawables.SchoolSolidDrawable
 
 
-class AddSchoolActivity : AppCompatActivity() {
-    private val TAG = "AddSchool_Activity"
-    private lateinit var rootView: View
+class AddSchoolActivity : ActivityUIHandler() {
     private lateinit var embeddedMap: GoogleMap
     private lateinit var school: School
-    private var bannerType = Banner.SUCCESS
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.school_create)
+        this.TAG = "AddSchool_Activity"
+        this.progressTracker = createSchoolProgress
+
         actionBar?.setDisplayHomeAsUpEnabled(true)
         initView()
     }
@@ -61,63 +50,68 @@ class AddSchoolActivity : AppCompatActivity() {
 
 
     private fun initView() {
-        rootView = window.decorView.rootView
-        school = School()
         schoolNameIcon.setImageDrawable(SchoolSolidDrawable(this))
         phoneIcon.setImageDrawable(MobileDrawable(this))
-        searchSchool.setOnClickListener {
-            val locationPickerIntent = LocationPickerActivity.Builder()
-                .withLocation(DEFAULT_LOC)
-                .withSearchZone("en_IN")
-                .build(applicationContext)
-
-            startActivityForResult(locationPickerIntent, SCHOOL_MAP_ACTIVITY.requestCode)
-        }
-        addLocationToMap()
-        addSchool.setOnClickListener {
-            GlobalScope.launch(Dispatchers.Main) {
-                createSchoolProgress.visibility = View.VISIBLE
-                bannerType = Banner.SUCCESS
-                var message = MESSAGES.SCHOOL_SAVED_MESSAGE.message
-                val job = GlobalScope.launch(Dispatchers.IO) {
-                    try {
-                        school.name = schoolNameEditText.text.toString()
-                        school.uniqueCode = uniqueCodeEditText.text.toString()
-
-                        AppCore.instance.saveSchool(school)
-                    } catch (exception: Exception) {
-                        bannerType = Banner.ERROR
-                        message = MESSAGES.DATA_VALIDATION_FAILURE.message
-                        if (exception is AppCoreException)
-                            message = exception.message
-
-                        Log.e(TAG, "Error during saving school", exception)
-                    }
+        uiHandler(
+            {
+                val schoolId = intent.extras?.getString(ActivityRequestCodes.SCHOOL_UPDATE_ACTIVITY.name)
+                if (schoolId.isNullOrEmpty()) {
+                    // Setting Bangalore as Default location
+                    val defaultLocation = Location("DEFAULT")
+                    defaultLocation.latitude = 12.9542946 
+                    defaultLocation.longitude = 77.4908551
+                    
+                    school = School(
+                        location = defaultLocation
+                    )
+                    return@uiHandler
                 }
-                job.join()
-                createSchoolProgress.visibility = View.GONE
-                val infoBanner = Banner.make(rootView, this@AddSchoolActivity, bannerType, message, Banner.TOP)
-                infoBanner.bannerView.setOnClickListener {
-                    infoBanner.dismissBanner()
-                    if (Banner.SUCCESS == bannerType) {
-                        setResult(Activity.RESULT_OK )
-                        finish()
-                    }
+                
+                school = AppCore.instance.loadSchool(schoolId)
+            },
+            {
+                if(!school.name.isNullOrEmpty() && !school.uniqueCode.isNullOrEmpty()){
+                    schoolNameEditText.setText(school.name)
+                    uniqueCodeEditText.setText(school.uniqueCode)
                 }
+                
+                addLocationToMap()
 
-                infoBanner.show()
+                addSchool.setOnClickListener {
+                    uiHandler(
+                        {
+                            school.name = schoolNameEditText.text.toString()
+                            school.uniqueCode = uniqueCodeEditText.text.toString()
+                            AppCore.instance.saveOrUpdate(school)
+                        },
+                        {
+                            showSuccessBanner(SCHOOL_SAVED_MESSAGE.message)
+                        }
+                    )
+                }
             }
-        }
+        )
     }
 
-    private fun addLocationToMap(position: LatLng = DEFAULT_LOC) {
+    private fun addLocationToMap() {
+        val position = LatLng(school.location!!.latitude, school.location!!.longitude)
+        
         val mapFragment = schoolAddressDescription as SupportMapFragment
         with(mapFragment) {
             onCreate(null)
             getMapAsync() {
                 MapsInitializer.initialize(applicationContext)
-                setMapLocation(it, position, "Bangalore")
+                setMapLocation(it, position, "Default location")
             }
+        }
+
+        searchSchool.setOnClickListener {
+            val locationPickerIntent = LocationPickerActivity.Builder()
+                .withLocation(position)
+                .withSearchZone("en_IN")
+                .build(applicationContext)
+
+            startActivityForResult(locationPickerIntent, SCHOOL_MAP_ACTIVITY.requestCode)
         }
     }
 
@@ -137,9 +131,9 @@ class AddSchoolActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {
             Log.d("RESULT****", "OK")
-            val latitude = data.getDoubleExtra(LATITUDE, DEFAULT_LOC.latitude)
+            val latitude = data.getDoubleExtra(LATITUDE, school.location!!.latitude)
             Log.d("LATITUDE****", latitude.toString())
-            val longitude = data.getDoubleExtra(LONGITUDE, DEFAULT_LOC.longitude)
+            val longitude = data.getDoubleExtra(LONGITUDE, school.location!!.longitude)
             Log.d("LONGITUDE****", longitude.toString())
             val address = data.getStringExtra(LOCATION_ADDRESS)
             Log.d("ADDRESS****", address.toString())
